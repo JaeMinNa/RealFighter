@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9dffb1d9e509547c5ac76447d33d1746
+guid: 3a46743f698be544ea55ec1095d0fd0f
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -133,10 +133,3 @@ TextureImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 194741
-  packageName: GUI Pro - Survival Clean
-  packageVersion: 2.0.5
-  assetPath: Assets/Layer Lab/GUI Pro-SurvivalClean/ResourcesData/Sprites/Demo/Demo_Character/Character06_05.png
-  uploadId: 765468

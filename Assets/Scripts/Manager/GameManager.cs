@@ -87,6 +87,8 @@ public class GameManager : Singleton<GameManager>
         //_ = PoolManager.Instance;
         //_ = BackKeyManager.Instance;
         //_ = RedPointManager.Instance;
+        _ = DataManager.Instance;
+        _ = ScenesManager.Instance;
     }
 
     public void ExitGame()
@@ -217,21 +219,21 @@ public class GameManager : Singleton<GameManager>
 
     #endregion
 
-    #region UserData
-    public void LoadUserData(string Data)
-    {
-        List<string> DataList = Data.Split('&').ToList();
+    //#region UserData
+    ////public void LoadUserData(string Data)
+    ////{
+    ////    List<string> DataList = Data.Split('&').ToList();
 
-        for (int count = 0; count < DataList.Count; ++count)
-        {
-            string[] Datas = DataList[count].Split('$');
+    ////    for (int count = 0; count < DataList.Count; ++count)
+    ////    {
+    ////        string[] Datas = DataList[count].Split('$');
 
-            switch (Datas[0])
-            {
-                // 유저 기본 데이터
-                case nameof(UserData_Common): User.SetUserCommonData(Util.ToObjectJson<UserData_Common>(Datas[1])); break;
-            }
-        }
-    }
-    #endregion
+    ////        switch (Datas[0])
+    ////        {
+    ////            // 유저 기본 데이터
+    ////            case nameof(UserData_Common): User.SetUserCommonData(Util.ToObjectJson<UserData_Common>(Datas[1])); break;
+    ////        }
+    ////    }
+    ////}
+    //#endregion
 }

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: c2d4a61fc5ecb44c081ebd99855672f0
+guid: 87ab1305f0d1d8642817589b4c914e9c
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -133,10 +133,3 @@ TextureImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 194741
-  packageName: GUI Pro - Survival Clean
-  packageVersion: 2.0.5
-  assetPath: Assets/Layer Lab/GUI Pro-SurvivalClean/ResourcesData/Sprites/Demo/Demo_Character/Character_Zombie_02.png
-  uploadId: 765468

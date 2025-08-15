@@ -10,69 +10,6 @@ using UnityEngine.UI;
 
 public static class Util
 {
-    public static string MakeServerPacket(PacketType packetType, string data)
-    {
-        ServerPacket serverPacket = new ServerPacket()
-        {
-            PacketType = packetType,
-            StateType = PacketState.None,
-            Data = data
-        };
-
-        return ToJson(serverPacket);
-    }
-
-    // 패킷을 만들 때 사용한다
-    public static string MakeGamePacket(ContentsType type, PacketHeader head, List<PacketBody> body = default)
-    {
-        GamePacket gamePacket = new GamePacket()
-        {
-            ContentsType = type,
-            HeaderData = head,
-            BodyData = body
-        };
-
-        return ToJson(gamePacket);
-    }
-
-    // 패킷에 포함될 HeaderData, BodyData를 만들 때 사용한다
-    public static PacketHeader MakeHeaderData(Enum subContentsType, string data = "")
-    {
-        var header = new PacketHeader()
-        {
-            ContentsIndex = subContentsType.GetHashCode(),
-            Success = true,
-            Data = data,
-        };
-
-        return header;
-    }
-
-    public static string MakeData(string separator = "#", List<string> datas = null)
-    {
-        if (datas == null)
-            return string.Empty;
-
-        return string.Join(separator, datas.ToArray());
-    }
-
-    public static string MakeData(string data1 = "", string data2 = "", string data3 = "", string data4 = "")
-    {
-        if (string.IsNullOrEmpty(data1))
-            return string.Empty;
-
-        if (string.IsNullOrEmpty(data2))
-            return $"{data1}";
-
-        if (string.IsNullOrEmpty(data3))
-            return $"{data1}#{data2}";
-
-        if (string.IsNullOrEmpty(data4))
-            return $"{data1}#{data2}#{data3}";
-
-        return $"{data1}#{data2}#{data3}#{data4}";
-    }
-
     #region Json
     public static T ToObjectJson<T>(string JsonData)
     {
