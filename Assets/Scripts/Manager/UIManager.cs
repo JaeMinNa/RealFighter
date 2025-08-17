@@ -71,7 +71,7 @@ public class UIManager : Singleton<UIManager>
         m_UIRootObjects = new Dictionary<UI, Canvas>();
         m_UIDictionary = new ConcurrentDictionary<Type, UIElement>();
 
-        SpriteAtlasManager.atlasRequested += RequestAtlas;
+        //SpriteAtlasManager.atlasRequested += RequestAtlas;
     }
 
     public override void DestroyInstance()
@@ -309,49 +309,42 @@ public class UIManager : Singleton<UIManager>
         }
     }
 
-    //public void CloseAll()
-    //{
-    //    Dictionary<Type, UIElement> DontRemove = new Dictionary<Type, UIElement>();
+    public void CloseAll()
+    {
+        Dictionary<Type, UIElement> notRemove = new Dictionary<Type, UIElement>();
 
-    //    if (m_UIDictionary.ContainsKey(typeof(LobbyWindow)))
-    //    {
-    //        DontRemove.Add(typeof(LobbyWindow), m_UIDictionary[typeof(LobbyWindow)]);
-    //        m_UIDictionary.TryRemove(typeof(LobbyWindow), out _);
-    //    }
+        if (m_UIDictionary.ContainsKey(typeof(LobbyWindow)))
+        {
+            notRemove.Add(typeof(LobbyWindow), m_UIDictionary[typeof(LobbyWindow)]);
+            m_UIDictionary.TryRemove(typeof(LobbyWindow), out _);
+        }
 
-    //    if (m_UIDictionary.ContainsKey(typeof(TopWindow)))
-    //    {
-    //        DontRemove.Add(typeof(TopWindow), m_UIDictionary[typeof(TopWindow)]);
-    //        m_UIDictionary.TryRemove(typeof(TopWindow), out _);
-    //    }
+        //if (m_UIDictionary.ContainsKey(typeof(TopWindow)))
+        //{
+        //    notRemove.Add(typeof(TopWindow), m_UIDictionary[typeof(TopWindow)]);
+        //    m_UIDictionary.TryRemove(typeof(TopWindow), out _);
+        //}
 
-    //    if (m_UIDictionary.ContainsKey(typeof(FadeWindow)))
-    //    {
-    //        DontRemove.Add(typeof(FadeWindow), m_UIDictionary[typeof(FadeWindow)]);
-    //        m_UIDictionary.TryRemove(typeof(FadeWindow), out _);
-    //    }
+        foreach (var ui in m_UIDictionary)
+        {
+            if (ui.Value != null)
+            {
+                ui.Value.OnClose();
+                Destroy(ui.Value.gameObject);
+            }
+            else
+            {
+                Debug.LogWarning($"{ui.Key} is aready remove");
+            }
+        }
 
-    //    foreach (var UI in m_UIDictionary)
-    //    {
-    //        if (UI.Value != null)
-    //        {
-    //            UI.Value.OnClose();
-    //            Destroy(UI.Value.gameObject);
-    //        }
-    //        else
-    //        {
-    //            Debug.LogWarning(UI.Key.ToString());
-    //        }
-    //    }
+        m_UIDictionary.Clear();
 
-    //    m_UIDictionary.Clear();
+        foreach (var UI in notRemove)
+            m_UIDictionary.TryAdd(UI.Key, UI.Value);
 
-    //    foreach (var UI in DontRemove)
-    //        m_UIDictionary.TryAdd(UI.Key, UI.Value);
-
-    //    BackKeyManager.Instance.UnRegistAll();
-    //    //RedPointManager.Instance.RemoveAllAction();
-    //}
+        //RedPointManager.Instance.RemoveAllAction();
+    }
 
     public void Refresh()
     {
@@ -365,10 +358,10 @@ public class UIManager : Singleton<UIManager>
         //TutorialManager.Instance.AddTargetUIListeners().Forget();
     }
 
-    //public void OpenSystemPopup(MessageData Data)
-    //{
-    //    Open<Popup_System>(UI.Popup, "Prefab/UI/Popup/Popup_System", new List<object> { Data }, IsBundle: false);
-    //}
+    public void OpenSystemPopup(MessageData Data)
+    {
+        Open<Popup_System>(UI.Popup, "Prefabs/UI/Popup/Popup_System", new List<object> { Data });
+    }
 
     //public async UniTask OpenPurchasePopup(List<object> Args)
     //{

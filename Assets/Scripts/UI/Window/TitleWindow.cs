@@ -10,7 +10,7 @@ public class TitleWindow : UIElement
 
     #region Override Method
     public override void Init()
-    {
+    {     
         Btn_Start.onClick.AddListener(OnClick_Start);
     }
 

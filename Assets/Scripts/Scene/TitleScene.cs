@@ -10,6 +10,9 @@ public class TitleScene : MonoBehaviour
         // GameManager 셋팅
         GameManager.Instance.InitDefaultManager();
 
+        // 첫 Scene에서는 수동으로 DataLoader를 셋팅
+        DataManager.Instance.SetDataLoader();
+
         // 최초의 데이터 로드
         DataManager.Instance.LoadData();
 

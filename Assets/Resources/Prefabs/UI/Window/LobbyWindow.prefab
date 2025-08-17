@@ -5021,6 +5021,12 @@ MonoBehaviour:
   Text_Level: {fileID: 7257332788002036453}
   Text_Hero: {fileID: 1788291016286465947}
   Text_Gold: {fileID: 1788291016052603455}
+  Btn_Setting: {fileID: 1788291015889290104}
+  Btn_PVP: {fileID: 1788291016494014998}
+  Btn_Training: {fileID: 1788291016003439593}
+  Btn_Hero: {fileID: 1788291015243106410}
+  Btn_Shop: {fileID: 1788291015768838265}
+  Btn_Ranking: {fileID: 1788291014758024700}
 --- !u!1 &1788291015741329136
 GameObject:
   m_ObjectHideFlags: 0

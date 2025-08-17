@@ -66,7 +66,7 @@ public class GameManager : Singleton<GameManager>
     #endregion
 
     #region Public Method
-    public static bool IsEditor
+    public bool IsEditor
     {
         get
         {

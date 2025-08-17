@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 public class DataManager : Singleton<DataManager>
@@ -56,7 +57,8 @@ public class DataManager : Singleton<DataManager>
     {
         if (m_DataLoader == null)
         {
-            SetDataLoader();
+            Debug.LogWarning("DataLoader is null");
+            return;
         }
 
         ES3.Save("UserData", m_DataLoader);
@@ -67,9 +69,10 @@ public class DataManager : Singleton<DataManager>
     [ContextMenu("Load Data")]
     public void LoadData()
     {
-        if(m_DataLoader == null)
+        if (m_DataLoader == null)
         {
-            SetDataLoader();
+            Debug.LogWarning("DataLoader is null");
+            return;
         }
 
         if (ES3.FileExists("SaveFile.txt"))
@@ -83,16 +86,33 @@ public class DataManager : Singleton<DataManager>
             Debug.LogWarning("UserData 로드 실패");
 
             SetUserData();
-            Debug.LogWarning("UserData 생성 성공");
-
-            SaveData();
         }
     }
 
     public void DeleteData()
     {
         // 데이터 삭제
-        ES3.DeleteFile("SaveFile.txt"); // 저장 파일 이름
+        ES3.DeleteFile("SaveFile.txt");
+        Debug.LogWarning("UserData 삭제 성공");
+
+        // PlayerPrefs 삭제
+        PlayerPrefs.DeleteAll();
+        Debug.LogWarning("PlayerPrefs 삭제 성공");
+
+        // 게임 종료
+        ExitGame();
+    }
+
+    public void ExitGame()
+    {
+        if(GameManager.Instance.IsEditor)
+        {
+            EditorApplication.isPlaying = false;
+        }
+        else
+        {
+            Application.Quit();
+        }
     }
 
     // 현재 씬에서 DataLoader를 새로 설정해 준다.
@@ -140,6 +160,8 @@ public class DataManager : Singleton<DataManager>
         userData_Hero.MyHeroes.Add(heroData);
 
         m_DataLoader.UserHeroData = userData_Hero;
+
+        Debug.LogWarning("UserData 생성 성공");
     }
     #endregion
 }
