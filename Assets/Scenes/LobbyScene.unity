@@ -588,7 +588,6 @@ GameObject:
   m_Component:
   - component: {fileID: 423474868}
   - component: {fileID: 423474867}
-  - component: {fileID: 423474866}
   m_Layer: 0
   m_Name: Easy Save 3 Manager
   m_TagString: Untagged
@@ -596,48 +595,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &423474866
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 423474865}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9107aee0ced90422da95f0b31680501f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  key: d2de0fc3-e8f9-4542-8b0a-8534ac8945fb
-  immediatelyCommitToFile: 1
-  saveEvent: 1
-  loadEvent: 2
-  settings:
-    _location: 4
-    path: SaveFile.es3
-    encryptionType: 0
-    compressionType: 0
-    encryptionPassword: password
-    directory: 0
-    format: 0
-    prettyPrint: 1
-    bufferSize: 2048
-    saveChildren: 1
-    postprocessRawCachedData: 0
-    storeCacheAtEndOfEveryFrame: 1
-    storeCacheOnApplicationQuit: 1
-    storeCacheOnApplicationPause: 1
-    autoCacheDefaultFile: 1
-    autoCacheFileOnLoad: 1
-    typeChecking: 1
-    safeReflection: 1
-    memberReferenceMode: 0
-    referenceMode: 2
-    serializationDepthLimit: 64
-    assemblyNames:
-    - Assembly-CSharp-firstpass
-    - Assembly-CSharp
-    showAdvancedSettings: 0
 --- !u!114 &423474867
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -654,7 +611,7 @@ MonoBehaviour:
   openPrefabs: 0
   prefabs: []
   idRef:
-    _Keys: 7f95c8301ab4e55328d96ea8093f796e07f8c57ddc401045e3dd96422aaf742a4359917019a22071d6cc0e7772155214de0efbfa7d0d4749621c83c8f4ba476954fdb73f25cf0034aa9b1ace74e1682cd8503822b541362de90c551c8653493a0c18c9a3c23c451bae1d912e0d83a7032813694134e6381ed38eff6032f4de335886b8441aef4e57cf628c342b989a0dcc94f9dd521ee87f4955aba780c30a1ffb31f197aaee1e5b91ce538b2236211597a8453bb1db9d07641f2b17212d635d61e88735864ec3218b6192df8e8b5d11cb69c1d6f6b92e1f94e9328bc30739423c4392271e362d0ff20b63d8fcb44c3f373045d123e4783cabcf3f5264163c6ce9659c929281a14346d82ae274027048cc87787c9a9bf238517e9745acdc2b688e917c01a24040498e018a4aba96c752418886dc9dc0d27b57d4e31018e7ef23049370067e72ea74b8d0f463dac20c18ba15fadba9b13532bf015977245162581266462725c0d34d73fb956eb536556ac8ca5603ec1379535e3dc57fcb61990aceb2ae8c831a0d0641ac4ea546a3e877acee3feea7654501ecf3c9e8fb53822b95a0a10287c9e71d29a33ec03a2bf345abb2d4455e774e676ead7876e3f502112a223ae745eafe1df8dd39fbd97a39181af16d51d738751c523995d9507039335fd215a39925746a4f0ec1c34eb5be17196fa20d774fc6639757387f7fd86d69e99363f99a69813e67d7a0e6f9386b0707530c40ecb8540f0cb10b42ecf5ea7660a8531ee6484d7c101e8cb00f53a22fc240772ccb2d7c5ee972054c75c32b5b3de879ae1bb2df4fa1894f0b45051f60543a7fac7dbeaa7226b236734201074b0ccf120733aeb51061288b42dd7119126d9a5e4fbd28267fc3f92c3216ac6e5d7064008a0de8d35a31cfd9095dc0b45a856f4a5532689569cc48e1dc6056091ca993ca2ddbe8270e96e9b14172a32056934735b1222fb32b909667cecb91fd18
+    _Keys: 7f95c8301ab4e55328d96ea8093f796e07f8c57ddc401045e3dd96422aaf742a4359917019a22071d6cc0e7772155214de0efbfa7d0d4749621c83c8f4ba4769aa9b1ace74e1682cd8503822b541362de90c551c8653493a0c18c9a3c23c451bae1d912e0d83a7032813694134e6381ed38eff6032f4de33cf628c342b989a0dcc94f9dd521ee87f4955aba780c30a1ffb31f197aaee1e5b91ce538b2236211597a8453bb1db9d07641f2b17212d635d61e88735864ec3218b6192df8e8b5d11cb69c1d6f6b92e1f94e9328bc30739423c4392271e362d0ff20b63d8fcb44c3f373045d123e4783cabcf3f5264163c6ce9659c929281a14346d82ae274027048cc87787c9a9bf238517e9745acdc2b688e917c01a24040498e018a4aba96c752418886dc9dc0d27b57d4e31018e7ef23049370067e72ea74b8d0f463dac20c18ba15fadba9b13532bf015977245162581266462725c0d34d73fb956eb536556ac8ca5603ec1379535e3dc57fcb61990aceb2ae8c831a0d0641ac4ea546a3e877acee3feea7654501ecf3c9e8fb53822b95a0a10287c9e71d29a33ec03a2bf345abb2d4455e774e676ead7876e3f502112a223ae745eafe1df8dd39fbd97a39181af16d51d738751c523995d9507039335fd215a39925746a4f0ec1c34eb5be17196fa20d774fc6639757387f7fd86d69e99363f99a69813e67d7a0e6f9386b0707530c40ecb8540f0cb10b42ecf5ea7660a8531ee6484d7c101e8cb00f53a22fc240772ccb2d7c5ee972054c75c32b5b3de879ae1bb2df4fa1894f0b45051f60543a7fac7dbeaa7226b236734201074b0ccf120733aeb51061288b42dd7119126d9a5e4fbd28267fc3f92c3216ac6e5d7064008a0de8d35a31cfd9095dc0b45a856f4a5532689569cc48e1dc6056091ca993ca2ddbe8270e96e9b14172a32056934735b1222fb32b909667cecb91fd18
     _Values:
     - {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
     - {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
@@ -664,7 +621,6 @@ MonoBehaviour:
     - {fileID: 11500000, guid: ccf1aba9553839d41ae37dd52e9ebcce, type: 3}
     - {fileID: 11500000, guid: 97c23e3b12dc18c42a140437e53d3951, type: 3}
     - {fileID: 11400000, guid: 10fc4df2da32a41aaa32d77bc913491c, type: 2}
-    - {fileID: 2800000, guid: 32b23d5d74f3aee4f9364e34e2f59379, type: 3}
     - {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
     - {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
     - {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
@@ -672,7 +628,6 @@ MonoBehaviour:
     - {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
     - {fileID: 11500000, guid: 39fa3d8997a24136984ca6e2c99902bc, type: 3}
     - {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
-    - {fileID: 2800000, guid: 3028dc075ba8c584d9bc7d1e0255e038, type: 3}
     - {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
     - {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
     - {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}

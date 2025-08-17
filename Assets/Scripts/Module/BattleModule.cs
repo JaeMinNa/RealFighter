@@ -1,5 +1,6 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using Unity.VisualScripting;
 
 public class BattleModule : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class BattleModule : MonoBehaviour
     protected GameObject m_CharacterRoot = null;
     protected GameObject m_CameraRoot = null;
     protected GameObject m_EnvironmentRoot = null;
+
+    protected bool m_IsStartGame = false;
     #endregion
 
     #region Instance
@@ -50,27 +53,31 @@ public class BattleModule : MonoBehaviour
     }
     #endregion
 
+    #region Unity Method
+    protected virtual void Update()
+    {
+
+    }
+
+    #endregion
+
     // BattleModule을 상속받는 Module에서 대부분 공통으로 사용하는 기능을 구현
     // 자식 Module에서 구현하지 않아도 된다.
     #region Virtual Method
     // 게임 시작
     // 로드 할 내용이 많이 때문에 Delay를 준다.
-    protected async virtual void StartGame()
+    public async virtual UniTask StartGame()
     {
-        // 1. UI
-        LoadUI();
+        // 1. 모든 UI 닫기
+        UIManager.Instance.CloseAll();
 
         await UniTask.Delay(100);
 
-        // 2.
+        //// 2.
 
-        await UniTask.Delay(100);
+        //await UniTask.Delay(100);
 
-        // 3.
-
-        await UniTask.Delay(100);
-
-        // ....
+        //// ....
     }
 
     // 게임 끝
@@ -86,25 +93,15 @@ public class BattleModule : MonoBehaviour
         //m_IsPause = true;
         //m_IsEndGame = true;
 
+        m_IsStartGame = false;
+
         // Module 제거
         DestroyModule();
     }
-
-    // UI 세팅
-    public virtual void LoadUI()
-    {
-        UIManager.Instance.CloseAll();
-    }
-
     #endregion
 
     // BattleModule을 상속받는 module에서 별다른 구현 없이 공통적으로 사용하는 기능을 구현
     #region Public Method
-    public void Initialize()
-    {
-        StartGame();
-    }
-
     public bool IsModule<T>() where T : BattleModule
     {
         return this is T;

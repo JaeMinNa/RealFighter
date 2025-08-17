@@ -7,18 +7,16 @@ public class GameScene : MonoBehaviour
     [SerializeField] private GameObject Root_UI = null;
     [SerializeField] private GameObject Root_Character = null;
 
-    private void Start()
+    private async void Start()
     {
         // Module 持失
-        if(BattleModule.Instance == null)
-        {
-            BattleModule.CreateModule<PVPModule>();
-            BattleModule.Instance.SetRootObject(Root_Camera, Root_Environment, Root_Character);
-            BattleModule.Instance.Initialize();
-        }
+        BattleModule.CreateModule<PVPModule>();
+        BattleModule.Instance.SetRootObject(Root_Camera, Root_Environment, Root_Character);
+        await BattleModule.Instance.StartGame();
 
+        // IngameWindow 持失
         UIManager.Instance.SetUIRoot(Root_UI);
         UIManager.Instance.SetActiveRoot(UI.BackGround, false);
-        UIManager.Instance.Open<TitleWindow>(UI.Main, "Prefabs/UI/Window/IngameWindow");
+        UIManager.Instance.Open<IngameWindow>(UI.Main, "Prefabs/UI/Window/IngameWindow");
     }
 }

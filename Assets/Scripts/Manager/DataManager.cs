@@ -52,6 +52,7 @@ public class DataManager : Singleton<DataManager>
     #endregion
 
     #region public Method
+    #region Data
     [ContextMenu("Save Data")]
     public void SaveData()
     {
@@ -103,6 +104,24 @@ public class DataManager : Singleton<DataManager>
         ExitGame();
     }
 
+    // 현재 씬에서 DataLoader를 새로 설정해 준다.
+    public void SetDataLoader()
+    {
+        m_DataLoader = GameObject.Find("DataLoader").GetComponent<DataLoader>();
+    }
+
+    public UserData GetMyUserData()
+    {
+        return m_DataLoader.MyUserData;
+    }
+
+    public UserData GetAIUserData()
+    {
+        return SetAIUserData();
+    }
+    #endregion
+
+    #region Game
     public void ExitGame()
     {
         if(GameManager.Instance.IsEditor)
@@ -114,23 +133,15 @@ public class DataManager : Singleton<DataManager>
             Application.Quit();
         }
     }
-
-    // 현재 씬에서 DataLoader를 새로 설정해 준다.
-    public void SetDataLoader()
-    {
-        m_DataLoader = GameObject.Find("DataLoader").GetComponent<DataLoader>();
-    }
-
-    public DataLoader GetDataLoader()
-    {
-        return m_DataLoader;
-    }
+    #endregion
     #endregion
 
     #region Private Method
     // 저장된 데이터가 없을 때, 최초로 불러오는 유저 데이터
     private void SetUserData()
     {
+        m_DataLoader.MyUserData = new UserData();
+
         // Common
         UserData_Common userData_Common = new UserData_Common()
         {
@@ -142,7 +153,7 @@ public class DataManager : Singleton<DataManager>
             Gold = 0
         };
 
-        m_DataLoader.UserCommonData = userData_Common;
+        m_DataLoader.MyUserData.UserCommonData = userData_Common;
 
         // Hero
         HeroData heroData = new HeroData()
@@ -159,9 +170,40 @@ public class DataManager : Singleton<DataManager>
         userData_Hero.EquipHero = heroData;
         userData_Hero.MyHeroes.Add(heroData);
 
-        m_DataLoader.UserHeroData = userData_Hero;
+        m_DataLoader.MyUserData.UserHeroData = userData_Hero;
 
         Debug.LogWarning("UserData 생성 성공");
+    }
+
+    private UserData SetAIUserData()
+    {
+        UserData AIUserData = new UserData();
+
+        // Common
+        UserData_Common aiData_Common = new UserData_Common()
+        {
+            AccountCode = "AI",
+            UID = "AI",
+            NickName = TextUtil.GetRandomAINickName(),
+            Score = RandomUtil.GetRandomIndex(0, 5),
+            Image = RandomUtil.GetRandomIndex(1, 5).ToString(),
+            Gold = 0
+        };
+
+        AIUserData.UserCommonData = aiData_Common;
+
+        // Hero
+        HeroData heroData = HeroUtil.GetRandomAIHeroData();
+
+        UserData_Hero aiData_Hero = new UserData_Hero();
+        aiData_Hero.EquipHero = heroData;
+        aiData_Hero.MyHeroes.Add(heroData);
+
+        AIUserData.UserHeroData = aiData_Hero;
+
+        Debug.LogWarning("EnemyUserData 생성 성공");
+
+        return AIUserData;
     }
     #endregion
 }

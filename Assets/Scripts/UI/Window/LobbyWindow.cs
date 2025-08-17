@@ -54,11 +54,11 @@ public class LobbyWindow : UIElement
     #region Private Method
     private void SetTopUI()
     {
-        Text_NickName.text = DataManager.Instance.GetDataLoader().UserCommonData.NickName;
-        Img_Character.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Character/Character_{DataManager.Instance.GetDataLoader().UserCommonData.Image}");
-        Text_Level.text = DataManager.Instance.GetDataLoader().UserHeroData.EquipHero.Level.ToString();
-        Text_Hero.text = DataManager.Instance.GetDataLoader().UserHeroData.EquipHero.HeroName;
-        Text_Gold.text = DataManager.Instance.GetDataLoader().UserCommonData.Gold.ToString();
+        Text_NickName.text = DataManager.Instance.GetMyUserData().UserCommonData.NickName;
+        Img_Character.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Character/Character_{DataManager.Instance.GetMyUserData().UserCommonData.Image}");
+        Text_Level.text = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level.ToString();
+        Text_Hero.text = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName;
+        Text_Gold.text = DataManager.Instance.GetMyUserData().UserCommonData.Gold.ToString();
     }
     #endregion
 

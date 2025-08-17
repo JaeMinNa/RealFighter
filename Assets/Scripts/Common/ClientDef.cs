@@ -14,6 +14,15 @@ public static class ClientDef
 }
 
 #region UserData
+public class UserData
+{
+    // 유저의 기본 정보
+    public UserData_Common UserCommonData = null;
+
+    // 유저의 히어로 정보
+    public UserData_Hero UserHeroData = null;
+}
+
 public class UserData_Common
 {
     public string AccountCode = string.Empty;

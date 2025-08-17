@@ -5682,7 +5682,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &286563592606285462
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6508,10 +6508,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Player Name
+  m_text: Lazyzz
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 38aecd77a18d544bfb836befe83883b7, type: 2}
-  m_sharedMaterial: {fileID: 6434564289584660316, guid: 38aecd77a18d544bfb836befe83883b7, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b47e6dda10077cd478e199b032893946, type: 2}
+  m_sharedMaterial: {fileID: 8009923162452323068, guid: b47e6dda10077cd478e199b032893946, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7115,9 +7115,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 0}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 3500
+  m_MaxValue: 100
   m_WholeNumbers: 0
-  m_Value: 2350
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -7718,6 +7718,20 @@ MonoBehaviour:
   UIName: 
   RectTransform: {fileID: 0}
   UIParent: 0
+  Text_Time: {fileID: 286563592305925389}
+  Text_Round: {fileID: 5738689124328398747}
+  Text_NickName_Left: {fileID: 2503864769413860328}
+  Text_Score_Left: {fileID: 286563592243808603}
+  Text_Hp_Left: {fileID: 286563592446987982}
+  Slider_Hp_Left: {fileID: 286563592874438855}
+  Img_Hero_Left: {fileID: 2503864768329543948}
+  Text_Level_Left: {fileID: 2061707757598454741}
+  Text_NickName_Right: {fileID: 286563592724285135}
+  Text_Score_Right: {fileID: 286563593448951282}
+  Text_Hp_Right: {fileID: 286563592569247897}
+  Slider_Hp_Right: {fileID: 286563593337573159}
+  Img_Hero_Right: {fileID: 286563592675638151}
+  Text_Level_Right: {fileID: 5806910004698895255}
 --- !u!1 &286563592953732317
 GameObject:
   m_ObjectHideFlags: 0
@@ -9688,9 +9702,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 0}
   m_Direction: 1
   m_MinValue: 0
-  m_MaxValue: 3500
+  m_MaxValue: 100
   m_WholeNumbers: 0
-  m_Value: 1652
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -10648,7 +10662,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &286563593633500101
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13282,10 +13296,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Player Name
+  m_text: Lazyzz
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 38aecd77a18d544bfb836befe83883b7, type: 2}
-  m_sharedMaterial: {fileID: 6434564289584660316, guid: 38aecd77a18d544bfb836befe83883b7, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b47e6dda10077cd478e199b032893946, type: 2}
+  m_sharedMaterial: {fileID: 8009923162452323068, guid: b47e6dda10077cd478e199b032893946, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
