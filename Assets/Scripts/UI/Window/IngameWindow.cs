@@ -17,6 +17,7 @@ public class IngameWindow : UIElement
     [SerializeField] private Slider Slider_Hp_Left = null;
     [SerializeField] private Image Img_Hero_Left = null;
     [SerializeField] private TMP_Text Text_Level_Left = null;
+    [SerializeField] private TMP_Text Text_Hero_Left = null;
 
     [Header("Player_Right")]
     [SerializeField] private TMP_Text Text_NickName_Right = null;
@@ -25,11 +26,12 @@ public class IngameWindow : UIElement
     [SerializeField] private Slider Slider_Hp_Right = null;
     [SerializeField] private Image Img_Hero_Right = null;
     [SerializeField] private TMP_Text Text_Level_Right = null;
+    [SerializeField] private TMP_Text Text_Hero_Right = null;
     #endregion
 
     #region Member Property
     private PVPModule m_PVPModule = null;
-    private bool m_IsLeftPlayer;
+    //private bool m_IsLeftPlayer;
     #endregion
 
     #region Unity Method
@@ -47,8 +49,6 @@ public class IngameWindow : UIElement
     {
         if (m_PVPModule == null)
             m_PVPModule = BattleModule.Instance as PVPModule;
-
-        SetLeftPlayer();
     }
 
     public override void OnClose()
@@ -77,21 +77,9 @@ public class IngameWindow : UIElement
     #endregion
 
     #region Private Method
-    // Player의 위치 결정
-    private void SetLeftPlayer()
-    {
-        // Player의 위치 결정
-        var randomIndex = RandomUtil.GetRandomIndex(0, 1);
-        if (randomIndex == 0)
-            m_IsLeftPlayer = true;
-        else
-            m_IsLeftPlayer = false;
-
-    }
-
     private void SetUI_Player()
     {
-        if(m_IsLeftPlayer)
+        if(m_PVPModule.IsLeftPlayer)
         {
             SetUI_Player_Left(DataManager.Instance.GetMyUserData());
             SetUI_Player_Right(m_PVPModule.EnemyUserData);
@@ -107,20 +95,22 @@ public class IngameWindow : UIElement
     {
         Text_NickName_Left.text = userData.UserCommonData.NickName;
         Text_Score_Left.text = userData.UserCommonData.Score.ToString();
-        Text_Hp_Left.text = $"{(m_IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp)} <#afd9e9>/ {100}";
-        Slider_Hp_Left.value = m_IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp;
+        Text_Hp_Left.text = $"{(m_PVPModule.IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp)} <#afd9e9>/ {100}";
+        Slider_Hp_Left.value = m_PVPModule.IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp;
         Img_Hero_Left.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Character/Character_{userData.UserCommonData.Image}");
         Text_Level_Left.text = userData.UserHeroData.EquipHero.Level.ToString();
+        Text_Hero_Left.text = userData.UserHeroData.EquipHero.HeroName;
     }
 
     private void SetUI_Player_Right(UserData userData)
     {
         Text_NickName_Right.text = userData.UserCommonData.NickName;
         Text_Score_Right.text = userData.UserCommonData.Score.ToString();
-        Text_Hp_Right.text = $"{(!m_IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp)} <#ffc9d6>/ {100}";
-        Slider_Hp_Right.value = !m_IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp;
+        Text_Hp_Right.text = $"{(!m_PVPModule.IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp)} <#ffc9d6>/ {100}";
+        Slider_Hp_Right.value = !m_PVPModule.IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp;
         Img_Hero_Right.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Character/Character_{userData.UserCommonData.Image}");
         Text_Level_Right.text = userData.UserHeroData.EquipHero.Level.ToString();
+        Text_Hero_Right.text = userData.UserHeroData.EquipHero.HeroName;
     }
     #endregion
 }

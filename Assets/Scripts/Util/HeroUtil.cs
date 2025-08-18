@@ -7,7 +7,7 @@ public static class HeroUtil
     #region AI
     public static HeroData GetRandomAIHeroData()
     {
-        List<string> heroNames = new List<string>() { "REX", "BLAZE", "DRAKE", "DOMINICK", "MAVERICK", "STEELTON", "IRIS", "SERENA", "ORIANNA" };
+        List<string> heroNames = new List<string>() { "REX", "BLAZE", "DRAKE", "DOMINICK", "MAVERICK", "STEELTON", "IRIS", "SERENA", "ORIANNA", "JIN" };
         var randomValue = RandomUtil.GetRandomIndex(0, heroNames.Count - 1);
 
         var randomLevel = RandomUtil.GetRandomIndex(1, 5);

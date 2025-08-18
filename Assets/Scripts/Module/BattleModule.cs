@@ -71,11 +71,7 @@ public class BattleModule : MonoBehaviour
         // 1. ¸ðµç UI ´Ý±â
         UIManager.Instance.CloseAll();
 
-        await UniTask.Delay(100);
-
         //// 2.
-
-        //await UniTask.Delay(100);
 
         //// ....
     }

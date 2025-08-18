@@ -63,7 +63,7 @@ public static class RandomUtil
         return -1;
     }
 
-    // startCount ~ endCount 숫자 중 하나의 랜덤 숫자를 가져옴
+    // startNum ~ endNum 숫자 중 하나의 랜덤 숫자를 가져옴
     public static int GetRandomIndex(int startNum, int endNum)
     {
         var randomValue = Random.Range(startNum, endNum + 1);

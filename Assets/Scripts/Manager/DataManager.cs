@@ -158,7 +158,7 @@ public class DataManager : Singleton<DataManager>
         // Hero
         HeroData heroData = new HeroData()
         {
-            HeroName = "JIN",
+            HeroName = "BLAZE",
             SkillDamage_0 = 10,
             SkillDamage_1 = 10,
             SkillDamage_2 = 10,
