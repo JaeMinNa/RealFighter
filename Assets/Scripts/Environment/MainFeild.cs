@@ -4,9 +4,11 @@ public class MainFeild : MonoBehaviour
 {
 
     #region Cashed Object
-    [Header("Player")]
+    [Header("Transfrom")]
+    [SerializeField] private Transform Trs_Field = null;
     [SerializeField] private Transform Trs_Player_Left = null;
     [SerializeField] private Transform Trs_Player_Right = null;
+
     #endregion
 
     private void Start()
@@ -23,6 +25,11 @@ public class MainFeild : MonoBehaviour
             return Trs_Player_Left;
 
         return Trs_Player_Right;
+    }
+
+    public Transform GetTransfromField()
+    {
+        return Trs_Field;
     }
     #endregion
 }

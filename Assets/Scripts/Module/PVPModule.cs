@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class PVPModule : BattleModule
@@ -20,6 +21,8 @@ public class PVPModule : BattleModule
     #endregion
 
     #region Member Property
+    private CinemachineCamera m_Cinemachine = null;
+   private CinemachineSplineDolly m_SplineDolly = null;
     #endregion
 
     #region Unity Method
@@ -58,6 +61,9 @@ public class PVPModule : BattleModule
 
         // 히어로 생성
         CreateHeroes();
+
+        // 카메라 효과
+        await SetCameraMove();
 
         // 모든 준비가 완료 되었을 때
         m_IsStartGame = true;
@@ -106,6 +112,41 @@ public class PVPModule : BattleModule
 
         Instantiate(IsLeftPlayer ? myHero : enemyHero, Feild.GetTransformPlayer(true).position, Quaternion.Euler(0f, 90f, 0f), m_CharacterRoot.transform);
         Instantiate(IsLeftPlayer ? enemyHero : myHero, Feild.GetTransformPlayer(false).position, Quaternion.Euler(0f, -90f, 0f), m_CharacterRoot.transform);
+    }
+
+    private async UniTask SetCameraMove()
+    {
+        m_Cinemachine = GameObject.FindWithTag("Cinemachine").GetComponent<CinemachineCamera>();
+        m_SplineDolly = GameObject.FindWithTag("Cinemachine").GetComponent<CinemachineSplineDolly>();
+        m_Cinemachine.Follow = Feild.GetTransfromField();
+
+        // 카메라 움직임 시작
+        await StartCinemachine();
+
+        // 시네머신 비활성화
+        m_Cinemachine.gameObject.SetActive(false);
+
+        // 카메라 설정
+        Camera.main.transform.position = new Vector3(-1.33f, 3.3f, -1.78f);
+        Camera.main.transform.rotation = Quaternion.Euler(23.4f, 37.23f, 1.4f);
+    }
+
+    private async UniTask StartCinemachine()
+    {
+        float time = 0f;
+        float CameraTime = 2f;
+
+        while (time < CameraTime)
+        {
+            time += Time.deltaTime;
+            float positionValue = Mathf.Clamp01(time / CameraTime);
+
+            m_SplineDolly.CameraPosition = positionValue;
+
+            await UniTask.Yield(PlayerLoopTiming.Update);
+        }
+
+        m_SplineDolly.CameraPosition = 1f; // 마지막 위치 보정
     }
     #endregion
 }

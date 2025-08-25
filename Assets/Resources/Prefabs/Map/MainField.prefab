@@ -35740,6 +35740,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08377ca919cd912429348c23ffc5baef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Trs_Field: {fileID: 5432230528818602970}
   Trs_Player_Left: {fileID: 7459909113389291977}
   Trs_Player_Right: {fileID: 3850898034047545069}
 --- !u!1 &6669364971784018263
