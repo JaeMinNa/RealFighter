@@ -3,14 +3,16 @@ using UnityEngine.Events;
 
 public static class ClientDef
 {
-    public static readonly int MAX_PARTYMEMBER = 3;
+    public static readonly int SkillMaxCount = 3;
 
-    #region Player Preference
-    public static readonly string PomeSortOrderKey = "PomeSortOrder";
-    public static readonly string LastTutorialGroupKey = "LastTutorialGroup";
-    public static readonly string IsPomeSavedKey = "IsPomeSaved";
-    public static readonly string PomeGameOptionKey = "PomeGameOption";
-    #endregion
+    //public static readonly int MAX_PARTYMEMBER = 3;
+
+    //#region Player Preference
+    //public static readonly string PomeSortOrderKey = "PomeSortOrder";
+    //public static readonly string LastTutorialGroupKey = "LastTutorialGroup";
+    //public static readonly string IsPomeSavedKey = "IsPomeSaved";
+    //public static readonly string PomeGameOptionKey = "PomeGameOption";
+    //#endregion
 }
 
 #region UserData

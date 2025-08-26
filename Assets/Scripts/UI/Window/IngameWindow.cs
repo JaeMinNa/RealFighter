@@ -27,6 +27,22 @@ public class IngameWindow : UIElement
     [SerializeField] private Image Img_Hero_Right = null;
     [SerializeField] private TMP_Text Text_Level_Right = null;
     [SerializeField] private TMP_Text Text_Hero_Right = null;
+
+    [Header("SkillInfo_My")]
+    [SerializeField] private TMP_Text Text_MyATK_0 = null;
+    [SerializeField] private TMP_Text Text_MyCount_0 = null;
+    [SerializeField] private TMP_Text Text_MyATK_1 = null;
+    [SerializeField] private TMP_Text Text_MyCount_1 = null;
+    [SerializeField] private TMP_Text Text_MyATK_2 = null;
+    [SerializeField] private TMP_Text Text_MyCount_2 = null;
+
+    [Header("SkillInfo_Enemy")]
+    [SerializeField] private TMP_Text Text_EnemyATK_0 = null;
+    [SerializeField] private TMP_Text Text_EnemyCount_0 = null;
+    [SerializeField] private TMP_Text Text_EnemyATK_1 = null;
+    [SerializeField] private TMP_Text Text_EnemyCount_1 = null;
+    [SerializeField] private TMP_Text Text_EnemyATK_2 = null;
+    [SerializeField] private TMP_Text Text_EnemyCount_2 = null;
     #endregion
 
     #region Member Property
@@ -59,6 +75,7 @@ public class IngameWindow : UIElement
     public override void OnOpen(List<object> Args)
     {
         SetUI_Player();
+        SetUI_Skill();
         SetUI_Top();
     }
 
@@ -111,6 +128,25 @@ public class IngameWindow : UIElement
         Img_Hero_Right.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Character/Character_{userData.UserCommonData.Image}");
         Text_Level_Right.text = userData.UserHeroData.EquipHero.Level.ToString();
         Text_Hero_Right.text = userData.UserHeroData.EquipHero.HeroName;
+    }
+
+    private void SetUI_Skill()
+    {
+        // My
+        Text_MyATK_0.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamage_0}";
+        Text_MyCount_0.text = $"{m_PVPModule.MyCanUseSkillCount_0} / {ClientDef.SkillMaxCount}";
+        Text_MyATK_1.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamage_1}";
+        Text_MyCount_1.text = $"{m_PVPModule.MyCanUseSkillCount_1} / {ClientDef.SkillMaxCount}";
+        Text_MyATK_2.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamage_2}";
+        Text_MyCount_2.text = $"{m_PVPModule.MyCanUseSkillCount_2} / {ClientDef.SkillMaxCount}";
+
+        // Enemy
+        Text_EnemyATK_0.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamage_0}";
+        Text_EnemyCount_0.text = $"{m_PVPModule.EnemyCanUseSkillCount_0} / {ClientDef.SkillMaxCount}";
+        Text_EnemyATK_1.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamage_1}";
+        Text_EnemyCount_1.text = $"{m_PVPModule.EnemyCanUseSkillCount_1} / {ClientDef.SkillMaxCount}";
+        Text_EnemyATK_2.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamage_2}";
+        Text_EnemyCount_2.text = $"{m_PVPModule.EnemyCanUseSkillCount_2} / {ClientDef.SkillMaxCount}";
     }
     #endregion
 }

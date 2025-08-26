@@ -9,10 +9,16 @@ public class PVPModule : BattleModule
     public int CurRound { get; private set; }
     public float CurTime { get; private set; } = 30f;
     public int CurHp { get; private set; }
+    public int MyCanUseSkillCount_0 { get; private set; }
+    public int MyCanUseSkillCount_1 { get; private set; }
+    public int MyCanUseSkillCount_2 { get; private set; }
 
     // Enemy UserData
     public UserData EnemyUserData { get; private set; }
     public int EnemyCurHp { get; private set; }
+    public int EnemyCanUseSkillCount_0 { get; private set; }
+    public int EnemyCanUseSkillCount_1 { get; private set; }
+    public int EnemyCanUseSkillCount_2 { get; private set; }
 
     // Field
     public MainFeild Feild { get; private set; }
@@ -86,6 +92,8 @@ public class PVPModule : BattleModule
         CurTime = 30f;
         CurHp = 100;
         EnemyCurHp = 100;
+        MyCanUseSkillCount_0 = MyCanUseSkillCount_1 = MyCanUseSkillCount_2 = ClientDef.SkillMaxCount;
+        EnemyCanUseSkillCount_0 = EnemyCanUseSkillCount_1 = EnemyCanUseSkillCount_2 = ClientDef.SkillMaxCount;
 
         // Player의 위치 결정
         var randomIndex = RandomUtil.GetRandomIndex(0, 1);
@@ -126,9 +134,17 @@ public class PVPModule : BattleModule
         // 시네머신 비활성화
         m_Cinemachine.gameObject.SetActive(false);
 
-        // 카메라 설정
-        Camera.main.transform.position = new Vector3(-1.33f, 3.3f, -1.78f);
-        Camera.main.transform.rotation = Quaternion.Euler(23.4f, 37.23f, 1.4f);
+        // 메인 카메라 설정
+        if(IsLeftPlayer)
+        {
+            Camera.main.transform.position = new Vector3(-1.6f, 3.1f, -0.9f);
+            Camera.main.transform.rotation = Quaternion.Euler(14f, 63.9f, -1.8f);
+        }
+        else
+        {
+            Camera.main.transform.position = new Vector3(1.6f, 3.1f, 0.9f);
+            Camera.main.transform.rotation = Quaternion.Euler(14f, 247f, -1.8f);
+        }
     }
 
     private async UniTask StartCinemachine()
