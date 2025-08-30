@@ -6,6 +6,7 @@ public class PVPModule : BattleModule
 {
     #region Member Property
     // My UserData
+    public int CurTurn { get; private set; }                        // 턴이 변경될 때 마다 1씩 증가
     public int CurRound { get; private set; }
     public float CurTime { get; private set; } = 30f;
     public int CurHp { get; private set; }
@@ -24,6 +25,7 @@ public class PVPModule : BattleModule
     public MainFeild Feild { get; private set; }
 
     public bool IsLeftPlayer { get; private set; }
+    public bool IsAttackTurn { get; private set; }
     #endregion
 
     #region Member Property
@@ -42,9 +44,9 @@ public class PVPModule : BattleModule
         CurTime -= Time.deltaTime;
         if (CurTime < 0)
         {
-            Debug.LogWarning("Round 종료!");
+            Debug.LogWarning("턴 종료!");
 
-            NextRound();
+            NextTurn();
         }
     }
     #endregion
@@ -88,6 +90,7 @@ public class PVPModule : BattleModule
     // Round 초기화, 최초 한번만 실행
     private void StartRound()
     {
+        CurTurn = 0;
         CurRound = 1;
         CurTime = 30f;
         CurHp = 100;
@@ -98,19 +101,43 @@ public class PVPModule : BattleModule
         // Player의 위치 결정
         var randomIndex = RandomUtil.GetRandomIndex(0, 1);
         if (randomIndex == 0)
+        {
             IsLeftPlayer = true;
+            IsAttackTurn = true;
+        }
         else
-           IsLeftPlayer = false;
+        {
+            IsLeftPlayer = false;
+            IsAttackTurn = false;
+        }
     }
 
     // 다음 Round로 넘어갈 때마다 실행
     private void NextRound()
     {
+        Debug.LogWarning("다음 라운드!");
+
         CurRound++;
-        CurTime = 30f;
 
         var ingameWindow = UIManager.Instance.GetOpened<IngameWindow>();
         ingameWindow.SetUI_Top();
+    }
+
+    // 턴 변경
+    private void NextTurn()
+    {
+        CurTurn++;
+        CurTime = 30f;
+        IsAttackTurn = !IsAttackTurn;
+
+        var ingameWindow = UIManager.Instance.GetOpened<IngameWindow>();
+        ingameWindow.SetUI_Skill();
+
+        // CurTurn이 2의 배수일 때 다음 라운드로
+        if (CurTurn % 2 == 0)
+        {
+            NextRound();
+        }
     }
 
     private void CreateHeroes()

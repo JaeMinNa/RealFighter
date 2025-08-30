@@ -28,13 +28,17 @@ public class IngameWindow : UIElement
     [SerializeField] private TMP_Text Text_Level_Right = null;
     [SerializeField] private TMP_Text Text_Hero_Right = null;
 
-    [Header("SkillInfo_My")]
+    [Header("SkillInfo_My_Attack")]
+    [SerializeField] private GameObject Obj_AttackPanel = null;
     [SerializeField] private TMP_Text Text_MyATK_0 = null;
     [SerializeField] private TMP_Text Text_MyCount_0 = null;
     [SerializeField] private TMP_Text Text_MyATK_1 = null;
     [SerializeField] private TMP_Text Text_MyCount_1 = null;
     [SerializeField] private TMP_Text Text_MyATK_2 = null;
     [SerializeField] private TMP_Text Text_MyCount_2 = null;
+
+    [Header("SkillInfo_My_Defence")]
+    [SerializeField] private GameObject Obj_DefencePanel = null;
 
     [Header("SkillInfo_Enemy")]
     [SerializeField] private TMP_Text Text_EnemyATK_0 = null;
@@ -130,15 +134,27 @@ public class IngameWindow : UIElement
         Text_Hero_Right.text = userData.UserHeroData.EquipHero.HeroName;
     }
 
-    private void SetUI_Skill()
+    public void SetUI_Skill()
     {
-        // My
-        Text_MyATK_0.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamage_0}";
-        Text_MyCount_0.text = $"{m_PVPModule.MyCanUseSkillCount_0} / {ClientDef.SkillMaxCount}";
-        Text_MyATK_1.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamage_1}";
-        Text_MyCount_1.text = $"{m_PVPModule.MyCanUseSkillCount_1} / {ClientDef.SkillMaxCount}";
-        Text_MyATK_2.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamage_2}";
-        Text_MyCount_2.text = $"{m_PVPModule.MyCanUseSkillCount_2} / {ClientDef.SkillMaxCount}";
+        Obj_AttackPanel.SetActive(false);
+        Obj_DefencePanel.SetActive(false);
+
+        if(m_PVPModule.IsAttackTurn)
+        {
+            // My
+            Text_MyATK_0.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamage_0}";
+            Text_MyCount_0.text = $"{m_PVPModule.MyCanUseSkillCount_0} / {ClientDef.SkillMaxCount}";
+            Text_MyATK_1.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamage_1}";
+            Text_MyCount_1.text = $"{m_PVPModule.MyCanUseSkillCount_1} / {ClientDef.SkillMaxCount}";
+            Text_MyATK_2.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamage_2}";
+            Text_MyCount_2.text = $"{m_PVPModule.MyCanUseSkillCount_2} / {ClientDef.SkillMaxCount}";
+
+            Obj_AttackPanel.SetActive(true);
+        }
+        else
+        {
+            Obj_DefencePanel.SetActive(true);
+        }
 
         // Enemy
         Text_EnemyATK_0.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamage_0}";
