@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
+using System.Linq;
+using Unity.VisualScripting;
 
 public class IngameWindow : UIElement
 {
@@ -9,6 +12,10 @@ public class IngameWindow : UIElement
     [Header("Top")]
     [SerializeField] private TMP_Text Text_Time = null;
     [SerializeField] private TMP_Text Text_Round = null;
+
+    [Header("Under")]
+    [SerializeField] private Button Btn_Ready = null;
+    [SerializeField] private Button Btn_Exit = null;
 
     [Header("Player_Left")]
     [SerializeField] private TMP_Text Text_NickName_Left = null;
@@ -36,9 +43,11 @@ public class IngameWindow : UIElement
     [SerializeField] private TMP_Text Text_MyCount_1 = null;
     [SerializeField] private TMP_Text Text_MyATK_2 = null;
     [SerializeField] private TMP_Text Text_MyCount_2 = null;
+    [SerializeField] private Button[] Btn_MyAttacks = null;
 
     [Header("SkillInfo_My_Defence")]
     [SerializeField] private GameObject Obj_DefencePanel = null;
+    [SerializeField] private Button[] Btn_MyDefences = null;
 
     [Header("SkillInfo_Enemy")]
     [SerializeField] private TMP_Text Text_EnemyATK_0 = null;
@@ -69,6 +78,21 @@ public class IngameWindow : UIElement
     {
         if (m_PVPModule == null)
             m_PVPModule = BattleModule.Instance as PVPModule;
+
+        for (int index = 0; index < Btn_MyAttacks.Length; ++index)
+        {
+            int capturedIndex = index;
+            Btn_MyAttacks[index].onClick.AddListener(() => OnClick_MyAttacks(capturedIndex));
+        }
+
+        for (int index = 0; index < Btn_MyDefences.Length; ++index)
+        {
+            int capturedIndex = index;
+            Btn_MyDefences[index].onClick.AddListener(() => OnClick_MyDefences(capturedIndex));
+        }
+
+        Btn_Exit.onClick.AddListener(OnClick_Exit);
+        Btn_Ready.onClick.AddListener(OnClick_Ready);
     }
 
     public override void OnClose()
@@ -85,8 +109,8 @@ public class IngameWindow : UIElement
 
     public override void OnRefresh()
     {
-        //SetUI_Player();
-        //SetUI_Top();
+        SetUI_Player();
+        SetUI_Top();
     }
     #endregion
 
@@ -98,7 +122,7 @@ public class IngameWindow : UIElement
     #endregion
 
     #region Private Method
-    private void SetUI_Player()
+    public void SetUI_Player()
     {
         if(m_PVPModule.IsLeftPlayer)
         {
@@ -139,15 +163,31 @@ public class IngameWindow : UIElement
         Obj_AttackPanel.SetActive(false);
         Obj_DefencePanel.SetActive(false);
 
-        if(m_PVPModule.IsAttackTurn)
+        // 모든 버튼 활성화
+        foreach (var btn in Btn_MyAttacks)
+            btn.interactable = true;
+
+        foreach (var btn in Btn_MyDefences)
+            btn.interactable = true;
+
+        Btn_Ready.interactable = true;
+
+        // 모든 버튼 초기 이미지
+        foreach (var btn in Btn_MyAttacks)
+            btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_MenuButton_Square01_n");
+
+        foreach (var btn in Btn_MyDefences)
+            btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_MenuButton_Square01_n");
+
+        if (m_PVPModule.IsAttackTurn)
         {
             // My
-            Text_MyATK_0.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamage_0}";
-            Text_MyCount_0.text = $"{m_PVPModule.MyCanUseSkillCount_0} / {ClientDef.SkillMaxCount}";
-            Text_MyATK_1.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamage_1}";
-            Text_MyCount_1.text = $"{m_PVPModule.MyCanUseSkillCount_1} / {ClientDef.SkillMaxCount}";
-            Text_MyATK_2.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamage_2}";
-            Text_MyCount_2.text = $"{m_PVPModule.MyCanUseSkillCount_2} / {ClientDef.SkillMaxCount}";
+            Text_MyATK_0.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamages[0]}";
+            Text_MyCount_0.text = $"{m_PVPModule.MyCanUseSkillCounts[0]} / {ClientDef.SkillMaxCount}";
+            Text_MyATK_1.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamages[1]}";
+            Text_MyCount_1.text = $"{m_PVPModule.MyCanUseSkillCounts[1]} / {ClientDef.SkillMaxCount}";
+            Text_MyATK_2.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamages[2]}";
+            Text_MyCount_2.text = $"{m_PVPModule.MyCanUseSkillCounts[2]} / {ClientDef.SkillMaxCount}";
 
             Obj_AttackPanel.SetActive(true);
         }
@@ -157,12 +197,76 @@ public class IngameWindow : UIElement
         }
 
         // Enemy
-        Text_EnemyATK_0.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamage_0}";
-        Text_EnemyCount_0.text = $"{m_PVPModule.EnemyCanUseSkillCount_0} / {ClientDef.SkillMaxCount}";
-        Text_EnemyATK_1.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamage_1}";
-        Text_EnemyCount_1.text = $"{m_PVPModule.EnemyCanUseSkillCount_1} / {ClientDef.SkillMaxCount}";
-        Text_EnemyATK_2.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamage_2}";
-        Text_EnemyCount_2.text = $"{m_PVPModule.EnemyCanUseSkillCount_2} / {ClientDef.SkillMaxCount}";
+        Text_EnemyATK_0.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamages[0]}";
+        Text_EnemyCount_0.text = $"{m_PVPModule.EnemyCanUseSkillCounts[0]} / {ClientDef.SkillMaxCount}";
+        Text_EnemyATK_1.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamages[1]}";
+        Text_EnemyCount_1.text = $"{m_PVPModule.EnemyCanUseSkillCounts[1]} / {ClientDef.SkillMaxCount}";
+        Text_EnemyATK_2.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamages[2]}";
+        Text_EnemyCount_2.text = $"{m_PVPModule.EnemyCanUseSkillCounts[2]} / {ClientDef.SkillMaxCount}";
+    }
+    #endregion
+
+    #region Button
+    private void OnClick_MyAttacks(int num)
+    {
+        if (m_PVPModule.IsMyReady)
+            return;
+
+        // 기본 Image로 초기화
+        foreach (var btn in Btn_MyAttacks)
+            btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_MenuButton_Square01_n");
+
+        // Select Image
+        Btn_MyAttacks[num].image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_MenuButton_Square01_s");
+
+        m_PVPModule.MySelectBtnNum = num;
+    }
+
+    private void OnClick_MyDefences(int num)
+    {
+        if (m_PVPModule.IsMyReady)
+            return;
+
+        // 기본 Image로 초기화
+        foreach (var btn in Btn_MyDefences)
+            btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_MenuButton_Square01_n");
+
+        // Select Image
+        Btn_MyDefences[num].image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_MenuButton_Square01_s");
+
+        m_PVPModule.MySelectBtnNum = num;
+    }
+
+    private void OnClick_Exit()
+    {
+        UIManager.Instance.OpenSystemPopup(new MessageData
+        {
+            Type = PopupType.OkCancel,
+            Message = "게임을 포기하고 로비로 나가시겠습니까?",
+            OkAction = async () => { await ScenesManager.Instance.LoadScene("LobbyScene"); }
+        });
+    }
+
+    private void OnClick_Ready()
+    {
+        if (m_PVPModule.IsMyReady)
+            return;
+
+        // 버튼 클릭하지 않았으면 리턴
+        if (m_PVPModule.MySelectBtnNum == -1)
+            return;
+
+        m_PVPModule.IsMyReady = true;
+        Btn_Ready.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_TextButton_Square01_Gray");
+
+        // 레디 완료 시, 모든 버튼 비활성화
+        Btn_Ready.interactable = false;
+
+        foreach (var btn in Btn_MyAttacks)
+            btn.interactable = false;
+
+        foreach (var btn in Btn_MyDefences)
+            btn.interactable = false;
     }
     #endregion
 }

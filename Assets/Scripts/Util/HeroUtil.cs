@@ -13,15 +13,13 @@ public static class HeroUtil
 
         var randomLevel = RandomUtil.GetRandomIndex(1, 5);
 
-        HeroData heroData = new HeroData()
-        {
-            HeroName = heroNames[randomValue],
-            SkillDamage_0 = 10 + randomLevel -1,
-            SkillDamage_1 = 10 + randomLevel - 1,
-            SkillDamage_2 = 10 + randomLevel - 1,
-            Level = randomLevel,
-            Exp = 0
-        };
+        HeroData heroData = new HeroData();
+        heroData.HeroName = heroNames[randomValue];
+        heroData.SkillDamages[0] = 10 + randomLevel - 1;
+        heroData.SkillDamages[1] = 10 + randomLevel - 1;
+        heroData.SkillDamages[2] = 10 + randomLevel - 1;
+        heroData.Level = randomLevel;
+        heroData.Exp = 0;
 
         return heroData;
     }

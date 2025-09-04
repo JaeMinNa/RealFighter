@@ -156,15 +156,13 @@ public class DataManager : Singleton<DataManager>
         m_DataLoader.MyUserData.UserCommonData = userData_Common;
 
         // Hero
-        HeroData heroData = new HeroData()
-        {
-            HeroName = "BLAZE",
-            SkillDamage_0 = 10,
-            SkillDamage_1 = 10,
-            SkillDamage_2 = 10,
-            Level = 1,
-            Exp = 0
-        };
+        HeroData heroData = new HeroData();
+        heroData.HeroName = "BLAZE";
+        heroData.SkillDamages[0] = 10;
+        heroData.SkillDamages[1] = 10;
+        heroData.SkillDamages[2] = 10;
+        heroData.Level = 1;
+        heroData.Exp = 0;
 
         UserData_Hero userData_Hero = new UserData_Hero();
         userData_Hero.EquipHero = heroData;

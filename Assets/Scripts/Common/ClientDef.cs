@@ -45,9 +45,7 @@ public class UserData_Hero
 public class HeroData
 {
     public string HeroName = string.Empty;
-    public int SkillDamage_0 = 0;
-    public int SkillDamage_1 = 0;
-    public int SkillDamage_2 = 0;
+    public int[] SkillDamages = { 0, 0, 0};
     public int Level = 0;
     public int Exp = 0;
 }
