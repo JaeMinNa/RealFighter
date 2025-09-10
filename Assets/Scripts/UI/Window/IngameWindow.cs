@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using System;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEngine.Assertions.Must;
+using Cysharp.Threading.Tasks.Triggers;
 
 public class IngameWindow : UIElement
 {
@@ -44,6 +46,8 @@ public class IngameWindow : UIElement
     [SerializeField] private TMP_Text Text_MyATK_2 = null;
     [SerializeField] private TMP_Text Text_MyCount_2 = null;
     [SerializeField] private Button[] Btn_MyAttacks = null;
+    [SerializeField] private TMP_Text Text_MyCombo = null;
+    [SerializeField] private GameObject Obj_MyCritical = null;
 
     [Header("SkillInfo_My_Defence")]
     [SerializeField] private GameObject Obj_DefencePanel = null;
@@ -56,6 +60,9 @@ public class IngameWindow : UIElement
     [SerializeField] private TMP_Text Text_EnemyCount_1 = null;
     [SerializeField] private TMP_Text Text_EnemyATK_2 = null;
     [SerializeField] private TMP_Text Text_EnemyCount_2 = null;
+    [SerializeField] private GameObject[] Obj_EnemyDangerIcons = null;
+    [SerializeField] private TMP_Text Text_EnemyCombo = null;
+    [SerializeField] private GameObject Obj_EnemyCritical = null;
     #endregion
 
     #region Member Property
@@ -102,29 +109,31 @@ public class IngameWindow : UIElement
 
     public override void OnOpen(List<object> Args)
     {
-        SetUI_Player();
+        SetUI_Players();
         SetUI_Skill();
-        SetUI_Top();
+        SetUI_Round();
+        SetUI_DangerIcon();
     }
 
     public override void OnRefresh()
     {
-        SetUI_Player();
-        SetUI_Top();
+        SetUI_Players();
+        SetUI_Round();
+        SetUI_Skill();
     }
     #endregion
 
     #region Public Method
-    public void SetUI_Top()
+
+    #region UI
+    public void SetUI_Round()
     {
         Text_Round.text = $"Round {m_PVPModule.CurRound}";
     }
-    #endregion
 
-    #region Private Method
-    public void SetUI_Player()
+    public void SetUI_Players()
     {
-        if(m_PVPModule.IsLeftPlayer)
+        if (m_PVPModule.IsLeftPlayer)
         {
             SetUI_Player_Left(DataManager.Instance.GetMyUserData());
             SetUI_Player_Right(m_PVPModule.EnemyUserData);
@@ -136,6 +145,74 @@ public class IngameWindow : UIElement
         }
     }
 
+    public void SetUI_Skill()
+    {
+        Obj_AttackPanel.SetActive(false);
+        Obj_DefencePanel.SetActive(false);
+        Text_MyCombo.transform.gameObject.SetActive(false);
+        Text_EnemyCombo.transform.gameObject.SetActive(false);
+        Obj_MyCritical.SetActive(false);
+        Obj_EnemyCritical.SetActive(false);
+
+        // 모든 사용가능한 버튼 활성화
+        for (int Index = 0; Index < Btn_MyAttacks.Length; ++Index)
+        {
+            if (m_PVPModule.MyCanUseSkillCounts[Index] > 0)
+                Btn_MyAttacks[Index].interactable = true;
+            else
+                Btn_MyAttacks[Index].interactable = false;
+        }
+
+        for (int Index = 0; Index < Btn_MyDefences.Length; ++Index)
+        {
+            Btn_MyDefences[Index].interactable = true;
+        }
+
+        Btn_Ready.interactable = true;
+
+        // 모든 버튼 초기 이미지
+        foreach (var btn in Btn_MyAttacks)
+            btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_n");
+
+        foreach (var btn in Btn_MyDefences)
+            btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_n");
+
+        // My
+        if (m_PVPModule.IsAttackTurn)
+        {
+            Text_MyATK_0.text = $"ATK : {DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, 0)}";
+            Text_MyCount_0.text = $"{m_PVPModule.MyCanUseSkillCounts[0]} / {ClientDef.SkillMaxCount}";
+            Text_MyATK_1.text = $"ATK : {DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, 1)}";
+            Text_MyCount_1.text = $"{m_PVPModule.MyCanUseSkillCounts[1]} / {ClientDef.SkillMaxCount}";
+            Text_MyATK_2.text = $"ATK : {DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, 2)}";
+            Text_MyCount_2.text = $"{m_PVPModule.MyCanUseSkillCounts[2]} / {ClientDef.SkillMaxCount}";
+
+            SetUI_MyCombo();
+
+            Obj_AttackPanel.SetActive(true);
+        }
+        else
+        {
+            Obj_DefencePanel.SetActive(true);
+        }
+
+        // Enemy
+        Text_EnemyATK_0.text = $"ATK : {DamageUtil.GetSkillDamage(m_PVPModule.EnemyUserData.UserHeroData.EquipHero, 0)}";
+        Text_EnemyCount_0.text = $"{m_PVPModule.EnemyCanUseSkillCounts[0]} / {ClientDef.SkillMaxCount}";
+        Text_EnemyATK_1.text = $"ATK : {DamageUtil.GetSkillDamage(m_PVPModule.EnemyUserData.UserHeroData.EquipHero, 1)}";
+        Text_EnemyCount_1.text = $"{m_PVPModule.EnemyCanUseSkillCounts[1]} / {ClientDef.SkillMaxCount}";
+        Text_EnemyATK_2.text = $"ATK : {DamageUtil.GetSkillDamage(m_PVPModule.EnemyUserData.UserHeroData.EquipHero, 2)}";
+        Text_EnemyCount_2.text = $"{m_PVPModule.EnemyCanUseSkillCounts[2]} / {ClientDef.SkillMaxCount}";
+
+        SetUI_EnemyCombo();
+    }
+    #endregion
+
+    #endregion
+
+    #region Private Method
+
+    #region UI
     private void SetUI_Player_Left(UserData userData)
     {
         Text_NickName_Left.text = userData.UserCommonData.NickName;
@@ -158,52 +235,57 @@ public class IngameWindow : UIElement
         Text_Hero_Right.text = userData.UserHeroData.EquipHero.HeroName;
     }
 
-    public void SetUI_Skill()
+    private void SetUI_DangerIcon()
     {
-        Obj_AttackPanel.SetActive(false);
-        Obj_DefencePanel.SetActive(false);
+        List<int> damages = new List<int>() {DamageUtil.GetSkillDamage(m_PVPModule.EnemyUserData.UserHeroData.EquipHero, 0),
+                                             DamageUtil.GetSkillDamage(m_PVPModule.EnemyUserData.UserHeroData.EquipHero, 1),
+                                             DamageUtil.GetSkillDamage(m_PVPModule.EnemyUserData.UserHeroData.EquipHero, 2)};
 
-        // 모든 버튼 활성화
-        foreach (var btn in Btn_MyAttacks)
-            btn.interactable = true;
+        int maxValue = damages.Max();
 
-        foreach (var btn in Btn_MyDefences)
-            btn.interactable = true;
+        List<int> maxIndices = damages
+            .Select((value, index) => new { value, index })
+            .Where(x => x.value == maxValue)
+            .Select(x => x.index)
+            .ToList();
 
-        Btn_Ready.interactable = true;
+        int chosenIndex = maxIndices[RandomUtil.GetRandomIndex(0, maxIndices.Count - 1)];
 
-        // 모든 버튼 초기 이미지
-        foreach (var btn in Btn_MyAttacks)
-            btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_MenuButton_Square01_n");
+        foreach (var icon in Obj_EnemyDangerIcons)
+            icon.SetActive(false);
 
-        foreach (var btn in Btn_MyDefences)
-            btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_MenuButton_Square01_n");
-
-        if (m_PVPModule.IsAttackTurn)
-        {
-            // My
-            Text_MyATK_0.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamages[0]}";
-            Text_MyCount_0.text = $"{m_PVPModule.MyCanUseSkillCounts[0]} / {ClientDef.SkillMaxCount}";
-            Text_MyATK_1.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamages[1]}";
-            Text_MyCount_1.text = $"{m_PVPModule.MyCanUseSkillCounts[1]} / {ClientDef.SkillMaxCount}";
-            Text_MyATK_2.text = $"ATK : {DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamages[2]}";
-            Text_MyCount_2.text = $"{m_PVPModule.MyCanUseSkillCounts[2]} / {ClientDef.SkillMaxCount}";
-
-            Obj_AttackPanel.SetActive(true);
-        }
-        else
-        {
-            Obj_DefencePanel.SetActive(true);
-        }
-
-        // Enemy
-        Text_EnemyATK_0.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamages[0]}";
-        Text_EnemyCount_0.text = $"{m_PVPModule.EnemyCanUseSkillCounts[0]} / {ClientDef.SkillMaxCount}";
-        Text_EnemyATK_1.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamages[1]}";
-        Text_EnemyCount_1.text = $"{m_PVPModule.EnemyCanUseSkillCounts[1]} / {ClientDef.SkillMaxCount}";
-        Text_EnemyATK_2.text = $"ATK : {m_PVPModule.EnemyUserData.UserHeroData.EquipHero.SkillDamages[2]}";
-        Text_EnemyCount_2.text = $"{m_PVPModule.EnemyCanUseSkillCounts[2]} / {ClientDef.SkillMaxCount}";
+        Obj_EnemyDangerIcons[chosenIndex].SetActive(true);
     }
+
+    private void SetUI_MyCombo()
+    {
+        if(m_PVPModule.MyCombo != 0)
+        {
+            if (m_PVPModule.MyCombo == 3)
+                Obj_MyCritical.SetActive(true);
+            else
+            {
+                Text_MyCombo.text = m_PVPModule.MyCombo.ToString();
+                Text_MyCombo.transform.gameObject.SetActive(true);
+            }
+        }
+    }
+
+    private void SetUI_EnemyCombo()
+    {
+        if (m_PVPModule.EnemyCombo != 0)
+        {
+            if (m_PVPModule.EnemyCombo == 3)
+                Obj_EnemyCritical.SetActive(true);
+            else
+            {
+                Text_EnemyCombo.text = m_PVPModule.EnemyCombo.ToString();
+                Text_EnemyCombo.transform.gameObject.SetActive(true);
+            }
+        }
+    }
+    #endregion
+
     #endregion
 
     #region Button
@@ -214,10 +296,10 @@ public class IngameWindow : UIElement
 
         // 기본 Image로 초기화
         foreach (var btn in Btn_MyAttacks)
-            btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_MenuButton_Square01_n");
+            btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_n");
 
         // Select Image
-        Btn_MyAttacks[num].image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_MenuButton_Square01_s");
+        Btn_MyAttacks[num].image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_s");
 
         m_PVPModule.MySelectBtnNum = num;
     }
@@ -229,10 +311,10 @@ public class IngameWindow : UIElement
 
         // 기본 Image로 초기화
         foreach (var btn in Btn_MyDefences)
-            btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_MenuButton_Square01_n");
+            btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_n");
 
         // Select Image
-        Btn_MyDefences[num].image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_MenuButton_Square01_s");
+        Btn_MyDefences[num].image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_s");
 
         m_PVPModule.MySelectBtnNum = num;
     }
@@ -257,7 +339,7 @@ public class IngameWindow : UIElement
             return;
 
         m_PVPModule.IsMyReady = true;
-        Btn_Ready.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Image/Button/Btn_TextButton_Square01_Gray");
+        Btn_Ready.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_TextButton_Square01_Gray");
 
         // 레디 완료 시, 모든 버튼 비활성화
         Btn_Ready.interactable = false;

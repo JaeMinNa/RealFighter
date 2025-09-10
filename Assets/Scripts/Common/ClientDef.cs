@@ -4,6 +4,13 @@ using UnityEngine.Events;
 public static class ClientDef
 {
     public static readonly int SkillMaxCount = 3;
+    public static readonly float TurnTime = 10f;
+    public static readonly int MaxRound = 3;
+    public static readonly int MaxHeroLevel = 10;
+    public static readonly int WinExp = 5;
+    public static readonly int LoseExp = 2;
+    public static readonly int WinGold = 1000;
+    public static readonly int LoseGold = 200;
 
     //public static readonly int MAX_PARTYMEMBER = 3;
 
@@ -45,7 +52,8 @@ public class UserData_Hero
 public class HeroData
 {
     public string HeroName = string.Empty;
-    public int[] SkillDamages = { 0, 0, 0};
+    //public int[] SkillDamages = { 0, 0, 0};
+    public int[] Skillproficiencies = { 0, 0, 0 };
     public int Level = 0;
     public int Exp = 0;
 }
@@ -66,6 +74,18 @@ public enum PopupType
     OkCancel,
 
     Max
+}
+
+public class ItemData
+{
+    public string Name = string.Empty;
+    public int Count = 0;
+
+    public ItemData(string name, int count)
+    {
+        Name = name;
+        Count = count;
+    }
 }
 
 //public enum eItemType

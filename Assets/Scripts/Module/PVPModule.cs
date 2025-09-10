@@ -14,6 +14,8 @@ public class PVPModule : BattleModule
     public bool IsMyReady { get; set; }
     public int MySelectBtnNum { get; set; }
     public HeroAnim MyHeroAnim { get; private set; }
+    public int MyCombo { get; private set; }
+    public bool IsMyCombo { get; private set; }
 
     // Enemy UserData
     public UserData EnemyUserData { get; private set; }
@@ -22,6 +24,8 @@ public class PVPModule : BattleModule
     public bool IsEnemyReady { get; set; }
     public int EnemySelectBtnNum { get; set; }
     public HeroAnim EnemyHeroAnim { get; private set; }
+    public int EnemyCombo { get; private set; }
+    public bool IsEnemyCombo { get; private set; }
 
     // Field
     public MainFeild Feild { get; private set; }
@@ -54,10 +58,26 @@ public class PVPModule : BattleModule
 
             // Button을 클릭하지 않으면 랜덤 클릭
             if (MySelectBtnNum == -1)
-                MySelectBtnNum = RandomUtil.GetRandomIndex(0, 2);
+            {
+                while (MySelectBtnNum == -1)
+                {
+                    int value = RandomUtil.GetRandomIndex(0, 2);
+
+                    if (MyCanUseSkillCounts[value] > 0)
+                        MySelectBtnNum = value;
+                }
+            }
 
             if (EnemySelectBtnNum == -1)
-                EnemySelectBtnNum = RandomUtil.GetRandomIndex(0, 2);
+            {
+                while (EnemySelectBtnNum == -1)
+                {
+                    int value = RandomUtil.GetRandomIndex(0, 2);
+
+                    if (EnemyCanUseSkillCounts[value] > 0)
+                        EnemySelectBtnNum = value;
+                }
+            }
         }
 
         if(IsMyReady && IsEnemyReady && !IsBattle)
@@ -78,8 +98,8 @@ public class PVPModule : BattleModule
     {
         await base.StartGame();
 
-        // 라운드 초기화
-        StartRound();
+        // 게임 시작 시, 최초 한번만 실행되는 것들
+        InitialGame();
 
         // AI 적 생성 (임시)
         EnemyUserData = DataManager.Instance.GetAIUserData();
@@ -109,16 +129,22 @@ public class PVPModule : BattleModule
     #endregion
 
     #region Private Method
-    // Round 초기화, 최초 한번만 실행
-    private void StartRound()
+
+    #region Initial
+    // 최초 한번만 실행 되는 것들
+    private void InitialGame()
     {
         // 최초 한번만 초기화 하는 것들
         CurTurn = 0;
         CurRound = 1;
         CurHp = 100;
         EnemyCurHp = 100;
+        MyCombo = 0;
+        EnemyCombo = 0;
+        IsMyCombo = false;
+        IsEnemyCombo = false;
 
-        InitialTurn();
+        StartTurn();
 
         for (int index = 0; index < MyCanUseSkillCounts.Length; ++index)
         {
@@ -144,10 +170,10 @@ public class PVPModule : BattleModule
         }
     }
 
-    // 턴 변경 시, 초기화 하는 것들
-    private void InitialTurn()
+    // 턴 변경 시, 실행되는 것들
+    private void StartTurn()
     {
-        CurTime = 10f;
+        CurTime = ClientDef.TurnTime;
         IsMyReady = false;
         IsEnemyReady = false;
         IsBattle = false;
@@ -155,14 +181,27 @@ public class PVPModule : BattleModule
         EnemySelectBtnNum = -1;
     }
 
-    private void NextRound()
+    // 라운드 변경
+    private async void NextRound()
     {
-        Debug.LogWarning("다음 라운드!");
-
         CurRound++;
 
+        if(CurRound > ClientDef.MaxRound)
+        {
+            await UniTask.Delay(2000);
+
+            // 나중에 무승부인 경우 추가
+            if (CurHp >= EnemyCurHp)
+                m_Win = true;
+            else
+                m_Win = false;
+
+            EndGame();
+        }
+
+
         var ingameWindow = UIManager.Instance.GetOpened<IngameWindow>();
-        ingameWindow.SetUI_Top();
+        ingameWindow.SetUI_Round();
     }
 
     // 턴 변경
@@ -170,7 +209,7 @@ public class PVPModule : BattleModule
     {
         Debug.LogWarning("턴 종료!");
 
-        InitialTurn();
+        StartTurn();
 
         CurTurn++;
         IsAttackTurn = !IsAttackTurn;
@@ -184,6 +223,7 @@ public class PVPModule : BattleModule
             NextRound();
         }
     }
+    #endregion
 
     private void CreateHeroes()
     {
@@ -210,10 +250,11 @@ public class PVPModule : BattleModule
 
     private async UniTask StartBattle()
     {
+        var ingameWindow = UIManager.Instance.GetOpened<IngameWindow>();
+
         if (IsAttackTurn)
         {
             MyCanUseSkillCounts[MySelectBtnNum]--;
-
             MyHeroAnim.Anim.SetTrigger($"Skill_{MySelectBtnNum}");
 
             await UniTask.Delay((int)(MyHeroAnim.SkillTimes[MySelectBtnNum] * 1000));
@@ -221,25 +262,43 @@ public class PVPModule : BattleModule
             // 공격 성공 시
             if(MySelectBtnNum != EnemySelectBtnNum)
             {
+                // 콤보
+                if (IsMyCombo)
+                    MyCombo++;
+                else
+                {
+                    MyCombo = 1;
+                    IsMyCombo = true;
+                }
+
                 EnemyHeroAnim.Anim.SetTrigger("Hit");
+                EnemyCurHp -= DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
+                ingameWindow.SetUI_Players();
 
-                EnemyCurHp -= DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.SkillDamages[MySelectBtnNum];
-
-                if(EnemyCurHp <= 0)
+                if (EnemyCurHp <= 0)
                 {
                     Debug.Log("Enemy 사망! 승리!");
+
+                    EnemyHeroAnim.Anim.SetTrigger("Die");
+
+                    await UniTask.Delay(2000);
+
+                    m_Win = true;
+                    EndGame();
                 }
             }
             else
             {
-                Debug.Log("Enemy의 방어 성공!");
-                //EnemyHeroAnim.Anim.SetTrigger("Hit");
+                // 콤보
+                IsMyCombo = false;
+                MyCombo = 0;
+
+                EnemyHeroAnim.Anim.SetTrigger("Block");
             }
         }
         else
         {
             EnemyCanUseSkillCounts[EnemySelectBtnNum]--;
-
             EnemyHeroAnim.Anim.SetTrigger($"Skill_{EnemySelectBtnNum}");
 
             await UniTask.Delay((int)(EnemyHeroAnim.SkillTimes[EnemySelectBtnNum] * 1000));
@@ -247,24 +306,40 @@ public class PVPModule : BattleModule
             // 공격 성공 시
             if (MySelectBtnNum != EnemySelectBtnNum)
             {
-                MyHeroAnim.Anim.SetTrigger("Hit");
+                // 콤보
+                if (IsEnemyCombo)
+                    EnemyCombo++;
+                else
+                {
+                    EnemyCombo = 1;
+                    IsEnemyCombo = true;
+                }
 
-                CurHp -= EnemyUserData.UserHeroData.EquipHero.SkillDamages[EnemySelectBtnNum];
+                MyHeroAnim.Anim.SetTrigger("Hit");
+                CurHp -= DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, EnemySelectBtnNum);
+                ingameWindow.SetUI_Players();
 
                 if (CurHp <= 0)
                 {
                     Debug.Log("나의 사망! 패배!");
+
+                    MyHeroAnim.Anim.SetTrigger("Die");
+
+                    await UniTask.Delay(2000);
+
+                    m_Win = false;
+                    EndGame();
                 }
             }
             else
             {
-                Debug.Log("나의 방어 성공!");
-                //MyHeroAnim.Anim.SetTrigger("Hit");
+                // 콤보
+                IsEnemyCombo = false;
+                EnemyCombo = 0;
+
+                MyHeroAnim.Anim.SetTrigger("Block");
             }
         }
-
-        var ingameWindow = UIManager.Instance.GetOpened<IngameWindow>();
-        ingameWindow.SetUI_Player();
     }
 
     #region Camera

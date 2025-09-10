@@ -1,6 +1,7 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Unity.VisualScripting;
+using System.Collections.Generic;
 
 public class BattleModule : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class BattleModule : MonoBehaviour
     protected GameObject m_EnvironmentRoot = null;
 
     protected bool m_IsStartGame = false;
+    protected bool m_Win = false;
     #endregion
 
     #region Instance
@@ -89,7 +91,11 @@ public class BattleModule : MonoBehaviour
         //m_IsPause = true;
         //m_IsEndGame = true;
 
+        Time.timeScale = 0f;
         m_IsStartGame = false;
+
+        List<object> args = new List<object> { m_Win };
+        UIManager.Instance.Open<Popup_Result>(UI.Popup, "Prefabs/UI/Popup/Popup_Result", args);
 
         // Module Á¦°Å
         DestroyModule();
