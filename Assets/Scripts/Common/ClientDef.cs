@@ -5,7 +5,7 @@ public static class ClientDef
 {
     public static readonly int SkillMaxCount = 3;
     public static readonly float TurnTime = 10f;
-    public static readonly int MaxRound = 3;
+    public static readonly int MaxRound = 9;
     public static readonly int MaxHeroLevel = 10;
     public static readonly int WinExp = 5;
     public static readonly int LoseExp = 2;

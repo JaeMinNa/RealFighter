@@ -157,7 +157,7 @@ public class DataManager : Singleton<DataManager>
 
         // Hero
         HeroData heroData = new HeroData();
-        heroData.HeroName = "BLAZE";
+        heroData.HeroName = "STEELTON";
         heroData.Skillproficiencies[0] = 0;
         heroData.Skillproficiencies[1] = 0;
         heroData.Skillproficiencies[2] = 0;

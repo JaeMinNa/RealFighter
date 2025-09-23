@@ -16,6 +16,7 @@ public class PVPModule : BattleModule
     public HeroAnim MyHeroAnim { get; private set; }
     public int MyCombo { get; private set; }
     public bool IsMyCombo { get; private set; }
+    public bool IsMyCritical { get; private set; }
 
     // Enemy UserData
     public UserData EnemyUserData { get; private set; }
@@ -26,6 +27,7 @@ public class PVPModule : BattleModule
     public HeroAnim EnemyHeroAnim { get; private set; }
     public int EnemyCombo { get; private set; }
     public bool IsEnemyCombo { get; private set; }
+    public bool IsEnemyCritical { get; private set; }
 
     // Field
     public MainFeild Feild { get; private set; }
@@ -33,9 +35,7 @@ public class PVPModule : BattleModule
     public bool IsLeftPlayer { get; private set; }
     public bool IsAttackTurn { get; private set; }
     public bool IsBattle { get; private set; }
-    #endregion
 
-    #region Member Property
     private CinemachineCamera m_Cinemachine = null;
     private CinemachineSplineDolly m_SplineDolly = null;
     #endregion
@@ -89,6 +89,15 @@ public class PVPModule : BattleModule
             await StartBattle();
 
             NextTurn();
+
+            if (CurRound == ClientDef.MaxRound)
+            {
+                if (CurHp >= EnemyCurHp)
+                    m_Win = true;
+
+                EndGame();
+                return;
+            }
         }
     }
     #endregion
@@ -143,6 +152,8 @@ public class PVPModule : BattleModule
         EnemyCombo = 0;
         IsMyCombo = false;
         IsEnemyCombo = false;
+        IsMyCritical = false;
+        IsEnemyCritical = false;
 
         StartTurn();
 
@@ -198,10 +209,6 @@ public class PVPModule : BattleModule
 
             EndGame();
         }
-
-
-        var ingameWindow = UIManager.Instance.GetOpened<IngameWindow>();
-        ingameWindow.SetUI_Round();
     }
 
     // 턴 변경
@@ -214,14 +221,15 @@ public class PVPModule : BattleModule
         CurTurn++;
         IsAttackTurn = !IsAttackTurn;
 
-        var ingameWindow = UIManager.Instance.GetOpened<IngameWindow>();
-        ingameWindow.SetUI_Skill();
-
         // CurTurn이 2의 배수일 때 다음 라운드로
         if (CurTurn % 2 == 0)
         {
             NextRound();
         }
+
+        var ingameWindow = UIManager.Instance.GetOpened<IngameWindow>();
+        ingameWindow.SetUI_Skill();
+        ingameWindow.SetUI_Top();
     }
     #endregion
 
@@ -255,89 +263,176 @@ public class PVPModule : BattleModule
         if (IsAttackTurn)
         {
             MyCanUseSkillCounts[MySelectBtnNum]--;
-            MyHeroAnim.Anim.SetTrigger($"Skill_{MySelectBtnNum}");
 
-            await UniTask.Delay((int)(MyHeroAnim.SkillTimes[MySelectBtnNum] * 1000));
-
-            // 공격 성공 시
-            if(MySelectBtnNum != EnemySelectBtnNum)
+            if(IsMyCritical)
             {
-                // 콤보
-                if (IsMyCombo)
-                    MyCombo++;
-                else
-                {
-                    MyCombo = 1;
-                    IsMyCombo = true;
-                }
+                MyHeroAnim.Anim.SetTrigger($"Skill_Cri");
 
-                EnemyHeroAnim.Anim.SetTrigger("Hit");
-                EnemyCurHp -= DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
+                await UniTask.Delay((int)(MyHeroAnim.CriticalTime * 1000));
+
+                EnemyHeroAnim.Anim.SetTrigger("Hit_Cri");
+
+                int damage = DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
+                if (MySelectBtnNum != EnemySelectBtnNum)
+                    damage *= 2;
+                else
+                    damage /= 2;
+
+                EnemyCurHp -= damage;
                 ingameWindow.SetUI_Players();
 
                 if (EnemyCurHp <= 0)
                 {
-                    Debug.Log("Enemy 사망! 승리!");
-
                     EnemyHeroAnim.Anim.SetTrigger("Die");
 
-                    await UniTask.Delay(2000);
+                    await UniTask.Delay(2000);  // Die 시간도 추가
 
                     m_Win = true;
                     EndGame();
                 }
+
+                IsMyCombo = false;
+                MyCombo = 0;
+                IsMyCritical = false;
+
+                await UniTask.Delay(1000);
             }
             else
             {
-                // 콤보
-                IsMyCombo = false;
-                MyCombo = 0;
+                MyHeroAnim.Anim.SetTrigger($"Skill_{MySelectBtnNum}");
 
-                EnemyHeroAnim.Anim.SetTrigger("Block");
+                await UniTask.Delay((int)(MyHeroAnim.SkillTimes[MySelectBtnNum] * 1000));
+
+                // 공격 성공 시
+                if (MySelectBtnNum != EnemySelectBtnNum)
+                {
+                    EnemyHeroAnim.Anim.SetTrigger("Hit");
+                    EnemyCurHp -= DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
+                    ingameWindow.SetUI_Players();
+
+                    if (EnemyCurHp <= 0)
+                    {
+                        EnemyHeroAnim.Anim.SetTrigger("Die");
+
+                        await UniTask.Delay(2000);  // Die 시간도 추가
+
+                        m_Win = true;
+                        EndGame();
+                    }
+
+                    // 콤보
+                    if (IsMyCombo)
+                    {
+                        MyCombo++;
+
+                        if (MyCombo == 3)
+                            IsMyCritical = true;
+                    }
+                    else
+                    {
+                        MyCombo = 1;
+                        IsMyCombo = true;
+                    }
+
+                    await UniTask.Delay(1000);
+                }
+                else
+                {
+                    IsMyCombo = false;
+                    MyCombo = 0;
+
+                    EnemyHeroAnim.Anim.SetTrigger("Block");
+
+                    await UniTask.Delay(1000);
+                }
             }
         }
         else
         {
             EnemyCanUseSkillCounts[EnemySelectBtnNum]--;
-            EnemyHeroAnim.Anim.SetTrigger($"Skill_{EnemySelectBtnNum}");
 
-            await UniTask.Delay((int)(EnemyHeroAnim.SkillTimes[EnemySelectBtnNum] * 1000));
-
-            // 공격 성공 시
-            if (MySelectBtnNum != EnemySelectBtnNum)
+            if(IsEnemyCritical)
             {
-                // 콤보
-                if (IsEnemyCombo)
-                    EnemyCombo++;
-                else
-                {
-                    EnemyCombo = 1;
-                    IsEnemyCombo = true;
-                }
+                EnemyHeroAnim.Anim.SetTrigger($"Skill_Cri");
 
-                MyHeroAnim.Anim.SetTrigger("Hit");
-                CurHp -= DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, EnemySelectBtnNum);
+                await UniTask.Delay((int)(EnemyHeroAnim.CriticalTime * 1000));
+
+                MyHeroAnim.Anim.SetTrigger("Hit_Cri");
+
+                int damage = DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, MySelectBtnNum);
+                if (MySelectBtnNum != EnemySelectBtnNum)
+                    damage *= 2;
+                else
+                    damage /= 2;
+
+                CurHp -= damage;
                 ingameWindow.SetUI_Players();
 
                 if (CurHp <= 0)
                 {
-                    Debug.Log("나의 사망! 패배!");
-
                     MyHeroAnim.Anim.SetTrigger("Die");
 
-                    await UniTask.Delay(2000);
+                    await UniTask.Delay(2000);  // Die 시간도 추가
 
                     m_Win = false;
                     EndGame();
                 }
+
+                IsEnemyCombo = false;
+                EnemyCombo = 0;
+                IsEnemyCritical = false;
+
+                await UniTask.Delay(1000);
             }
             else
             {
-                // 콤보
-                IsEnemyCombo = false;
-                EnemyCombo = 0;
+                EnemyHeroAnim.Anim.SetTrigger($"Skill_{EnemySelectBtnNum}");
 
-                MyHeroAnim.Anim.SetTrigger("Block");
+                await UniTask.Delay((int)(EnemyHeroAnim.SkillTimes[EnemySelectBtnNum] * 1000));
+
+                // 공격 성공 시
+                if (MySelectBtnNum != EnemySelectBtnNum)
+                {
+                    MyHeroAnim.Anim.SetTrigger("Hit");
+                    CurHp -= DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, EnemySelectBtnNum);
+                    ingameWindow.SetUI_Players();
+
+                    if (CurHp <= 0)
+                    {
+                        MyHeroAnim.Anim.SetTrigger("Die");
+
+                        await UniTask.Delay(2000);  // Die 시간도 추가
+
+                        m_Win = false;
+                        EndGame();
+                    }
+
+                    // 콤보
+                    if (IsEnemyCombo)
+                    {
+                        EnemyCombo++;
+
+                        if (EnemyCombo == 3)
+                            IsEnemyCritical = true;
+                    }
+                    else
+                    {
+                        EnemyCombo = 1;
+                        IsEnemyCombo = true;
+                    }
+
+                    await UniTask.Delay(1000);
+                }
+                else
+                {
+                    // 콤보
+                    IsEnemyCombo = false;
+                    EnemyCombo = 0;
+
+                    MyHeroAnim.Anim.SetTrigger("Block");
+
+                    await UniTask.Delay(1000);
+                }
             }
         }
     }

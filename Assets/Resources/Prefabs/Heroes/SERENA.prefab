@@ -1816,8 +1816,8 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1875539412281594}
   m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: c36ed9343574a3c4c8ad32b4940615f4, type: 3}
-  m_Controller: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: c8ffcaa339e8af44db177fc2762a1a6a, type: 3}
+  m_Controller: {fileID: 9100000, guid: 4bbca644b5550dd4d862f565a9640c50, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1903,8 +1903,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2141868f8b9af147b862225ad1f6184, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <SkillTimes>k__BackingField: []
-  <Anim>k__BackingField: {fileID: 0}
+  <SkillTimes>k__BackingField:
+  - 0.4
+  - 0.45
+  - 0.3
+  <CriticalTime>k__BackingField: 1
+  <Anim>k__BackingField: {fileID: 95948881383513526}
 --- !u!1 &1878905077643724
 GameObject:
   m_ObjectHideFlags: 0

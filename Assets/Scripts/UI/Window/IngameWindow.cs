@@ -14,6 +14,8 @@ public class IngameWindow : UIElement
     [Header("Top")]
     [SerializeField] private TMP_Text Text_Time = null;
     [SerializeField] private TMP_Text Text_Round = null;
+    [SerializeField] private GameObject Obj_AtkTurn = null;
+    [SerializeField] private GameObject Obj_DefTurn = null;
 
     [Header("Under")]
     [SerializeField] private Button Btn_Ready = null;
@@ -111,14 +113,14 @@ public class IngameWindow : UIElement
     {
         SetUI_Players();
         SetUI_Skill();
-        SetUI_Round();
+        SetUI_Top();
         SetUI_DangerIcon();
     }
 
     public override void OnRefresh()
     {
         SetUI_Players();
-        SetUI_Round();
+        SetUI_Top();
         SetUI_Skill();
     }
     #endregion
@@ -126,9 +128,17 @@ public class IngameWindow : UIElement
     #region Public Method
 
     #region UI
-    public void SetUI_Round()
+    public void SetUI_Top()
     {
+        Obj_AtkTurn.SetActive(false);
+        Obj_DefTurn.SetActive(false);
+
         Text_Round.text = $"Round {m_PVPModule.CurRound}";
+        
+        if(m_PVPModule.IsAttackTurn)
+            Obj_AtkTurn.SetActive(true);
+        else
+            Obj_DefTurn.SetActive(true);
     }
 
     public void SetUI_Players()
@@ -187,14 +197,14 @@ public class IngameWindow : UIElement
             Text_MyATK_2.text = $"ATK : {DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, 2)}";
             Text_MyCount_2.text = $"{m_PVPModule.MyCanUseSkillCounts[2]} / {ClientDef.SkillMaxCount}";
 
-            SetUI_MyCombo();
-
             Obj_AttackPanel.SetActive(true);
         }
         else
         {
             Obj_DefencePanel.SetActive(true);
         }
+
+        SetUI_MyCombo();
 
         // Enemy
         Text_EnemyATK_0.text = $"ATK : {DamageUtil.GetSkillDamage(m_PVPModule.EnemyUserData.UserHeroData.EquipHero, 0)}";

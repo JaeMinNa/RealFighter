@@ -1997,9 +1997,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <SkillTimes>k__BackingField:
-  - 0.5
-  - 0.5
-  - 0.5
+  - 0.3
+  - 0.3
+  - 0.3
+  <CriticalTime>k__BackingField: 1
   <Anim>k__BackingField: {fileID: 95939370439069904}
 --- !u!1 &1943039900739030
 GameObject:
