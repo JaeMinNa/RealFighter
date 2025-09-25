@@ -149,7 +149,7 @@ public class DataManager : Singleton<DataManager>
             UID = "Admin",
             NickName = "Jaemin",
             Score = 0,
-            Image = "1",
+            Image = "0",
             Gold = 0
         };
 
@@ -157,7 +157,7 @@ public class DataManager : Singleton<DataManager>
 
         // Hero
         HeroData heroData = new HeroData();
-        heroData.HeroName = "STEELTON";
+        heroData.HeroName = "BLAZE";
         heroData.Skillproficiencies[0] = 0;
         heroData.Skillproficiencies[1] = 0;
         heroData.Skillproficiencies[2] = 0;
@@ -184,7 +184,7 @@ public class DataManager : Singleton<DataManager>
             UID = "AI",
             NickName = TextUtil.GetRandomAINickName(),
             Score = RandomUtil.GetRandomIndex(0, 5),
-            Image = RandomUtil.GetRandomIndex(1, 5).ToString(),
+            Image = RandomUtil.GetRandomIndex(0, 4).ToString(),
             Gold = 0
         };
 

@@ -7,6 +7,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine.Assertions.Must;
 using Cysharp.Threading.Tasks.Triggers;
+using Cysharp.Threading.Tasks;
 
 public class IngameWindow : UIElement
 {
@@ -65,6 +66,9 @@ public class IngameWindow : UIElement
     [SerializeField] private GameObject[] Obj_EnemyDangerIcons = null;
     [SerializeField] private TMP_Text Text_EnemyCombo = null;
     [SerializeField] private GameObject Obj_EnemyCritical = null;
+
+    [Header("Images")]
+    [SerializeField] private Image SkillImage = null;
     #endregion
 
     #region Member Property
@@ -115,6 +119,8 @@ public class IngameWindow : UIElement
         SetUI_Skill();
         SetUI_Top();
         SetUI_DangerIcon();
+
+        SkillImage.gameObject.SetActive(false);
     }
 
     public override void OnRefresh()
@@ -215,6 +221,20 @@ public class IngameWindow : UIElement
         Text_EnemyCount_2.text = $"{m_PVPModule.EnemyCanUseSkillCounts[2]} / {ClientDef.SkillMaxCount}";
 
         SetUI_EnemyCombo();
+    }
+
+    public async UniTask ShowSkillImage(string heroName, float time)
+    {
+        SkillImage.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Hero/{heroName}");
+
+        if(SkillImage.sprite == null)
+            SkillImage.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Hero/DOMINICK");
+
+        SkillImage.gameObject.SetActive(true);
+
+        await UniTask.Delay((int)(time * 1000));
+
+        SkillImage.gameObject.SetActive(false);
     }
     #endregion
 

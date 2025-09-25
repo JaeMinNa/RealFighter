@@ -266,6 +266,8 @@ public class PVPModule : BattleModule
 
             if(IsMyCritical)
             {
+                await ingameWindow.ShowSkillImage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName, 2);
+
                 MyHeroAnim.Anim.SetTrigger($"Skill_Cri");
 
                 await UniTask.Delay((int)(MyHeroAnim.CriticalTime * 1000));
@@ -353,6 +355,8 @@ public class PVPModule : BattleModule
 
             if(IsEnemyCritical)
             {
+                await ingameWindow.ShowSkillImage(EnemyUserData.UserHeroData.EquipHero.HeroName, 2);
+
                 EnemyHeroAnim.Anim.SetTrigger($"Skill_Cri");
 
                 await UniTask.Delay((int)(EnemyHeroAnim.CriticalTime * 1000));

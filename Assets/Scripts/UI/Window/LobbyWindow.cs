@@ -7,6 +7,7 @@ public class LobbyWindow : UIElement
 {
     #region Cashed Object
     [Header("Top")]
+    [SerializeField] private Button Btn_Character = null;
     [SerializeField] private TMP_Text Text_NickName = null;
     [SerializeField] private Image Img_Character = null;
     [SerializeField] private Slider Slider_Exp = null;
@@ -28,6 +29,7 @@ public class LobbyWindow : UIElement
     #region Override Method
     public override void Init()
     {
+        Btn_Character.onClick.AddListener(OnClick_Character);
         Btn_Hero.onClick.AddListener(OnClick_Hero);
         Btn_Shop.onClick.AddListener(OnClick_Shop);
         Btn_Ranking.onClick.AddListener(OnClick_Ranking);
@@ -93,6 +95,11 @@ public class LobbyWindow : UIElement
     private void OnClick_Setting()
     {
         UIManager.Instance.Open<Popup_Setting>(UI.Popup, "Prefabs/UI/Popup/Popup_Setting");
+    }
+
+    private void OnClick_Character()
+    {
+        UIManager.Instance.Open<Popup_SelectCharacter>(UI.Popup, "Prefabs/UI/Popup/Popup_SelectCharacter");
     }
     #endregion
 }
