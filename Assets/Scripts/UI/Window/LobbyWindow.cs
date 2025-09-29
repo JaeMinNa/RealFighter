@@ -79,7 +79,7 @@ public class LobbyWindow : UIElement
 
     private void OnClick_Hero()
     {
-
+        UIManager.Instance.Open<Popup_Hero>(UI.Popup, "Prefabs/UI/Popup/Popup_Hero");
     }
 
     private void OnClick_Shop()

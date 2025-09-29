@@ -227,8 +227,8 @@ public class IngameWindow : UIElement
     {
         SkillImage.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Hero/{heroName}");
 
-        if(SkillImage.sprite == null)
-            SkillImage.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Hero/DOMINICK");
+        if (SkillImage.sprite == null)
+            return;
 
         SkillImage.gameObject.SetActive(true);
 
