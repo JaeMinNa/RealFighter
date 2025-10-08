@@ -90,14 +90,14 @@ public class PVPModule : BattleModule
 
             NextTurn();
 
-            if (CurRound == ClientDef.MaxRound)
-            {
-                if (CurHp >= EnemyCurHp)
-                    m_Win = true;
+            //if (CurRound == ClientDef.MaxRound)
+            //{
+            //    if (CurHp >= EnemyCurHp)
+            //        m_Win = true;
 
-                EndGame();
-                return;
-            }
+            //    EndGame();
+            //    return;
+            //}
         }
     }
     #endregion
@@ -235,8 +235,8 @@ public class PVPModule : BattleModule
 
     private void CreateHeroes()
     {
-        var myHero = ResourceLoader.LoadAssetResources<GameObject>($"Prefabs/Heroes/{DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName}");
-        var enemyHero = ResourceLoader.LoadAssetResources<GameObject>($"Prefabs/Heroes/{EnemyUserData.UserHeroData.EquipHero.HeroName}");
+        var myHero = ResourceLoader.LoadAssetResources<GameObject>($"Prefabs/Hero/Hero_Ingame/{DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName}");
+        var enemyHero = ResourceLoader.LoadAssetResources<GameObject>($"Prefabs/Hero/Hero_Ingame/{EnemyUserData.UserHeroData.EquipHero.HeroName}");
 
         GameObject myHeroObj = null;
         GameObject enemyHeroObj = null;
@@ -272,6 +272,7 @@ public class PVPModule : BattleModule
 
                 await UniTask.Delay((int)(MyHeroAnim.CriticalTime * 1000));
 
+                EffectUtil.StartShake(0.15f, 0.2f);
                 EnemyHeroAnim.Anim.SetTrigger("Hit_Cri");
 
                 int damage = DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
@@ -308,6 +309,7 @@ public class PVPModule : BattleModule
                 // 공격 성공 시
                 if (MySelectBtnNum != EnemySelectBtnNum)
                 {
+                    EffectUtil.StartShake(0.1f, 0.2f);
                     EnemyHeroAnim.Anim.SetTrigger("Hit");
                     EnemyCurHp -= DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
                     ingameWindow.SetUI_Players();
@@ -343,6 +345,7 @@ public class PVPModule : BattleModule
                     IsMyCombo = false;
                     MyCombo = 0;
 
+                    EffectUtil.StartShake(0.02f, 0.15f);
                     EnemyHeroAnim.Anim.SetTrigger("Block");
 
                     await UniTask.Delay(1000);
@@ -361,6 +364,7 @@ public class PVPModule : BattleModule
 
                 await UniTask.Delay((int)(EnemyHeroAnim.CriticalTime * 1000));
 
+                EffectUtil.StartShake(0.15f, 0.2f);
                 MyHeroAnim.Anim.SetTrigger("Hit_Cri");
 
                 int damage = DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, MySelectBtnNum);
@@ -397,6 +401,7 @@ public class PVPModule : BattleModule
                 // 공격 성공 시
                 if (MySelectBtnNum != EnemySelectBtnNum)
                 {
+                    EffectUtil.StartShake(0.1f, 0.2f);
                     MyHeroAnim.Anim.SetTrigger("Hit");
                     CurHp -= DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, EnemySelectBtnNum);
                     ingameWindow.SetUI_Players();
@@ -433,6 +438,7 @@ public class PVPModule : BattleModule
                     IsEnemyCombo = false;
                     EnemyCombo = 0;
 
+                    EffectUtil.StartShake(0.02f, 0.15f);
                     MyHeroAnim.Anim.SetTrigger("Block");
 
                     await UniTask.Delay(1000);

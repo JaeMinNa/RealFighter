@@ -329,7 +329,7 @@ MonoBehaviour:
   - 0.3
   - 0.35
   - 0.3
-  <CriticalTime>k__BackingField: 1
+  <CriticalTime>k__BackingField: 2
   <Anim>k__BackingField: {fileID: 95017601058467940}
 --- !u!1 &1152750459449430
 GameObject:

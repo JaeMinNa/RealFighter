@@ -229,7 +229,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 07db5151211204a56864e89c55552af3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e7ff0d5f0d9904e42b233b892c55938c, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -296,12 +296,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Slider_Exp: {fileID: 7669371356639090831}
+  Img_Element: {fileID: 4256013805425985814}
+  Img_BackGlow: {fileID: 5343202533527172839}
   Text_Level: {fileID: 538008159951529449}
   Text_HeroName: {fileID: 7060257056201804061}
   Text_Atk_High: {fileID: 838171803143640460}
   Text_Atk_Mid: {fileID: 4637364993874065126}
   Text_Atk_Low: {fileID: 817602587163559969}
   RawImg_Hero: {fileID: 176731353032345830}
+  Btn_Click: {fileID: 2623072542176748584}
 --- !u!1 &1315249921533297970
 GameObject:
   m_ObjectHideFlags: 0
@@ -1551,7 +1554,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 49, y: -33}
+  m_AnchoredPosition: {x: 49, y: -47}
   m_SizeDelta: {x: 373.7, y: 12}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &8457454518104414335
@@ -2170,8 +2173,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60
-  m_fontSizeBase: 60
+  m_fontSize: 55
+  m_fontSizeBase: 55
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

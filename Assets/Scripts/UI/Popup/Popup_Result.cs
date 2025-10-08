@@ -24,7 +24,7 @@ public class Popup_Result : UIElement
     {
         Btn_Home.onClick.AddListener(OnClick_Home);
 
-        m_slotObj = ResourceLoader.LoadAssetResources<GameObject>($"Prefabs/Slot/ElementSlot");
+        m_slotObj = ResourceLoader.LoadAssetResources<GameObject>($"Prefabs/Element/ElementSlot");
     }
 
     public override void OnClose()
@@ -90,6 +90,8 @@ public class Popup_Result : UIElement
         Text_CurLevel.text = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level.ToString();
         Text_CurExp.text = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp.ToString();
         Slider_CurExp.value = (float)DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp / (float)(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level * 10) * 100f;
+
+        DataManager.Instance.SaveData();
     }
     #endregion
 

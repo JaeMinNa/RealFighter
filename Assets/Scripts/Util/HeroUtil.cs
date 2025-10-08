@@ -37,21 +37,42 @@ public static class HeroUtil
         int curLevel = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level;
         int curExp = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp;
         int levelUpExp = curLevel * 10;
+        string heroName = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName;
+        HeroData myHeroData = null;
 
-        if(curExp + value >= levelUpExp)
+        for (int index = 0; index < DataManager.Instance.GetMyUserData().UserHeroData.MyHeroes.Count; ++index)
+        {
+            if (DataManager.Instance.GetMyUserData().UserHeroData.MyHeroes[index].HeroName == heroName)
+            {
+                myHeroData = DataManager.Instance.GetMyUserData().UserHeroData.MyHeroes[index];
+                break;
+            }
+        }
+
+        if (myHeroData == null)
+            return;
+
+        // 장착, 보유 히어로 각각 모두 경험치를 증가
+        if (curExp + value >= levelUpExp)
         {
             if(curLevel >= ClientDef.MaxHeroLevel)
             {
                 DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp = curExp + value;
+                myHeroData.Exp = curExp + value;
             }
             else
             {
                 DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp = curExp + value - levelUpExp;
+                myHeroData.Exp = curExp + value - levelUpExp;
+
                 curExp = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp;
 
                 while (true)
                 {
-                    curLevel = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level++;
+                    DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level++;
+                    myHeroData.Level++;
+
+                    curLevel = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level;
                     levelUpExp = curLevel * 10;
 
                     if (curExp < levelUpExp)
@@ -62,6 +83,7 @@ public static class HeroUtil
         else
         {
             DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp = curExp + value;
+            myHeroData.Exp = curExp + value;
         }
     }
     #endregion
