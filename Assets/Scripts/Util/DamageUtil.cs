@@ -10,11 +10,14 @@ public static class DamageUtil
         // 기본 데미지
         int defaultDamage = 10;
 
+        // 등급 데미지
+        int gradeDamage = data.Grade * 3;
+
         // 숙련도 데미지
         int proficiencyDamage = data.Skillproficiencies[num] < 1001 ? (int)((float)data.Skillproficiencies[num] * 0.01f) : 10;
 
-        // 데지미 계산 = 기본 데미지 + 레벨 데미지 + 숙련도 데미지
-        int damage = defaultDamage + (data.Level - 1) + proficiencyDamage;
+        // 데미지 계산 = 기본 데미지 + 레벨 데미지 + 숙련도 데미지 + 등급 데미지
+        int damage = defaultDamage + (data.Level - 1) + proficiencyDamage + gradeDamage;
 
         return damage;
     }

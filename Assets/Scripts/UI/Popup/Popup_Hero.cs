@@ -28,6 +28,8 @@ public class Popup_Hero : UIElement
         // MyHeroData¸¦ Á¤·Ä
         m_MyHeroes = m_MyHeroes
         .OrderByDescending(data => data.HeroName == DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName)
+        .ThenByDescending(data => data.Grade)
+        .ThenByDescending(data => data.GradeExp)
         .ThenByDescending(data => data.Level)
         .ThenByDescending(data => data.Exp)
         .ToList();

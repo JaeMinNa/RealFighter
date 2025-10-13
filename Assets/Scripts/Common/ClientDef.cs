@@ -49,12 +49,18 @@ public class UserData_Hero
 }
 #endregion
 
+// Grade 0 : 노말
+// Grade 1 : 레어
+// Grade 2 : 에픽
+// Grade 3 : 유니크
 public class HeroData
 {
     public string HeroName = string.Empty;
     public int[] Skillproficiencies = { 0, 0, 0 };
     public int Level = 0;
     public int Exp = 0;
+    public int Grade = 0;
+    public int GradeExp = 0;
 }
 
 public class MessageData

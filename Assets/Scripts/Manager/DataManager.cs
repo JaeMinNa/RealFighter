@@ -163,6 +163,8 @@ public class DataManager : Singleton<DataManager>
         heroData.Skillproficiencies[2] = 0;
         heroData.Level = 1;
         heroData.Exp = 0;
+        heroData.Grade = 0;
+        heroData.GradeExp = 2;
 
         // Hero1
         HeroData heroData1 = new HeroData();
@@ -172,6 +174,8 @@ public class DataManager : Singleton<DataManager>
         heroData1.Skillproficiencies[2] = 0;
         heroData1.Level = 1;
         heroData1.Exp = 0;
+        heroData1.Grade = 1;
+        heroData1.GradeExp = 2;
 
         // Hero2
         HeroData heroData2 = new HeroData();
@@ -181,6 +185,8 @@ public class DataManager : Singleton<DataManager>
         heroData2.Skillproficiencies[2] = 0;
         heroData2.Level = 1;
         heroData2.Exp = 0;
+        heroData2.Grade = 2;
+        heroData2.GradeExp = 2;
 
         // Hero3
         HeroData heroData3 = new HeroData();
@@ -190,6 +196,8 @@ public class DataManager : Singleton<DataManager>
         heroData3.Skillproficiencies[2] = 0;
         heroData3.Level = 1;
         heroData3.Exp = 0;
+        heroData3.Grade = 3;
+        heroData3.GradeExp = 2;
 
         // Hero3
         HeroData heroData4 = new HeroData();
@@ -199,6 +207,8 @@ public class DataManager : Singleton<DataManager>
         heroData4.Skillproficiencies[2] = 0;
         heroData4.Level = 1;
         heroData4.Exp = 0;
+        heroData3.Grade = 3;
+        heroData3.GradeExp = 2;
 
         UserData_Hero userData_Hero = new UserData_Hero();
         userData_Hero.EquipHero = heroData;

@@ -12,6 +12,8 @@ public class LobbyWindow : UIElement
     [SerializeField] private Image Img_Character = null;
     [SerializeField] private Slider Slider_Exp = null;
     [SerializeField] private TMP_Text Text_Level = null;
+    [SerializeField] private Image Img_Grade = null;
+    [SerializeField] private TMP_Text Text_Grade = null;
     [SerializeField] private TMP_Text Text_Hero = null;
     [SerializeField] private TMP_Text Text_Gold = null;
     [SerializeField] private Button Btn_Setting = null;
@@ -63,6 +65,38 @@ public class LobbyWindow : UIElement
         Text_Level.text = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level.ToString();
         Text_Hero.text = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName;
         Text_Gold.text = DataManager.Instance.GetMyUserData().UserCommonData.Gold.ToString();
+
+        SetGrade();
+    }
+
+    private void SetGrade()
+    {
+        HeroData data = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero;
+
+        if (data.Grade == 0)
+        {
+            Text_Grade.text = "NORMAL";
+            Text_Grade.color = new Color32(176, 176, 176, 255);
+            Img_Grade.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Label/Label_Label01_Gray");
+        }
+        else if (data.Grade == 1)
+        {
+            Text_Grade.text = "RARE";
+            Text_Grade.color = new Color32(77, 163, 255, 255);
+            Img_Grade.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Label/Label_Label01_Blue");
+        }
+        else if (data.Grade == 2)
+        {
+            Text_Grade.text = "EPIC";
+            Text_Grade.color = new Color32(195, 107, 255, 255);
+            Img_Grade.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Label/Label_Label01_Purple");
+        }
+        else
+        {
+            Text_Grade.text = "UNIQUE";
+            Text_Grade.color = new Color32(229, 245, 84, 89);
+            Img_Grade.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Label/Label_Label01_Yellow");
+        }
     }
     #endregion
 
@@ -84,7 +118,7 @@ public class LobbyWindow : UIElement
 
     private void OnClick_Shop()
     {
-
+        UIManager.Instance.Open<Popup_Shop>(UI.Popup, "Prefabs/UI/Popup/Popup_Shop");
     }
 
     private void OnClick_Ranking()
