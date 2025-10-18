@@ -91,7 +91,7 @@ public class BattleModule : MonoBehaviour
         //m_IsPause = true;
         //m_IsEndGame = true;
 
-        Time.timeScale = 0f;
+        //Time.timeScale = 0f;
         m_IsStartGame = false;
 
         List<object> args = new List<object> { m_Win };

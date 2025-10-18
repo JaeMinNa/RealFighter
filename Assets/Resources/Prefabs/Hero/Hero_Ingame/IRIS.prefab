@@ -201,7 +201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <SkillTimes>k__BackingField:
-  - 0.3
+  - 0.7
   - 0.3
   - 0.3
   <CriticalTime>k__BackingField: 1

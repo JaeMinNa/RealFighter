@@ -27,7 +27,7 @@ public class Popup_Hero : UIElement
 
         // MyHeroData¸¦ Á¤·Ä
         m_MyHeroes = m_MyHeroes
-        .OrderByDescending(data => data.HeroName == DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName)
+        .OrderByDescending(data => data.HeroName == DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName && data.Grade == DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Grade)
         .ThenByDescending(data => data.Grade)
         .ThenByDescending(data => data.GradeExp)
         .ThenByDescending(data => data.Level)
@@ -50,7 +50,8 @@ public class Popup_Hero : UIElement
             elementHero.GetComponent<ElementHero>().SetHero(m_MyHeroes[index]);
             elementHero.GetComponent<ElementHero>().SetButton(() => OnClick_Hero(capturedIndex));
 
-            if (m_MyHeroes[index].HeroName == DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName)
+            if (m_MyHeroes[index].HeroName == DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName &&
+                m_MyHeroes[index].Grade == DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Grade)
                 elementHero.GetComponent<ElementHero>().SetSelect(true);
         }
     }

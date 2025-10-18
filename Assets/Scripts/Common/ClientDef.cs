@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
 public static class ClientDef
 {
+    // 인게임
     public static readonly int SkillMaxCount = 3;
     public static readonly float TurnTime = 10f;
     public static readonly int MaxRound = 9;
@@ -11,6 +13,29 @@ public static class ClientDef
     public static readonly int LoseExp = 2;
     public static readonly int WinGold = 1000;
     public static readonly int LoseGold = 200;
+
+    // 히어로
+    public static readonly List<string> HeroNames = new List<string>
+    {
+        "REX", "BLAZE", "DRAKE", "DOMINICK", "MAVERICK", "STEELTON", "IRIS", "SERENA", "ORIANNA", "JIN"
+    };
+    public static readonly int MaxGradeExp = 3;
+
+    // 상점
+    public static readonly List<ShopData> ShopList_Hero = new List<ShopData>
+    {
+        new ShopData("NORMAL HERO PACK", 3000, 1, 2),
+        new ShopData("RARE HERO PACK", 10000, 1, 5)
+    };
+    public static readonly List<ShopData> ShopList_Gold = new List<ShopData>
+    {
+        new ShopData("FREE GOLD", 0, 1000),
+        new ShopData("AD GOLD", 0, 2000)
+    };
+
+
+    //public static readonly int HeroPackPrice_Normal = 3000;
+    //public static readonly int HeroPackPrice_Rare = 10000;
 
     //public static readonly int MAX_PARTYMEMBER = 3;
 
@@ -30,6 +55,9 @@ public class UserData
 
     // 유저의 히어로 정보
     public UserData_Hero UserHeroData = null;
+
+    // 유저의 컨텐츠 정보
+    public UserData_Contents UserContentsData = null;
 }
 
 public class UserData_Common
@@ -47,12 +75,14 @@ public class UserData_Hero
     public HeroData EquipHero = new HeroData();
     public List<HeroData> MyHeroes = new List<HeroData>();
 }
+
+public class UserData_Contents
+{
+    public DateTime LastLoginTime = DateTime.MinValue;
+    public bool IsGotFreeGold = false;
+}
 #endregion
 
-// Grade 0 : 노말
-// Grade 1 : 레어
-// Grade 2 : 에픽
-// Grade 3 : 유니크
 public class HeroData
 {
     public string HeroName = string.Empty;
@@ -90,6 +120,22 @@ public class ItemData
     {
         Name = name;
         Count = count;
+    }
+}
+
+public class ShopData
+{
+    public string Name = string.Empty;
+    public int Price = 0;
+    public int Count = 0;
+    public int Value = 0;
+
+    public ShopData(string name, int price, int count = 0, int value = 0)
+    {
+        Name = name;
+        Price = price;
+        Count = count;
+        Value = value;
     }
 }
 

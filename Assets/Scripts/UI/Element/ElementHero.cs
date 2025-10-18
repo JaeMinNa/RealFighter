@@ -31,7 +31,7 @@ public class ElementHero : MonoBehaviour
         Initial();
 
         Slider_Exp.value = (float)data.Exp / (float)(data.Level * 10) * 100f;
-        Slider_GradeExp.value = (float)data.GradeExp / (float)((data.Grade + 1) * 3) * 100f;
+        Slider_GradeExp.value = (float)data.GradeExp / (float)ClientDef.MaxGradeExp * 100f;
         Text_Level.text = $"Lv.{data.Level}";
         Text_HeroName.text = data.HeroName.ToString();
         Text_Atk_High.text = $"HIGH : {DamageUtil.GetSkillDamage(data, 0)}";
@@ -45,15 +45,9 @@ public class ElementHero : MonoBehaviour
     public void SetSelect(bool isOn)
     {
         if (isOn)
-        {
             Img_Element.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Element/Frame_ItemFrame06_s");
-            //Img_BackGlow.color = new Color(179f / 255f, 179f / 255f, 70f / 255f, 100f / 255f);
-        }
         else
-        {
             Img_Element.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Element/Frame_ItemFrame06_n");
-            //Img_BackGlow.color = new Color(0f / 255f, 134f / 255f, 255f / 255f, 100f / 255f);
-        }
     }
 
     public void SetButton(Action action)

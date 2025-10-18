@@ -74,10 +74,10 @@ public class Popup_System : UIElement
     #region Button Event
     private void OnClick_OK()
     {
+        UIManager.Instance.Close<Popup_System>();
+
         if (MyData != null)
             MyData.OkAction?.Invoke();
-
-        UIManager.Instance.Close<Popup_System>();
     }
 
     private void OnClick_Cancel()

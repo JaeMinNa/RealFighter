@@ -124,14 +124,8 @@ public class DataManager : Singleton<DataManager>
     #region Game
     public void ExitGame()
     {
-        if(GameManager.Instance.IsEditor)
-        {
-            EditorApplication.isPlaying = false;
-        }
-        else
-        {
-            Application.Quit();
-        }
+        GameManager.Instance.ExitGame();
+
     }
     #endregion
     #endregion
@@ -164,7 +158,7 @@ public class DataManager : Singleton<DataManager>
         heroData.Level = 1;
         heroData.Exp = 0;
         heroData.Grade = 0;
-        heroData.GradeExp = 2;
+        heroData.GradeExp = 0;
 
         // Hero1
         HeroData heroData1 = new HeroData();
@@ -175,7 +169,7 @@ public class DataManager : Singleton<DataManager>
         heroData1.Level = 1;
         heroData1.Exp = 0;
         heroData1.Grade = 1;
-        heroData1.GradeExp = 2;
+        heroData1.GradeExp = 0;
 
         // Hero2
         HeroData heroData2 = new HeroData();
@@ -186,7 +180,7 @@ public class DataManager : Singleton<DataManager>
         heroData2.Level = 1;
         heroData2.Exp = 0;
         heroData2.Grade = 2;
-        heroData2.GradeExp = 2;
+        heroData2.GradeExp = 0;
 
         // Hero3
         HeroData heroData3 = new HeroData();
@@ -197,7 +191,7 @@ public class DataManager : Singleton<DataManager>
         heroData3.Level = 1;
         heroData3.Exp = 0;
         heroData3.Grade = 3;
-        heroData3.GradeExp = 2;
+        heroData3.GradeExp = 0;
 
         // Hero3
         HeroData heroData4 = new HeroData();
@@ -208,7 +202,7 @@ public class DataManager : Singleton<DataManager>
         heroData4.Level = 1;
         heroData4.Exp = 0;
         heroData3.Grade = 3;
-        heroData3.GradeExp = 2;
+        heroData3.GradeExp = 0;
 
         UserData_Hero userData_Hero = new UserData_Hero();
         userData_Hero.EquipHero = heroData;
@@ -219,6 +213,15 @@ public class DataManager : Singleton<DataManager>
         userData_Hero.MyHeroes.Add(heroData4);
 
         m_DataLoader.MyUserData.UserHeroData = userData_Hero;
+
+        // Contents
+        UserData_Contents userData_Contents = new UserData_Contents()
+        {
+            LastLoginTime = Util.DateTimeNow,
+            IsGotFreeGold = false
+        };
+
+        m_DataLoader.MyUserData.UserContentsData = userData_Contents;
 
         Debug.LogWarning("UserData 생성 성공");
     }
@@ -242,7 +245,6 @@ public class DataManager : Singleton<DataManager>
 
         // Hero
         HeroData heroData = HeroUtil.GetRandomAIHeroData();
-
         UserData_Hero aiData_Hero = new UserData_Hero();
         aiData_Hero.EquipHero = heroData;
         aiData_Hero.MyHeroes.Add(heroData);

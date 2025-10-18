@@ -7,6 +7,16 @@ using UnityEngine.UI;
 
 public class Popup_Shop : UIElement
 {
+    private enum ShopType
+    {
+        None,
+
+        Hero,
+        Item,
+
+        Max
+    }
+
     #region Cahsed Object
     [Header("Top UI")]
     [SerializeField] private TMP_Text Text_Gold = null;
@@ -16,20 +26,26 @@ public class Popup_Shop : UIElement
     [SerializeField] private List<Button> LeftBtnList = new List<Button>();
 
     [Header("Contents")]
-    [SerializeField] private List<GameObject> ContentsList = new List<GameObject>();
-
-    //[SerializeField] private Transform Trans_Content = null;
-    //[SerializeField] private Button Btn_Close = null;
+    [SerializeField] private List<GameObject> ContentList = new List<GameObject>();
+    [SerializeField] private Transform Trans_HeroContent = null;
+    [SerializeField] private Transform Trans_GoldContent = null;
     #endregion
 
     #region Member Property
-    //private List<HeroData> m_MyHeroes = new List<HeroData>();
-    //private GameObject m_ElementHero = null;
+    private List<ShopData> m_ShopList_Hero = new List<ShopData>();
+    private List<ShopData> m_ShopList_Gold = new List<ShopData>();
+    private GameObject m_ElementShop = null;
+    private ShopData m_ShopData = null;
+    private int m_GachaGrade = -1;
     #endregion
 
     #region Override Method
     public override void Init()
     {
+        m_ElementShop = ResourceLoader.LoadAssetResources<GameObject>("Prefabs/Element/ElementShop");
+        m_ShopList_Hero = ClientDef.ShopList_Hero;
+        m_ShopList_Gold = ClientDef.ShopList_Gold;
+
         for (int index = 0; index < LeftBtnList.Count; ++index)
         {
             int capturedIndex = index;
@@ -49,6 +65,7 @@ public class Popup_Shop : UIElement
     {
         Text_Gold.text = DataManager.Instance.GetMyUserData().UserCommonData.Gold.ToString();
 
+        SetShopList();
         OnClick_LeftBtn(0);
     }
 
@@ -74,10 +91,140 @@ public class Popup_Shop : UIElement
 
     private void SetContent(GameObject obj)
     {
-        for (int index = 0; index < ContentsList.Count; ++index)
-            ContentsList[index].SetActive(false);
+        for (int index = 0; index < ContentList.Count; ++index)
+            ContentList[index].SetActive(false);
 
         obj.SetActive(true);
+    }
+
+    private void SetShopList()
+    {
+        // Hero
+        for (int index = 0; index < m_ShopList_Hero.Count; ++index)
+        {
+            int capturedIndex = index;
+
+            var elementShop = Instantiate(m_ElementShop, Trans_HeroContent);
+            elementShop.GetComponent<ElementShop>().SetShop(m_ShopList_Hero[index]);
+            elementShop.GetComponent<ElementShop>().SetButton(() => OnClick_Buy_Hero(capturedIndex));
+        }
+
+        // Gold
+        for (int index = 0; index < m_ShopList_Gold.Count; ++index)
+        {
+            int capturedIndex = index;
+             
+            // 무료 골드
+            if(capturedIndex == 0)
+            {
+                var elementShop = Instantiate(m_ElementShop, Trans_GoldContent);
+                elementShop.GetComponent<ElementShop>().SetShop(m_ShopList_Gold[index]);
+                elementShop.GetComponent<ElementShop>().SetButton(() => OnClick_Buy_Gold_Free(capturedIndex));
+            }
+            // 광고 골드
+            else if (capturedIndex == 1)
+            {
+                var elementShop = Instantiate(m_ElementShop, Trans_GoldContent);
+                elementShop.GetComponent<ElementShop>().SetShop(m_ShopList_Gold[index]);
+                elementShop.GetComponent<ElementShop>().SetButton(() => OnClick_Buy_Gold_Ad(capturedIndex));
+                elementShop.GetComponent<ElementShop>().SetAd();
+            }
+        }
+    }
+
+    private void Buy_Hero()
+    {
+        // 가챠 등급 설정 에러
+        if(m_GachaGrade == -1)
+        {
+            UIManager.Instance.OpenSystemPopup(new MessageData
+            {
+                Type = PopupType.OkOnly,
+                Title = "알림",
+                Message = "Gacha 등급 설정 오류 입니다."
+            });
+            return;
+        }
+
+        // 골드 확인
+        if (DataManager.Instance.GetMyUserData().UserCommonData.Gold < m_ShopData.Price)
+        {
+            UIManager.Instance.OpenSystemPopup(new MessageData
+            {
+                Type = PopupType.OkOnly,
+                Title = "알림",
+                Message = "GOLD가 부족합니다."
+            });
+            return;
+        }
+
+        // 골드 감소
+        DataManager.Instance.GetMyUserData().UserCommonData.Gold -= m_ShopData.Price;
+
+        // 가챠
+        UIManager.Instance.Open<Popup_Gacha_Hero>(UI.Popup, "Prefabs/UI/Popup/Popup_Gacha_Hero", new List<object> { m_GachaGrade } );
+
+        // UI 갱신
+        UIManager.Instance.Refresh();
+    }
+
+    private void Buy_Gold_Free()
+    {
+        // 오늘 이미 구매했는지 확인
+        if(DataManager.Instance.GetMyUserData().UserContentsData.IsGotFreeGold)
+        {
+            UIManager.Instance.OpenSystemPopup(new MessageData
+            {
+                Type = PopupType.OkOnly,
+                Title = "알림",
+                Message = "무료 구매는 하루에 한번만 가능합니다.\n<size=40>* 00:00 시에 구매횟수가 초기화 됩니다.</size>"
+            });
+            return;
+        }
+
+        // 구매 완료
+        DataManager.Instance.GetMyUserData().UserContentsData.IsGotFreeGold = true;
+
+        // 골드 증가
+        DataManager.Instance.GetMyUserData().UserCommonData.Gold += m_ShopData.Count;
+
+        // 데이터 저장
+        DataManager.Instance.SaveData();
+
+        // UI 갱신
+        UIManager.Instance.Refresh();
+
+        // 완료 팝업
+        UIManager.Instance.OpenSystemPopup(new MessageData
+        {
+            Type = PopupType.OkOnly,
+            Title = "알림",
+            Message = "구매를 완료 하였습니다."
+        });
+    }
+
+    private void Buy_Gold_Ad()
+    {
+        // 광고 보기
+
+
+
+        // 골드 증가
+        DataManager.Instance.GetMyUserData().UserCommonData.Gold += m_ShopData.Count;
+
+        // 데이터 저장
+        DataManager.Instance.SaveData();
+
+        // UI 갱신
+        UIManager.Instance.Refresh();
+
+        // 완료 팝업
+        UIManager.Instance.OpenSystemPopup(new MessageData
+        {
+            Type = PopupType.OkOnly,
+            Title = "알림",
+            Message = "구매를 완료 하였습니다."
+        });
     }
     #endregion
 
@@ -91,27 +238,55 @@ public class Popup_Shop : UIElement
         SetLeftBtn(LeftBtnList[num], true);
 
         // 컨텐츠 설정
-        SetContent(ContentsList[num]);
+        SetContent(ContentList[num]);
     }
 
-    //private void OnClick_Hero(int num)
-    //{
-    //     모든 버튼 초기화
-    //    for (int index = 0; index < Trans_Content.childCount; ++index)
-    //        Trans_Content.GetChild(index).GetComponent<ElementHero>().SetSelect(false);
+    private void OnClick_Buy_Hero(int num)
+    {
+        m_ShopData = m_ShopList_Hero[num];
 
-    //     해당 버튼 활성화
-    //    Trans_Content.GetChild(num).GetComponent<ElementHero>().SetSelect(true);
+        // 가챠 등급 설정
+        if (num == 0)    // Normal
+            m_GachaGrade = 0;
+        else if (num == 1)  // Rare
+            m_GachaGrade = 1;
+        else
+            m_GachaGrade = -1;
 
-    //     장착 히어로 변경
-    //    DataManager.Instance.GetMyUserData().UserHeroData.EquipHero = m_MyHeroes[num];
+        UIManager.Instance.OpenSystemPopup(new MessageData
+        {
+            Type = PopupType.OkCancel,
+            Title = "구매",
+            Message = "정말 구매 하시겠습니까?",
+            OkAction = () => { Buy_Hero(); }
+        });
+    }
 
-    //     UI Refresh
-    //    UIManager.Instance.Refresh();
+    private void OnClick_Buy_Gold_Free(int num)
+    {
+        m_ShopData = m_ShopList_Gold[num];
 
-    //     데이터 저장
-    //    DataManager.Instance.SaveData();
-    //}
+        UIManager.Instance.OpenSystemPopup(new MessageData
+        {
+            Type = PopupType.OkCancel,
+            Title = "구매",
+            Message = "정말 구매 하시겠습니까?",
+            OkAction = () => { Buy_Gold_Free(); }
+        });
+    }
+
+    private void OnClick_Buy_Gold_Ad(int num)
+    {
+        m_ShopData = m_ShopList_Gold[num];
+
+        UIManager.Instance.OpenSystemPopup(new MessageData
+        {
+            Type = PopupType.OkCancel,
+            Title = "구매",
+            Message = "정말 구매 하시겠습니까?",
+            OkAction = () => { Buy_Gold_Ad(); }
+        });
+    }
 
     private void OnClick_Close()
     {

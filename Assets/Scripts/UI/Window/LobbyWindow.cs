@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 
 public class LobbyWindow : UIElement
 {
@@ -31,6 +32,8 @@ public class LobbyWindow : UIElement
     #region Override Method
     public override void Init()
     {
+        DailyInit();
+
         Btn_Character.onClick.AddListener(OnClick_Character);
         Btn_Hero.onClick.AddListener(OnClick_Hero);
         Btn_Shop.onClick.AddListener(OnClick_Shop);
@@ -97,6 +100,26 @@ public class LobbyWindow : UIElement
             Text_Grade.color = new Color32(229, 245, 84, 89);
             Img_Grade.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Label/Label_Label01_Yellow");
         }
+    }
+
+    private void DailyInit()
+    {
+        var userContentsData = DataManager.Instance.GetMyUserData().UserContentsData;
+        if (userContentsData == null)
+            return;
+
+        // 오늘 첫 로그인
+        if (Util.DateTimeNow.Date != userContentsData.LastLoginTime.Date)
+        {
+            // 일일 초기화
+            userContentsData.IsGotFreeGold = false;
+        }
+        else
+        {
+
+        }
+
+        userContentsData.LastLoginTime = Util.DateTimeNow;
     }
     #endregion
 
