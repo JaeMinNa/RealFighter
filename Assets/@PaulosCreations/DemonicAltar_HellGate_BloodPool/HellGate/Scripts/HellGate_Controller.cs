@@ -7,8 +7,8 @@ public class HellGate_Controller : MonoBehaviour
     private Gradient emissionColor;
     [SerializeField]
     private ParticleSystem orbParticlesL, orbParticlesR, fireParticles;
-    [SerializeField]
-    private AudioSource gateAudio, screamAudio, orbLAudio, orbRAudio, fireAudio;
+    //[SerializeField]
+    //private AudioSource gateAudio, screamAudio, orbLAudio, orbRAudio, fireAudio;
     [SerializeField]
     private Light gateLight;
     [SerializeField]
@@ -69,13 +69,13 @@ public class HellGate_Controller : MonoBehaviour
             if (transitionTimer >= rand1 && !orbParticlesL.isPlaying)
             {
                 orbParticlesL.Play();
-                orbLAudio.Play();
+                //orbLAudio.Play();
             }
 
             if (transitionTimer >= rand2 && !orbParticlesR.isPlaying)
             {
                 orbParticlesR.Play();
-                orbRAudio.Play();
+                //orbRAudio.Play();
             }
 
             gateMaterial.SetColor("_EmissionColor", emissionColor.Evaluate(transitionTimer));
@@ -96,10 +96,10 @@ public class HellGate_Controller : MonoBehaviour
         gateLight.gameObject.SetActive(true);
 
         fireParticles.Play();
-        fireAudio.volume = fireAudioMaxVolume;
-        fireAudio.Play();
-        screamAudio.Play();
-        gateAudio.Play();
+        //fireAudio.volume = fireAudioMaxVolume;
+        //fireAudio.Play();
+        //screamAudio.Play();
+        //gateAudio.Play();
 
         while (transitionTimer < 1f)
         {
@@ -108,14 +108,14 @@ public class HellGate_Controller : MonoBehaviour
             gateEffectMaterial.SetFloat("_Alpha", 1f - transitionTimer * 0.75f);
 
             gateLight.intensity = transitionTimer * gateLightMaxIntencity;
-            gateAudio.volume = transitionTimer * gateAudioMaxVolume;
+            //gateAudio.volume = transitionTimer * gateAudioMaxVolume;
 
             yield return null;
         }
 
         gateEffectMaterial.SetFloat("_Alpha", 0f);
         gateLight.intensity = gateLightMaxIntencity;
-        gateAudio.volume = gateAudioMaxVolume;
+        //gateAudio.volume = gateAudioMaxVolume;
         inTransition = false;
     }
 
@@ -137,8 +137,8 @@ public class HellGate_Controller : MonoBehaviour
 
             gateEffectMaterial.SetFloat("_Alpha", 1f - transitionTimer);
             gateLight.intensity = transitionTimer * gateLightMaxIntencity;
-            gateAudio.volume = transitionTimer * gateAudioMaxVolume;
-            fireAudio.volume = transitionTimer * fireAudioMaxVolume;
+            //gateAudio.volume = transitionTimer * gateAudioMaxVolume;
+            //fireAudio.volume = transitionTimer * fireAudioMaxVolume;
             yield return null;
         }
 
@@ -146,8 +146,8 @@ public class HellGate_Controller : MonoBehaviour
         gateMaterial.SetColor("_EmissionColor", emissionColor.Evaluate(0f));
         gateEffectObj.SetActive(false);
         gateLight.gameObject.SetActive(false);
-        gateAudio.Stop();
-        fireAudio.Stop();
+        //gateAudio.Stop();
+        //fireAudio.Stop();
 
         inTransition = false;
     }

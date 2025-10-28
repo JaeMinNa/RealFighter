@@ -12,7 +12,7 @@ public class DemonicAltar_Controller : MonoBehaviour
     [SerializeField] private GameObject runeCircleParticlesObj, runeExplosionObj;
     [SerializeField] private ParticleSystem portalParticles, lightningParticles, sparksParticles;
     [SerializeField] private Light portalLight, lightningLight;
-    [SerializeField] private AudioSource chantingAudio, portalAudio, lightningAudio;
+    //[SerializeField] private AudioSource chantingAudio, portalAudio, lightningAudio;
 
     private Vector3 runeCircleStartPosition = new Vector3(0.18f, 1.2f, 0), runeCircleEndPosition = new Vector3(0.18f, 6.5f, 0);
     private bool inTransition, altarOn;
@@ -60,7 +60,7 @@ public class DemonicAltar_Controller : MonoBehaviour
 
         runeCircleTF.localPosition = runeCircleStartPosition;
         runeCircleTF.gameObject.SetActive(true);
-        chantingAudio.Play();
+        //chantingAudio.Play();
 
         while (runeCircleTF.localPosition.y < runeCircleEndPosition.y)
         {
@@ -81,9 +81,9 @@ public class DemonicAltar_Controller : MonoBehaviour
 
         yield return new WaitForSeconds(0.6f);
 
-        portalAudio.volume = portalAudioMaxVolume;
+        //portalAudio.volume = portalAudioMaxVolume;
         portalParticles.Play();
-        portalAudio.Play();
+        //portalAudio.Play();
         portalLight.intensity = portalLightMaxIntensity;
 
         if (lightningEffects == EnabledState.on && !lightningCorRunning)
@@ -106,8 +106,8 @@ public class DemonicAltar_Controller : MonoBehaviour
 
             lightningParticles.Play();
             sparksParticles.Play();
-            lightningAudio.pitch = Random.Range(0.9f, 1.1f);
-            lightningAudio.Play();
+            //lightningAudio.pitch = Random.Range(0.9f, 1.1f);
+            //lightningAudio.Play();
 
             yield return new WaitForSeconds(Random.Range(4f, 12f));
         }
@@ -149,13 +149,13 @@ public class DemonicAltar_Controller : MonoBehaviour
             transitionTimer -= Time.deltaTime * 0.2f;
 
             portalLight.intensity = transitionTimer * portalLightMaxIntensity;
-            portalAudio.volume = transitionTimer * portalAudioMaxVolume;
+            //portalAudio.volume = transitionTimer * portalAudioMaxVolume;
             altarMat.SetColor("_EmissionColor", emissionColor.Evaluate(transitionTimer));
 
             yield return null;
         }
 
-        portalAudio.Stop();
+        //portalAudio.Stop();
         runeExplosionObj.SetActive(false);
 
         inTransition = false; 

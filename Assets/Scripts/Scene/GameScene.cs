@@ -9,6 +9,9 @@ public class GameScene : MonoBehaviour
 
     private async void Start()
     {
+        SoundManager.Instance.StartBGM("BGM_Battle");
+        SoundManager.Instance.StartSFX("StartGame");
+
         // Module »ý¼º
         BattleModule.CreateModule<PVPModule>();
         BattleModule.Instance.SetRootObject(Root_Camera, Root_Environment, Root_Character);

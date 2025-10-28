@@ -16,7 +16,7 @@ public class TitleWindow : UIElement
 
     public override void OnOpen(List<object> args)
     {
-
+        
     }
 
     public override void OnClose()
@@ -31,6 +31,7 @@ public class TitleWindow : UIElement
     #region Button
     private async void OnClick_Start()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         await ScenesManager.Instance.LoadScene("LobbyScene");
     }
     #endregion

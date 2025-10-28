@@ -20,5 +20,7 @@ public class TitleScene : MonoBehaviour
         UIManager.Instance.SetUIRoot(Root_UI);
         UIManager.Instance.SetActiveRoot(UI.BackGround, false);
         UIManager.Instance.Open<TitleWindow>(UI.Main, "Prefabs/UI/Window/TitleWindow");
+
+        SoundManager.Instance.StartBGM("BGM_Title");
     }
 }

@@ -231,6 +231,8 @@ public class Popup_Shop : UIElement
     #region Button
     private void OnClick_LeftBtn(int num)
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
+
         // 버튼 설정
         for (int index = 0; index < LeftBtnList.Count; ++index)
             SetLeftBtn(LeftBtnList[index], false);
@@ -243,6 +245,7 @@ public class Popup_Shop : UIElement
 
     private void OnClick_Buy_Hero(int num)
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         m_ShopData = m_ShopList_Hero[num];
 
         // 가챠 등급 설정
@@ -264,6 +267,7 @@ public class Popup_Shop : UIElement
 
     private void OnClick_Buy_Gold_Free(int num)
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         m_ShopData = m_ShopList_Gold[num];
 
         UIManager.Instance.OpenSystemPopup(new MessageData
@@ -277,6 +281,7 @@ public class Popup_Shop : UIElement
 
     private void OnClick_Buy_Gold_Ad(int num)
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         m_ShopData = m_ShopList_Gold[num];
 
         UIManager.Instance.OpenSystemPopup(new MessageData
@@ -290,6 +295,7 @@ public class Popup_Shop : UIElement
 
     private void OnClick_Close()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Close<Popup_Shop>();
     }
     #endregion

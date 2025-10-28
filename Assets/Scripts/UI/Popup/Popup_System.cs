@@ -74,6 +74,7 @@ public class Popup_System : UIElement
     #region Button Event
     private void OnClick_OK()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Close<Popup_System>();
 
         if (MyData != null)
@@ -82,6 +83,7 @@ public class Popup_System : UIElement
 
     private void OnClick_Cancel()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Close<Popup_System>();
     }
     #endregion

@@ -126,36 +126,42 @@ public class LobbyWindow : UIElement
     #region Button
     private async void OnClick_PVP()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         await ScenesManager.Instance.LoadScene("GameScene");
     }
 
     private void OnClick_Training()
     {
-
+        SoundManager.Instance.StartSFX("ButtonClick");
+        UIManager.Instance.Open<Popup_Training>(UI.Popup, "Prefabs/UI/Popup/Popup_Training");
     }
 
     private void OnClick_Hero()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Open<Popup_Hero>(UI.Popup, "Prefabs/UI/Popup/Popup_Hero");
     }
 
     private void OnClick_Shop()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Open<Popup_Shop>(UI.Popup, "Prefabs/UI/Popup/Popup_Shop");
     }
 
     private void OnClick_Ranking()
     {
-
+        SoundManager.Instance.StartSFX("ButtonClick");
     }
 
     private void OnClick_Setting()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Open<Popup_Setting>(UI.Popup, "Prefabs/UI/Popup/Popup_Setting");
     }
 
     private void OnClick_Character()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Open<Popup_SelectCharacter>(UI.Popup, "Prefabs/UI/Popup/Popup_SelectCharacter");
     }
     #endregion

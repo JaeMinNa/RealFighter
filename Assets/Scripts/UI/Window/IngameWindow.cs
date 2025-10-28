@@ -40,6 +40,10 @@ public class IngameWindow : UIElement
     [SerializeField] private TMP_Text Text_Level_Right = null;
     [SerializeField] private TMP_Text Text_Hero_Right = null;
 
+    [Header("SkillInfo")]
+    [SerializeField] private GameObject Obj_MySkillInfoPanel = null;
+    [SerializeField] private GameObject Obj_EnemySkillInfoPanel = null;
+
     [Header("SkillInfo_My_Attack")]
     [SerializeField] private GameObject Obj_AttackPanel = null;
     [SerializeField] private TMP_Text Text_MyATK_0 = null;
@@ -153,6 +157,8 @@ public class IngameWindow : UIElement
         {
             SetUI_Player_Left(DataManager.Instance.GetMyUserData());
             SetUI_Player_Right(m_PVPModule.EnemyUserData);
+
+
         }
         else
         {
@@ -169,6 +175,30 @@ public class IngameWindow : UIElement
         Text_EnemyCombo.transform.gameObject.SetActive(false);
         Obj_MyCritical.SetActive(false);
         Obj_EnemyCritical.SetActive(false);
+
+        // UI 위치 설정
+        if(m_PVPModule.IsLeftPlayer)
+        {
+            Obj_MySkillInfoPanel.GetComponent<RectTransform>().anchorMax = new Vector2(0f, 0.5f);
+            Obj_MySkillInfoPanel.GetComponent<RectTransform>().anchorMin = new Vector2(0f, 0.5f);
+            Obj_MySkillInfoPanel.GetComponent<RectTransform>().pivot = new Vector2(0f, 0.5f);
+            Obj_MySkillInfoPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(-630f, -180f, 0f);
+            Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchorMax = new Vector2(1f, 0.5f);
+            Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchorMin = new Vector2(1f, 0.5f);
+            Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().pivot = new Vector2(1f, 0.5f);
+            Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(690f, 230f, 0f);
+        }
+        else
+        {
+            Obj_MySkillInfoPanel.GetComponent<RectTransform>().anchorMax = new Vector2(1f, 0.5f);
+            Obj_MySkillInfoPanel.GetComponent<RectTransform>().anchorMin = new Vector2(1f, 0.5f);
+            Obj_MySkillInfoPanel.GetComponent<RectTransform>().pivot = new Vector2(1f, 0.5f);
+            Obj_MySkillInfoPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(650f, -20f, 0f);
+            Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchorMax = new Vector2(0f, 0.5f);
+            Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchorMin = new Vector2(0f, 0.5f);
+            Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().pivot = new Vector2(0f, 0.5f);
+            Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(-600f, 250f, 0f);
+        }
 
         // 모든 사용가능한 버튼 활성화
         for (int Index = 0; Index < Btn_MyAttacks.Length; ++Index)
@@ -229,6 +259,8 @@ public class IngameWindow : UIElement
 
         if (SkillImage.sprite == null)
             return;
+
+        SoundManager.Instance.StartSFX("StartSkill");
 
         SkillImage.gameObject.SetActive(true);
 
@@ -324,6 +356,8 @@ public class IngameWindow : UIElement
         if (m_PVPModule.IsMyReady)
             return;
 
+        SoundManager.Instance.StartSFX("ButtonClick");
+
         // 기본 Image로 초기화
         foreach (var btn in Btn_MyAttacks)
             btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_n");
@@ -339,6 +373,8 @@ public class IngameWindow : UIElement
         if (m_PVPModule.IsMyReady)
             return;
 
+        SoundManager.Instance.StartSFX("ButtonClick");
+
         // 기본 Image로 초기화
         foreach (var btn in Btn_MyDefences)
             btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_n");
@@ -351,6 +387,7 @@ public class IngameWindow : UIElement
 
     private void OnClick_Exit()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkCancel,
@@ -367,6 +404,8 @@ public class IngameWindow : UIElement
         // 버튼 클릭하지 않았으면 리턴
         if (m_PVPModule.MySelectBtnNum == -1)
             return;
+
+        SoundManager.Instance.StartSFX("ButtonClick");
 
         m_PVPModule.IsMyReady = true;
         Btn_Ready.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_TextButton_Square01_Gray");

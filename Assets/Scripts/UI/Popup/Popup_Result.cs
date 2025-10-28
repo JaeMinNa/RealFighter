@@ -98,8 +98,8 @@ public class Popup_Result : UIElement
     #region Button
     private async void OnClick_Home()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         Time.timeScale = 1f;
-
         await ScenesManager.Instance.LoadScene("LobbyScene");
     }
     #endregion

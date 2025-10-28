@@ -68,6 +68,8 @@ public class Popup_Hero : UIElement
     #region Button
     private void OnClick_Hero(int num)
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
+
         // 모든 버튼 초기화
         for (int index = 0; index < Trans_Content.childCount; ++index)
             Trans_Content.GetChild(index).GetComponent<ElementHero>().SetSelect(false);
@@ -87,6 +89,7 @@ public class Popup_Hero : UIElement
 
     private void OnClick_Close()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Close<Popup_Hero>();
     }
     #endregion

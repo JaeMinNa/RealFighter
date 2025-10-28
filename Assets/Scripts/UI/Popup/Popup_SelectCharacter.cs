@@ -48,6 +48,8 @@ public class Popup_SelectCharacter : UIElement
     #region Button
     private void OnClick_Character(int num)
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
+
         // 모든 선택 비활성화
         for (int index = 0; index < Btn_Characters.Length; ++index)
         {
@@ -66,6 +68,7 @@ public class Popup_SelectCharacter : UIElement
 
     private void OnClick_Close()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Close<Popup_SelectCharacter>();
     }
     #endregion

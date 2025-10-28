@@ -88,6 +88,7 @@ public class Popup_Gacha_Hero : UIElement
     #region Button
     private void OnClick_Ok()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Close<Popup_Gacha_Hero>();
     }
     #endregion

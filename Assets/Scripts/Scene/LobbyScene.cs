@@ -12,5 +12,7 @@ public class LobbyScene : MonoBehaviour
 
         // ·Îºñ
         UIManager.Instance.Open<LobbyWindow>(UI.Main, "Prefabs/UI/Window/LobbyWindow");
+
+        SoundManager.Instance.StartBGM("BGM_Lobby");
     }
 }

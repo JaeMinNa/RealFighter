@@ -36,11 +36,13 @@ public class Popup_Setting : UIElement
     #region Button
     private void OnClick_Cancel()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Close<Popup_Setting>();
     }
 
     private void OnClick_DeleteData()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkCancel,
@@ -51,6 +53,7 @@ public class Popup_Setting : UIElement
 
     private void OnClick_Exit()
     {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.OpenSystemPopup(new MessageData
         { 
             Type = PopupType.OkCancel, 

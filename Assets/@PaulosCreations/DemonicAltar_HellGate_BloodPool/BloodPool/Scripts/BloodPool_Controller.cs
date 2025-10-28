@@ -7,7 +7,7 @@ public class BloodPool_Controller : MonoBehaviour
     [SerializeField] private Gradient emissionColor;
     [SerializeField] private ParticleSystem[] poolParticles = new ParticleSystem[8];
     [SerializeField] private Light[] fireLights = new Light[2];
-    [SerializeField] private AudioSource[] poolAudios = new AudioSource[3];
+    //[SerializeField] private AudioSource[] poolAudios = new AudioSource[3];
     [SerializeField] private Renderer poolRenderer;
 
     private float transitionFloat, transitionSpeed = 0.8f, maxLightIntencity, fireAudioVolumeMax, bubblesAudioVolumeMax;
@@ -19,16 +19,16 @@ public class BloodPool_Controller : MonoBehaviour
     {
         poolMaterial = poolRenderer.material;
         maxLightIntencity = fireLights[0].intensity;
-        fireAudioVolumeMax = poolAudios[1].volume;
-        bubblesAudioVolumeMax = poolAudios[2].volume;
+        //fireAudioVolumeMax = poolAudios[1].volume;
+        //bubblesAudioVolumeMax = poolAudios[2].volume;
 
         poolMaterial.SetColor("_EmissionColor", emissionColor.Evaluate(0));
 
         foreach (Light lgt in fireLights)
             lgt.intensity = 0;
 
-        poolAudios[1].volume = 0f;
-        poolAudios[2].volume = 0f;
+        //poolAudios[1].volume = 0f;
+        //poolAudios[2].volume = 0f;
 
         F_ToggleBloodPool();
     }
@@ -54,8 +54,8 @@ public class BloodPool_Controller : MonoBehaviour
             foreach (Light lgt in fireLights)
                 lgt.intensity = maxLightIntencity;
 
-            foreach (AudioSource audC in poolAudios)
-                audC.Play();
+            //foreach (AudioSource audC in poolAudios)
+            //    audC.Play();
 
             yield return new WaitForSeconds(0.5f);
 
@@ -64,8 +64,8 @@ public class BloodPool_Controller : MonoBehaviour
                 transitionFloat = Mathf.MoveTowards(transitionFloat, 1f, Time.deltaTime * transitionSpeed);
 
                 poolMaterial.SetColor("_EmissionColor", emissionColor.Evaluate(transitionFloat));
-                poolAudios[1].volume = transitionFloat * fireAudioVolumeMax;
-                poolAudios[2].volume = transitionFloat * bubblesAudioVolumeMax;
+                //poolAudios[1].volume = transitionFloat * fireAudioVolumeMax;
+                //poolAudios[2].volume = transitionFloat * bubblesAudioVolumeMax;
 
                 yield return new WaitForSeconds(Time.deltaTime);
             }
@@ -84,8 +84,8 @@ public class BloodPool_Controller : MonoBehaviour
                 transitionFloat = Mathf.MoveTowards(transitionFloat, 0f, Time.deltaTime * transitionSpeed);
 
                 poolMaterial.SetColor("_EmissionColor", emissionColor.Evaluate(transitionFloat));
-                poolAudios[1].volume = transitionFloat * fireAudioVolumeMax;
-                poolAudios[2].volume = transitionFloat * bubblesAudioVolumeMax;
+                //poolAudios[1].volume = transitionFloat * fireAudioVolumeMax;
+                //poolAudios[2].volume = transitionFloat * bubblesAudioVolumeMax;
 
                 foreach (Light lgt in fireLights)
                     lgt.intensity = transitionFloat * maxLightIntencity;
@@ -93,8 +93,8 @@ public class BloodPool_Controller : MonoBehaviour
                 yield return new WaitForSeconds(Time.deltaTime);
             }
 
-            foreach (AudioSource audC in poolAudios)
-                audC.Stop();
+            //foreach (AudioSource audC in poolAudios)
+            //    audC.Stop();
         }
 
         transitionRunning = false;

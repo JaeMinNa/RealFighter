@@ -6,6 +6,7 @@ public class PVPModule : BattleModule
 {
     #region Member Property
     // My UserData
+    public GameObject Obj_MyHero { get; private set; }
     public int CurTurn { get; private set; }                        // 턴이 변경될 때 마다 1씩 증가
     public int CurRound { get; private set; }
     public float CurTime { get; private set; } = 30f;
@@ -19,6 +20,7 @@ public class PVPModule : BattleModule
     public bool IsMyCritical { get; private set; }
 
     // Enemy UserData
+    public GameObject Obj_EnemyHero { get; private set; }
     public UserData EnemyUserData { get; private set; }
     public int EnemyCurHp { get; private set; }
     public int[] EnemyCanUseSkillCounts { get; private set; } = new int[3];
@@ -238,27 +240,27 @@ public class PVPModule : BattleModule
         var myHero = ResourceLoader.LoadAssetResources<GameObject>($"Prefabs/Hero/Hero_Ingame/{DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName}");
         var enemyHero = ResourceLoader.LoadAssetResources<GameObject>($"Prefabs/Hero/Hero_Ingame/{EnemyUserData.UserHeroData.EquipHero.HeroName}");
 
-        GameObject myHeroObj = null;
-        GameObject enemyHeroObj = null;
-
         if (IsLeftPlayer)
         {
-            myHeroObj = Instantiate(myHero, Feild.GetTransformPlayer(true).position, Quaternion.Euler(0f, 90f, 0f), m_CharacterRoot.transform);
-            enemyHeroObj = Instantiate(enemyHero, Feild.GetTransformPlayer(false).position, Quaternion.Euler(0f, -90f, 0f), m_CharacterRoot.transform);
+            Obj_MyHero = Instantiate(myHero, Feild.GetTransformPlayer(true).position, Quaternion.Euler(0f, 90f, 0f), m_CharacterRoot.transform);
+            Obj_EnemyHero = Instantiate(enemyHero, Feild.GetTransformPlayer(false).position, Quaternion.Euler(0f, -90f, 0f), m_CharacterRoot.transform);
         }
         else
         {
-            myHeroObj = Instantiate(myHero, Feild.GetTransformPlayer(false).position, Quaternion.Euler(0f, -90f, 0f), m_CharacterRoot.transform);
-            enemyHeroObj = Instantiate(enemyHero, Feild.GetTransformPlayer(true).position, Quaternion.Euler(0f, 90f, 0f), m_CharacterRoot.transform);
+            Obj_MyHero = Instantiate(myHero, Feild.GetTransformPlayer(false).position, Quaternion.Euler(0f, -90f, 0f), m_CharacterRoot.transform);
+            Obj_EnemyHero = Instantiate(enemyHero, Feild.GetTransformPlayer(true).position, Quaternion.Euler(0f, 90f, 0f), m_CharacterRoot.transform);
         }
 
-        MyHeroAnim = myHeroObj.GetComponent<HeroAnim>();
-        EnemyHeroAnim = enemyHeroObj.GetComponent<HeroAnim>();
+        MyHeroAnim = Obj_MyHero.GetComponent<HeroAnim>();
+        EnemyHeroAnim = Obj_EnemyHero.GetComponent<HeroAnim>();
     }
 
     private async UniTask StartBattle()
     {
         var ingameWindow = UIManager.Instance.GetOpened<IngameWindow>();
+
+        IsMyCritical = true;
+        IsEnemyCritical = true;
 
         if (IsAttackTurn)
         {
@@ -272,8 +274,10 @@ public class PVPModule : BattleModule
 
                 await UniTask.Delay((int)(MyHeroAnim.CriticalTime * 1000));
 
-                EffectUtil.StartShake(0.15f, 0.2f);
+                SoundManager.Instance.StartSFX_Punch();
+                SoundManager.Instance.StartSFX("Hit", Obj_EnemyHero.transform.position);
                 EnemyHeroAnim.Anim.SetTrigger("Hit_Cri");
+                EffectUtil.StartShake(0.15f, 0.2f);
 
                 int damage = DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
                 if (MySelectBtnNum != EnemySelectBtnNum)
@@ -286,6 +290,10 @@ public class PVPModule : BattleModule
 
                 if (EnemyCurHp <= 0)
                 {
+                    // Die Sound 추가 해야 됨 
+
+
+
                     EnemyHeroAnim.Anim.SetTrigger("Die");
 
                     await UniTask.Delay(2000);  // Die 시간도 추가
@@ -305,17 +313,22 @@ public class PVPModule : BattleModule
                 MyHeroAnim.Anim.SetTrigger($"Skill_{MySelectBtnNum}");
 
                 await UniTask.Delay((int)(MyHeroAnim.SkillTimes[MySelectBtnNum] * 1000));
+                SoundManager.Instance.StartSFX_Punch();
 
                 // 공격 성공 시
                 if (MySelectBtnNum != EnemySelectBtnNum)
                 {
                     EffectUtil.StartShake(0.1f, 0.2f);
+                    SoundManager.Instance.StartSFX("Hit", Obj_EnemyHero.transform.position);
                     EnemyHeroAnim.Anim.SetTrigger("Hit");
                     EnemyCurHp -= DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
                     ingameWindow.SetUI_Players();
 
                     if (EnemyCurHp <= 0)
                     {
+                        // Die Sound 추가
+
+
                         EnemyHeroAnim.Anim.SetTrigger("Die");
 
                         await UniTask.Delay(2000);  // Die 시간도 추가
@@ -364,8 +377,10 @@ public class PVPModule : BattleModule
 
                 await UniTask.Delay((int)(EnemyHeroAnim.CriticalTime * 1000));
 
-                EffectUtil.StartShake(0.15f, 0.2f);
+                SoundManager.Instance.StartSFX_Punch();
+                SoundManager.Instance.StartSFX("Hit", Obj_MyHero.transform.position);
                 MyHeroAnim.Anim.SetTrigger("Hit_Cri");
+                EffectUtil.StartShake(0.15f, 0.2f);
 
                 int damage = DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, MySelectBtnNum);
                 if (MySelectBtnNum != EnemySelectBtnNum)
@@ -378,6 +393,9 @@ public class PVPModule : BattleModule
 
                 if (CurHp <= 0)
                 {
+                    // Die Sound 추가
+
+
                     MyHeroAnim.Anim.SetTrigger("Die");
 
                     await UniTask.Delay(2000);  // Die 시간도 추가
@@ -397,17 +415,22 @@ public class PVPModule : BattleModule
                 EnemyHeroAnim.Anim.SetTrigger($"Skill_{EnemySelectBtnNum}");
 
                 await UniTask.Delay((int)(EnemyHeroAnim.SkillTimes[EnemySelectBtnNum] * 1000));
+                SoundManager.Instance.StartSFX_Punch();
 
                 // 공격 성공 시
                 if (MySelectBtnNum != EnemySelectBtnNum)
                 {
                     EffectUtil.StartShake(0.1f, 0.2f);
+                    SoundManager.Instance.StartSFX("Hit", Obj_MyHero.transform.position);
                     MyHeroAnim.Anim.SetTrigger("Hit");
                     CurHp -= DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, EnemySelectBtnNum);
                     ingameWindow.SetUI_Players();
 
                     if (CurHp <= 0)
                     {
+                        // Die Sound 추가
+
+
                         MyHeroAnim.Anim.SetTrigger("Die");
 
                         await UniTask.Delay(2000);  // Die 시간도 추가
@@ -468,8 +491,11 @@ public class PVPModule : BattleModule
         }
         else
         {
-            Camera.main.transform.position = new Vector3(1.3f, 2.8f, 0.7f);
-            Camera.main.transform.rotation = Quaternion.Euler(14f, -116f, 1.2f);
+            //Camera.main.transform.position = new Vector3(1.3f, 2.8f, 0.7f);
+            //Camera.main.transform.rotation = Quaternion.Euler(14f, -116f, 1.2f);
+
+            Camera.main.transform.position = new Vector3(1.3f, 2.8f, -0.7f);
+            Camera.main.transform.rotation = Quaternion.Euler(12.5f, -63.5f, -2.55f);
         }
     }
 
