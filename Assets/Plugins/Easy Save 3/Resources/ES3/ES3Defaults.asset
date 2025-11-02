@@ -37,6 +37,11 @@ MonoBehaviour:
     assemblyNames:
     - Assembly-CSharp
     - Assembly-CSharp-firstpass
+    - PhotonChat
+    - PhotonRealtime
+    - PhotonUnityNetworking
+    - PhotonUnityNetworking.Demos
+    - PhotonUnityNetworking.Utilities
     - UniTask
     - UniTask.Addressables
     - UniTask.DOTween

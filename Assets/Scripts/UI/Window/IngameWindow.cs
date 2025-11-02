@@ -8,6 +8,7 @@ using Unity.VisualScripting;
 using UnityEngine.Assertions.Must;
 using Cysharp.Threading.Tasks.Triggers;
 using Cysharp.Threading.Tasks;
+using Photon.Pun;
 
 public class IngameWindow : UIElement
 {
@@ -77,7 +78,6 @@ public class IngameWindow : UIElement
 
     #region Member Property
     private PVPModule m_PVPModule = null;
-    //private bool m_IsLeftPlayer;
     #endregion
 
     #region Unity Method
@@ -387,12 +387,23 @@ public class IngameWindow : UIElement
 
     private void OnClick_Exit()
     {
+        m_PVPModule.IsStartGame = false;
         SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkCancel,
             Message = "게임을 포기하고 로비로 나가시겠습니까?",
-            OkAction = async () => { await ScenesManager.Instance.LoadScene("LobbyScene"); }
+            OkAction = async () => 
+            {
+                if (PhotonNetwork.IsConnected)
+                    PhotonManager.Instance.Disconnect(null);
+
+                // 강제 종료 시, 패배 Score 1점 감소
+                if (DataManager.Instance.GetMyUserData().UserCommonData.Score > 0)
+                    DataManager.Instance.GetMyUserData().UserCommonData.Score--;
+
+                await ScenesManager.Instance.LoadScene("LobbyScene");
+            }
         });
     }
 

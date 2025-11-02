@@ -5,12 +5,12 @@ using System.Collections.Generic;
 
 public class BattleModule : MonoBehaviour
 {
+    public bool IsStartGame { get; set; } = false;
+
     #region Member Property
     protected GameObject m_CharacterRoot = null;
     protected GameObject m_CameraRoot = null;
     protected GameObject m_EnvironmentRoot = null;
-
-    protected bool m_IsStartGame = false;
     protected bool m_Win = false;
     #endregion
 
@@ -81,18 +81,9 @@ public class BattleModule : MonoBehaviour
     // ∞‘¿” ≥°
     protected virtual void EndGame()
     {
-        //if (MonsterMovementSystem != null)
-        //    Destroy(MonsterMovementSystem);
-
-        //if (m_AutoPlayController != null)
-        //    Destroy(m_AutoPlayController);
-
-        //SetStartGame(false);
-        //m_IsPause = true;
-        //m_IsEndGame = true;
-
-        //Time.timeScale = 0f;
-        m_IsStartGame = false;
+        
+        Time.timeScale = 0f;
+        IsStartGame = false;
 
         List<object> args = new List<object> { m_Win };
         UIManager.Instance.Open<Popup_Result>(UI.Popup, "Prefabs/UI/Popup/Popup_Result", args);

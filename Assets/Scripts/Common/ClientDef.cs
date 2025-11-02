@@ -6,8 +6,8 @@ public static class ClientDef
 {
     // 인게임
     public static readonly int SkillMaxCount = 3;
-    public static readonly float TurnTime = 10f;
-    public static readonly int MaxRound = 9;
+    public static readonly float TurnTime = 60f;
+    public static readonly int MaxRound = 9;    // SkillMaxCount x 3 보다 항상 작거나 같아야 함!
     public static readonly int MaxHeroLevel = 10;
     public static readonly int WinExp = 5;
     public static readonly int LoseExp = 2;
@@ -33,18 +33,8 @@ public static class ClientDef
         new ShopData("AD GOLD", 0, 2000)
     };
 
-
-    //public static readonly int HeroPackPrice_Normal = 3000;
-    //public static readonly int HeroPackPrice_Rare = 10000;
-
-    //public static readonly int MAX_PARTYMEMBER = 3;
-
-    //#region Player Preference
-    //public static readonly string PomeSortOrderKey = "PomeSortOrder";
-    //public static readonly string LastTutorialGroupKey = "LastTutorialGroup";
-    //public static readonly string IsPomeSavedKey = "IsPomeSaved";
-    //public static readonly string PomeGameOptionKey = "PomeGameOption";
-    //#endregion
+    // 로비
+    public static readonly float RoomWaitTime = 10f;
 }
 
 #region UserData
@@ -138,26 +128,3 @@ public class ShopData
         Value = value;
     }
 }
-
-//public enum eItemType
-//{
-//    None,
-
-//    Goods = 1,
-//    Consume = 2,
-//    Material = 3,
-//    Equip = 4,
-//    ProfileIcon = 5,
-
-//    Max
-//}
-
-//public enum eTutorialStep
-//{
-//    None,
-
-//    String_Welcome,
-//    String_Intro,
-//    String_PomeCheck_Start,
-//    Click_SubMenu,
-//}

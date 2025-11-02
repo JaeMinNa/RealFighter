@@ -1,0 +1,10 @@
+# ninja log v5
+74	4908	7835457630365974	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	3fe619b9edea7b1c
+2	5294	7835457633295653	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	efe2b61ce08f523a
+120	5307	7835457632746854	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	9097165ef9063956
+201	5452	7835457636098166	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	bcbcbe957f94074
+266	5538	7835457636566907	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	a8f57d078a22cce5
+149	5821	7835457639855688	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	9081e475ced72ef
+180	5928	7835457640788792	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	7defdb11d11725a2
+98	5979	7835457641482362	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	9f2be6da1fd077e7
+5979	7681	7835457656073658	E:/Git/Github/RealFighter/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/o5k47194/obj/arm64-v8a/libgame.so	9a4973c114865c59

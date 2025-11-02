@@ -60,10 +60,12 @@ public class Popup_Result : UIElement
 
         HeroUtil.AddHeroExp(ClientDef.WinExp);
         DataManager.Instance.GetMyUserData().UserCommonData.Gold += ClientDef.WinGold;
+        DataManager.Instance.GetMyUserData().UserCommonData.Score++;
 
         // Win 보상
         RewardItems.Add(new ItemData("Exp", ClientDef.WinExp));
         RewardItems.Add(new ItemData("Gold", ClientDef.WinGold));
+        RewardItems.Add(new ItemData("Score", 1));
     }
 
     private void SetLose()
@@ -76,6 +78,13 @@ public class Popup_Result : UIElement
         // Lose 보상
         RewardItems.Add(new ItemData("Exp", ClientDef.LoseExp));
         RewardItems.Add(new ItemData("Gold", ClientDef.LoseGold));
+
+        // Score 1 이상일 때만
+        if (DataManager.Instance.GetMyUserData().UserCommonData.Score > 0)
+        {
+            DataManager.Instance.GetMyUserData().UserCommonData.Score--;
+            RewardItems.Add(new ItemData("Score", -1));
+        }
     }
 
     private void SetResult()

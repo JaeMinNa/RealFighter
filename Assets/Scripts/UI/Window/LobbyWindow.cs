@@ -10,6 +10,7 @@ public class LobbyWindow : UIElement
     [Header("Top")]
     [SerializeField] private Button Btn_Character = null;
     [SerializeField] private TMP_Text Text_NickName = null;
+    [SerializeField] private TMP_Text Text_Score = null;
     [SerializeField] private Image Img_Character = null;
     [SerializeField] private Slider Slider_Exp = null;
     [SerializeField] private TMP_Text Text_Level = null;
@@ -63,6 +64,7 @@ public class LobbyWindow : UIElement
     private void SetTopUI()
     {
         Text_NickName.text = DataManager.Instance.GetMyUserData().UserCommonData.NickName;
+        Text_Score.text = DataManager.Instance.GetMyUserData().UserCommonData?.Score.ToString();
         Slider_Exp.value = (float)DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp / (float)(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level * 10) * 100f;
         Img_Character.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Character/Character_{DataManager.Instance.GetMyUserData().UserCommonData.Image}");
         Text_Level.text = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level.ToString();
@@ -124,10 +126,10 @@ public class LobbyWindow : UIElement
     #endregion
 
     #region Button
-    private async void OnClick_PVP()
+    private void OnClick_PVP()
     {
         SoundManager.Instance.StartSFX("ButtonClick");
-        await ScenesManager.Instance.LoadScene("GameScene");
+        UIManager.Instance.Open<Popup_BattleLoading>(UI.Popup, "Prefabs/UI/Popup/Popup_BattleLoading");
     }
 
     private void OnClick_Training()

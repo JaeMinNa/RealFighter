@@ -89,6 +89,7 @@ public class GameManager : Singleton<GameManager>
         //_ = RedPointManager.Instance;
         _ = DataManager.Instance;
         _ = ScenesManager.Instance;
+        _ = PhotonManager.Instance;
     }
 
     public void ExitGame()

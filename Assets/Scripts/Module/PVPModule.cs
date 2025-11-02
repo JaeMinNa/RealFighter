@@ -1,5 +1,9 @@
 using Cysharp.Threading.Tasks;
+using Photon.Pun;
+using System;
+using System.Linq;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PVPModule : BattleModule
@@ -9,7 +13,7 @@ public class PVPModule : BattleModule
     public GameObject Obj_MyHero { get; private set; }
     public int CurTurn { get; private set; }                        // 턴이 변경될 때 마다 1씩 증가
     public int CurRound { get; private set; }
-    public float CurTime { get; private set; } = 30f;
+    public float CurTime { get; set; } = 30f;
     public int CurHp { get; private set; }
     public int[] MyCanUseSkillCounts { get; private set; } = new int[3];
     public bool IsMyReady { get; set; }
@@ -40,18 +44,29 @@ public class PVPModule : BattleModule
 
     private CinemachineCamera m_Cinemachine = null;
     private CinemachineSplineDolly m_SplineDolly = null;
+    private PhotonController m_PhotonController_My = null;
+    private PhotonController m_PhotonController_Enemy = null;
     #endregion
 
     #region Unity Method
     protected async override void Update()
     {
-        if (!m_IsStartGame)
+        if (!IsStartGame)
             return;
 
         base.Update();
 
-        if(CurTime >= 0)
-            CurTime -= Time.deltaTime;
+        if (!PhotonNetwork.IsConnected)
+        {
+            if (CurTime >= 0)
+                CurTime -= Time.deltaTime;
+        }
+        else
+        {
+            if(PhotonNetwork.IsMasterClient)
+                if (CurTime >= 0)
+                    CurTime -= Time.deltaTime;
+        }
 
         if (CurTime <= 0)
         {
@@ -59,27 +74,51 @@ public class PVPModule : BattleModule
             IsEnemyReady = true;
 
             // Button을 클릭하지 않으면 랜덤 클릭
-            if (MySelectBtnNum == -1)
-            {
-                while (MySelectBtnNum == -1)
-                {
-                    int value = RandomUtil.GetRandomIndex(0, 2);
+            //if (MySelectBtnNum == -1)
+            //{
+            //    while (MySelectBtnNum == -1)
+            //    {
+            //        int value = RandomUtil.GetRandomIndex(0, 2);
 
-                    if (MyCanUseSkillCounts[value] > 0)
-                        MySelectBtnNum = value;
-                }
-            }
+            //        // 모든 스킬 횟수를 다 사용하고, 방어턴인 경우 바로 선택
+            //        if (MyCanUseSkillCounts[0] == 0 &&
+            //            MyCanUseSkillCounts[1] == 0 &&
+            //            MyCanUseSkillCounts[2] == 0 &&
+            //            !IsAttackTurn)
+            //        {
+            //            MySelectBtnNum = value;
+            //            break;
+            //        }
 
-            if (EnemySelectBtnNum == -1)
-            {
-                while (EnemySelectBtnNum == -1)
-                {
-                    int value = RandomUtil.GetRandomIndex(0, 2);
+            //        if (MyCanUseSkillCounts[value] > 0)
+            //            MySelectBtnNum = value;
+            //    }
+            //}
 
-                    if (EnemyCanUseSkillCounts[value] > 0)
-                        EnemySelectBtnNum = value;
-                }
-            }
+            // 상대의 랜덤 클릭은 AI 모드에서만
+            //if(!PhotonNetwork.IsConnected)
+            //{
+            //    if (EnemySelectBtnNum == -1)
+            //    {
+            //        while (EnemySelectBtnNum == -1)
+            //        {
+            //            int value = RandomUtil.GetRandomIndex(0, 2);
+
+            //            // 모든 스킬 횟수를 다 사용하고, 방어턴인 경우 바로 선택
+            //            if(EnemyCanUseSkillCounts[0] == 0 &&
+            //                EnemyCanUseSkillCounts[1] == 0 &&
+            //                EnemyCanUseSkillCounts[2] == 0 && 
+            //                IsAttackTurn)
+            //            {
+            //                EnemySelectBtnNum = value;
+            //                break;
+            //            }
+
+            //            if (EnemyCanUseSkillCounts[value] > 0)
+            //                EnemySelectBtnNum = value;
+            //        }
+            //    }
+            //}
         }
 
         if(IsMyReady && IsEnemyReady && !IsBattle)
@@ -91,16 +130,21 @@ public class PVPModule : BattleModule
             await StartBattle();
 
             NextTurn();
-
-            //if (CurRound == ClientDef.MaxRound)
-            //{
-            //    if (CurHp >= EnemyCurHp)
-            //        m_Win = true;
-
-            //    EndGame();
-            //    return;
-            //}
         }
+    }
+
+    private void OnApplicationQuit()
+    {
+        // 서버 연결 해제
+        if (PhotonNetwork.IsConnected)
+            PhotonManager.Instance.Disconnect(null);
+
+        // 강제 종료 시, 패배 Score 1점 감소
+        if (DataManager.Instance.GetMyUserData().UserCommonData.Score > 0)
+            DataManager.Instance.GetMyUserData().UserCommonData.Score--;
+
+        // 데이터 저장
+        DataManager.Instance.SaveData();
     }
     #endregion
 
@@ -112,8 +156,129 @@ public class PVPModule : BattleModule
         // 게임 시작 시, 최초 한번만 실행되는 것들
         InitialGame();
 
-        // AI 적 생성 (임시)
-        EnemyUserData = DataManager.Instance.GetAIUserData();
+        // 상대 적 생성
+        if (PhotonNetwork.IsConnected)
+        {
+            Debug.LogWarning("상대방 접속 대기 중...");
+
+            // 상대방 접속 까지 대기
+            await UniTask.WhenAny(UniTask.WaitUntil(() => PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.PlayerCount >= 2),UniTask.Delay(TimeSpan.FromSeconds(10)));
+
+            if (PhotonNetwork.CurrentRoom == null)
+            {
+                Debug.LogWarning("Room 입장 실패");
+
+                // 무승부 추가
+
+                return;
+            }
+
+            // 상대방 접속 실패
+            if (PhotonNetwork.CurrentRoom.PlayerCount < 2)
+            {
+                Debug.LogWarning("상대방 접속 실패");
+
+                // 무승부 추가
+
+                return;
+            }
+
+            Debug.LogWarning("상대방 접속 완료!");
+
+            // PhotonController 생성
+            PhotonNetwork.Instantiate("Prefabs/Photon/PhotonController", Vector3.zero, Quaternion.identity).GetComponent<PhotonController>();
+            Debug.LogWarning("PhotonController 생성 완료!");
+
+            await UniTask.WhenAny(UniTask.WaitUntil(() =>
+            {
+                var list = UnityEngine.Object.FindObjectsByType<PhotonController>(FindObjectsSortMode.None);
+                return list != null
+                    && list.Length >= 2
+                    && list.All(c => c.PhotonView != null && c.PhotonView.ViewID > 0);
+            }),
+            UniTask.Delay(TimeSpan.FromSeconds(10)));
+
+            var controllers = UnityEngine.Object.FindObjectsByType<PhotonController>(FindObjectsSortMode.None);
+            if (controllers == null
+                || controllers.Length < 2
+                || !controllers.All(c => c.PhotonView != null && c.PhotonView.ViewID > 0))
+            {
+                Debug.LogWarning("동기화 준비 실패");
+
+                // 무승부 추가
+
+                return;
+            }
+
+            Debug.LogWarning("동기화 준비 완료!");
+
+            foreach (var c in controllers)
+            {
+                if (c.PhotonView == null)
+                    continue;
+
+                if (c.PhotonView.IsMine)
+                    m_PhotonController_My = c;          // 내가 소유한 컨트롤러
+                else
+                    m_PhotonController_Enemy = c;     // 상대 컨트롤러
+            }
+
+            UserData_Common myCommonData = DataManager.Instance.GetMyUserData().UserCommonData;
+            HeroData myHeroData = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero;
+            m_PhotonController_My.PhotonView.RPC("RPCSetMyData", RpcTarget.Others, myCommonData.NickName, myCommonData.Score, myCommonData.Image,
+                                                myHeroData.HeroName,myHeroData.Skillproficiencies[0], myHeroData.Skillproficiencies[1], 
+                                                myHeroData.Skillproficiencies[2], myHeroData.Level, myHeroData.Exp, myHeroData.Grade, myHeroData.GradeExp);
+
+            Debug.LogWarning("상대방 데이터 로드 대기 중...");
+
+            await UniTask.WhenAny(UniTask.WaitUntil(() => !string.IsNullOrEmpty(m_PhotonController_Enemy.MyNickName)),UniTask.Delay(TimeSpan.FromSeconds(10)));
+
+            if (string.IsNullOrEmpty(m_PhotonController_Enemy.MyNickName))
+            {
+                Debug.LogWarning("상대방 데이터 로드 실패");
+
+                // 무승부 추가
+
+                return;
+            }
+
+            Debug.LogWarning("상대방 데이터 로드 완료!");
+
+            UserData_Common EnemyCommonData = new UserData_Common()
+            { 
+                NickName = m_PhotonController_Enemy.MyNickName,
+                Score = m_PhotonController_Enemy. MyScore,
+                Image = m_PhotonController_Enemy.MyImage
+            };
+
+            HeroData EnemyHero = new HeroData()
+            {
+                HeroName = m_PhotonController_Enemy.MyHeroName,
+                Skillproficiencies = m_PhotonController_Enemy.MyHeroSkillproficiencies,
+                Level = m_PhotonController_Enemy.MyHeroLevel,
+                Exp = m_PhotonController_Enemy.MyHeroExp,
+                Grade = m_PhotonController_Enemy.MyHeroGrade,
+                GradeExp = m_PhotonController_Enemy.MyHeroGradeExp
+            };
+
+            UserData_Hero EnemyUserHeroData = new UserData_Hero()
+            {
+                EquipHero = EnemyHero
+            };
+
+            UserData EnemyData = new UserData()
+            {
+                UserCommonData = EnemyCommonData,
+                UserHeroData = EnemyUserHeroData
+            };
+
+            EnemyUserData = EnemyData;
+        }
+        // AI 적 생성
+        else
+        {
+            EnemyUserData = DataManager.Instance.GetAIUserData();
+        }
 
         // 필드 생성
         var field = ResourceLoader.LoadAssetResources<GameObject>("Prefabs/Map/MainField");
@@ -127,11 +292,20 @@ public class PVPModule : BattleModule
         await SetCameraMove();
 
         // 모든 준비가 완료 되었을 때
-        m_IsStartGame = true;
+        IsStartGame = true;
     }
 
     protected override void EndGame()
     {
+        if (!IsStartGame)
+            return;
+
+        IsStartGame = true;
+
+        // 서버 연결 해제
+        if (PhotonNetwork.IsConnected)
+            PhotonManager.Instance.Disconnect(null);
+
         base.EndGame();
     }
     #endregion
@@ -170,16 +344,32 @@ public class PVPModule : BattleModule
         }
 
         // Player의 위치 결정
-        var randomIndex = RandomUtil.GetRandomIndex(0, 1);
-        if (randomIndex == 0)
+        if(!PhotonNetwork.IsConnected)
         {
-            IsLeftPlayer = true;
-            IsAttackTurn = true;
+            var randomIndex = RandomUtil.GetRandomIndex(0, 1);
+            if (randomIndex == 0)
+            {
+                IsLeftPlayer = true;
+                IsAttackTurn = true;
+            }
+            else
+            {
+                IsLeftPlayer = false;
+                IsAttackTurn = false;
+            }
         }
         else
         {
-            IsLeftPlayer = false;
-            IsAttackTurn = false;
+            if(PhotonNetwork.IsMasterClient)
+            {
+                IsLeftPlayer = true;
+                IsAttackTurn = true;
+            }
+            else
+            {
+                IsLeftPlayer = false;
+                IsAttackTurn = false;
+            }
         }
     }
 
@@ -259,47 +449,55 @@ public class PVPModule : BattleModule
     {
         var ingameWindow = UIManager.Instance.GetOpened<IngameWindow>();
 
-        IsMyCritical = true;
-        IsEnemyCritical = true;
-
         if (IsAttackTurn)
         {
-            MyCanUseSkillCounts[MySelectBtnNum]--;
+            if(MySelectBtnNum != -1)
+                MyCanUseSkillCounts[MySelectBtnNum]--;
 
             if(IsMyCritical)
             {
-                await ingameWindow.ShowSkillImage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName, 2);
-
-                MyHeroAnim.Anim.SetTrigger($"Skill_Cri");
-
-                await UniTask.Delay((int)(MyHeroAnim.CriticalTime * 1000));
-
-                SoundManager.Instance.StartSFX_Punch();
-                SoundManager.Instance.StartSFX("Hit", Obj_EnemyHero.transform.position);
-                EnemyHeroAnim.Anim.SetTrigger("Hit_Cri");
-                EffectUtil.StartShake(0.15f, 0.2f);
-
-                int damage = DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
-                if (MySelectBtnNum != EnemySelectBtnNum)
-                    damage *= 2;
-                else
-                    damage /= 2;
-
-                EnemyCurHp -= damage;
-                ingameWindow.SetUI_Players();
-
-                if (EnemyCurHp <= 0)
+                if (MySelectBtnNum != -1)
                 {
-                    // Die Sound 추가 해야 됨 
+                    await ingameWindow.ShowSkillImage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName, 2);
+
+                    MyHeroAnim.Anim.SetTrigger($"Skill_Cri");
+
+                    await UniTask.Delay((int)(MyHeroAnim.CriticalTime * 1000));
+
+                    SoundManager.Instance.StartSFX_Punch();
+                    SoundManager.Instance.StartSFX("Hit", Obj_EnemyHero.transform.position);
+
+                    EnemyHeroAnim.Anim.SetTrigger("Hit_Cri");
+                    EffectUtil.StartShake(0.15f, 0.2f);
+
+                    int damage = DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
+                    if (MySelectBtnNum != EnemySelectBtnNum)
+                        damage *= 2;
+                    else
+                        damage /= 2;
+
+                    EnemyCurHp -= damage;
+
+                    ingameWindow.SetUI_Players();
+
+                    if (EnemyCurHp <= 0)
+                    {
+                        // Die Sound 추가 해야 됨 
 
 
 
-                    EnemyHeroAnim.Anim.SetTrigger("Die");
+                        EnemyHeroAnim.Anim.SetTrigger("Die");
 
-                    await UniTask.Delay(2000);  // Die 시간도 추가
+                        await UniTask.Delay(2000);  // Die 시간도 추가
 
-                    m_Win = true;
-                    EndGame();
+                        m_Win = true;
+                        EndGame();
+                    }
+                }
+                else
+                {
+                    if(EnemySelectBtnNum != -1)
+                        EnemyHeroAnim.Anim.SetTrigger("Block");
                 }
 
                 IsMyCombo = false;
@@ -310,120 +508,99 @@ public class PVPModule : BattleModule
             }
             else
             {
-                MyHeroAnim.Anim.SetTrigger($"Skill_{MySelectBtnNum}");
-
-                await UniTask.Delay((int)(MyHeroAnim.SkillTimes[MySelectBtnNum] * 1000));
-                SoundManager.Instance.StartSFX_Punch();
-
-                // 공격 성공 시
-                if (MySelectBtnNum != EnemySelectBtnNum)
+                if (MySelectBtnNum != -1)
                 {
-                    EffectUtil.StartShake(0.1f, 0.2f);
-                    SoundManager.Instance.StartSFX("Hit", Obj_EnemyHero.transform.position);
-                    EnemyHeroAnim.Anim.SetTrigger("Hit");
-                    EnemyCurHp -= DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
-                    ingameWindow.SetUI_Players();
+                    MyHeroAnim.Anim.SetTrigger($"Skill_{MySelectBtnNum}");
 
-                    if (EnemyCurHp <= 0)
+                    await UniTask.Delay((int)(MyHeroAnim.SkillTimes[MySelectBtnNum] * 1000));
+                    SoundManager.Instance.StartSFX_Punch();
+
+                    // 공격 성공 시
+                    if (MySelectBtnNum != EnemySelectBtnNum)
                     {
-                        // Die Sound 추가
+                        EffectUtil.StartShake(0.1f, 0.2f);
+                        SoundManager.Instance.StartSFX("Hit", Obj_EnemyHero.transform.position);
+                        EnemyHeroAnim.Anim.SetTrigger("Hit");
+                        EnemyCurHp -= DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
+                        ingameWindow.SetUI_Players();
+
+                        if (EnemyCurHp <= 0)
+                        {
+                            // Die Sound 추가
 
 
-                        EnemyHeroAnim.Anim.SetTrigger("Die");
+                            EnemyHeroAnim.Anim.SetTrigger("Die");
 
-                        await UniTask.Delay(2000);  // Die 시간도 추가
+                            await UniTask.Delay(2000);  // Die 시간도 추가
 
-                        m_Win = true;
-                        EndGame();
-                    }
+                            m_Win = true;
+                            EndGame();
+                            return;
+                        }
 
-                    // 콤보
-                    if (IsMyCombo)
-                    {
-                        MyCombo++;
+                        // 콤보
+                        if (IsMyCombo)
+                        {
+                            MyCombo++;
 
-                        if (MyCombo == 3)
-                            IsMyCritical = true;
+                            if (MyCombo == 3)
+                                IsMyCritical = true;
+                        }
+                        else
+                        {
+                            MyCombo = 1;
+                            IsMyCombo = true;
+                        }
                     }
                     else
                     {
-                        MyCombo = 1;
-                        IsMyCombo = true;
-                    }
+                        IsMyCombo = false;
+                        MyCombo = 0;
 
-                    await UniTask.Delay(1000);
+                        EffectUtil.StartShake(0.02f, 0.15f);
+                        EnemyHeroAnim.Anim.SetTrigger("Block");
+
+                    }
                 }
                 else
                 {
                     IsMyCombo = false;
                     MyCombo = 0;
 
-                    EffectUtil.StartShake(0.02f, 0.15f);
-                    EnemyHeroAnim.Anim.SetTrigger("Block");
-
-                    await UniTask.Delay(1000);
+                    if(EnemySelectBtnNum != -1)
+                        EnemyHeroAnim.Anim.SetTrigger("Block");
                 }
+
+                await UniTask.Delay(1000);
             }
         }
         else
         {
-            EnemyCanUseSkillCounts[EnemySelectBtnNum]--;
+            if (EnemySelectBtnNum != -1)
+                EnemyCanUseSkillCounts[EnemySelectBtnNum]--;
 
             if(IsEnemyCritical)
             {
-                await ingameWindow.ShowSkillImage(EnemyUserData.UserHeroData.EquipHero.HeroName, 2);
-
-                EnemyHeroAnim.Anim.SetTrigger($"Skill_Cri");
-
-                await UniTask.Delay((int)(EnemyHeroAnim.CriticalTime * 1000));
-
-                SoundManager.Instance.StartSFX_Punch();
-                SoundManager.Instance.StartSFX("Hit", Obj_MyHero.transform.position);
-                MyHeroAnim.Anim.SetTrigger("Hit_Cri");
-                EffectUtil.StartShake(0.15f, 0.2f);
-
-                int damage = DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, MySelectBtnNum);
-                if (MySelectBtnNum != EnemySelectBtnNum)
-                    damage *= 2;
-                else
-                    damage /= 2;
-
-                CurHp -= damage;
-                ingameWindow.SetUI_Players();
-
-                if (CurHp <= 0)
+                if(EnemySelectBtnNum != -1)
                 {
-                    // Die Sound 추가
+                    await ingameWindow.ShowSkillImage(EnemyUserData.UserHeroData.EquipHero.HeroName, 2);
 
+                    EnemyHeroAnim.Anim.SetTrigger($"Skill_Cri");
 
-                    MyHeroAnim.Anim.SetTrigger("Die");
+                    await UniTask.Delay((int)(EnemyHeroAnim.CriticalTime * 1000));
 
-                    await UniTask.Delay(2000);  // Die 시간도 추가
-
-                    m_Win = false;
-                    EndGame();
-                }
-
-                IsEnemyCombo = false;
-                EnemyCombo = 0;
-                IsEnemyCritical = false;
-
-                await UniTask.Delay(1000);
-            }
-            else
-            {
-                EnemyHeroAnim.Anim.SetTrigger($"Skill_{EnemySelectBtnNum}");
-
-                await UniTask.Delay((int)(EnemyHeroAnim.SkillTimes[EnemySelectBtnNum] * 1000));
-                SoundManager.Instance.StartSFX_Punch();
-
-                // 공격 성공 시
-                if (MySelectBtnNum != EnemySelectBtnNum)
-                {
-                    EffectUtil.StartShake(0.1f, 0.2f);
+                    SoundManager.Instance.StartSFX_Punch();
                     SoundManager.Instance.StartSFX("Hit", Obj_MyHero.transform.position);
-                    MyHeroAnim.Anim.SetTrigger("Hit");
-                    CurHp -= DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, EnemySelectBtnNum);
+                    MyHeroAnim.Anim.SetTrigger("Hit_Cri");
+                    EffectUtil.StartShake(0.15f, 0.2f);
+
+                    int damage = DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, EnemySelectBtnNum);
+                    if (MySelectBtnNum != EnemySelectBtnNum)
+                        damage *= 2;
+                    else
+                        damage /= 2;
+
+                    CurHp -= damage;
                     ingameWindow.SetUI_Players();
 
                     if (CurHp <= 0)
@@ -438,33 +615,86 @@ public class PVPModule : BattleModule
                         m_Win = false;
                         EndGame();
                     }
-
-                    // 콤보
-                    if (IsEnemyCombo)
-                    {
-                        EnemyCombo++;
-
-                        if (EnemyCombo == 3)
-                            IsEnemyCritical = true;
-                    }
-                    else
-                    {
-                        EnemyCombo = 1;
-                        IsEnemyCombo = true;
-                    }
-
-                    await UniTask.Delay(1000);
                 }
                 else
                 {
-                    // 콤보
+                    if (MySelectBtnNum != -1)
+                        MyHeroAnim.Anim.SetTrigger("Block");
+                }
+               
+
+                IsEnemyCombo = false;
+                EnemyCombo = 0;
+                IsEnemyCritical = false;
+
+                await UniTask.Delay(1000);
+            }
+            else
+            {
+                if (EnemySelectBtnNum != -1)
+                {
+                    EnemyHeroAnim.Anim.SetTrigger($"Skill_{EnemySelectBtnNum}");
+
+                    await UniTask.Delay((int)(EnemyHeroAnim.SkillTimes[EnemySelectBtnNum] * 1000));
+                    SoundManager.Instance.StartSFX_Punch();
+
+                    // 공격 성공 시
+                    if (MySelectBtnNum != EnemySelectBtnNum)
+                    {
+                        EffectUtil.StartShake(0.1f, 0.2f);
+                        SoundManager.Instance.StartSFX("Hit", Obj_MyHero.transform.position);
+                        MyHeroAnim.Anim.SetTrigger("Hit");
+                        CurHp -= DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, EnemySelectBtnNum);
+                        ingameWindow.SetUI_Players();
+
+                        if (CurHp <= 0)
+                        {
+                            // Die Sound 추가
+
+
+                            MyHeroAnim.Anim.SetTrigger("Die");
+
+                            await UniTask.Delay(2000);  // Die 시간도 추가
+
+                            m_Win = false;
+                            EndGame();
+                            return;
+                        }
+
+                        // 콤보
+                        if (IsEnemyCombo)
+                        {
+                            EnemyCombo++;
+
+                            if (EnemyCombo == 3)
+                                IsEnemyCritical = true;
+                        }
+                        else
+                        {
+                            EnemyCombo = 1;
+                            IsEnemyCombo = true;
+                        }
+
+                        await UniTask.Delay(1000);
+                    }
+                    else
+                    {
+                        IsEnemyCombo = false;
+                        EnemyCombo = 0;
+
+                        EffectUtil.StartShake(0.02f, 0.15f);
+                        MyHeroAnim.Anim.SetTrigger("Block");
+
+                        await UniTask.Delay(1000);
+                    }
+                }
+                else
+                {
                     IsEnemyCombo = false;
                     EnemyCombo = 0;
-
-                    EffectUtil.StartShake(0.02f, 0.15f);
-                    MyHeroAnim.Anim.SetTrigger("Block");
-
-                    await UniTask.Delay(1000);
+                    
+                    if(MySelectBtnNum != -1)
+                        MyHeroAnim.Anim.SetTrigger("Block");
                 }
             }
         }
@@ -491,9 +721,6 @@ public class PVPModule : BattleModule
         }
         else
         {
-            //Camera.main.transform.position = new Vector3(1.3f, 2.8f, 0.7f);
-            //Camera.main.transform.rotation = Quaternion.Euler(14f, -116f, 1.2f);
-
             Camera.main.transform.position = new Vector3(1.3f, 2.8f, -0.7f);
             Camera.main.transform.rotation = Quaternion.Euler(12.5f, -63.5f, -2.55f);
         }
