@@ -168,18 +168,24 @@ public class PVPModule : BattleModule
             {
                 Debug.LogWarning("Room 입장 실패");
 
-                // 무승부 추가
-
-                return;
+                UIManager.Instance.OpenSystemPopup(new MessageData
+                {
+                    Type = PopupType.OkOnly,
+                    Message = "접속에 실패하였습니다.",
+                    OkAction = async () => { await ScenesManager.Instance.LoadScene("LobbyScene"); }
+                });
+                return;      
             }
 
             // 상대방 접속 실패
             if (PhotonNetwork.CurrentRoom.PlayerCount < 2)
             {
-                Debug.LogWarning("상대방 접속 실패");
-
-                // 무승부 추가
-
+                UIManager.Instance.OpenSystemPopup(new MessageData
+                {
+                    Type = PopupType.OkOnly,
+                    Message = "상대방을 찾을 수 없습니다.",
+                    OkAction = async () => { await ScenesManager.Instance.LoadScene("LobbyScene"); }
+                });
                 return;
             }
 
@@ -203,10 +209,12 @@ public class PVPModule : BattleModule
                 || controllers.Length < 2
                 || !controllers.All(c => c.PhotonView != null && c.PhotonView.ViewID > 0))
             {
-                Debug.LogWarning("동기화 준비 실패");
-
-                // 무승부 추가
-
+                UIManager.Instance.OpenSystemPopup(new MessageData
+                {
+                    Type = PopupType.OkOnly,
+                    Message = "상대방과 동기화에 실패했습니다.",
+                    OkAction = async () => { await ScenesManager.Instance.LoadScene("LobbyScene"); }
+                });
                 return;
             }
 
@@ -235,10 +243,12 @@ public class PVPModule : BattleModule
 
             if (string.IsNullOrEmpty(m_PhotonController_Enemy.MyNickName))
             {
-                Debug.LogWarning("상대방 데이터 로드 실패");
-
-                // 무승부 추가
-
+                UIManager.Instance.OpenSystemPopup(new MessageData
+                {
+                    Type = PopupType.OkOnly,
+                    Message = "상대방 데이터 로드를 실패했습니다.",
+                    OkAction = async () => { await ScenesManager.Instance.LoadScene("LobbyScene"); }
+                });
                 return;
             }
 
@@ -394,10 +404,12 @@ public class PVPModule : BattleModule
             await UniTask.Delay(2000);
 
             // 나중에 무승부인 경우 추가
-            if (CurHp >= EnemyCurHp)
-                m_Win = true;
-            else
-                m_Win = false;
+            if (CurHp > EnemyCurHp)
+                m_Result = "Win";
+            else if (CurHp < EnemyCurHp)
+                m_Result = "Lose";
+            else if (CurHp == EnemyCurHp)
+                m_Result = "Draw";
 
             EndGame();
         }
@@ -490,7 +502,7 @@ public class PVPModule : BattleModule
 
                         await UniTask.Delay(2000);  // Die 시간도 추가
 
-                        m_Win = true;
+                        m_Result = "Win";
                         EndGame();
                     }
                 }
@@ -533,7 +545,7 @@ public class PVPModule : BattleModule
 
                             await UniTask.Delay(2000);  // Die 시간도 추가
 
-                            m_Win = true;
+                            m_Result = "Win";
                             EndGame();
                             return;
                         }
@@ -612,7 +624,7 @@ public class PVPModule : BattleModule
 
                         await UniTask.Delay(2000);  // Die 시간도 추가
 
-                        m_Win = false;
+                        m_Result = "Lose";
                         EndGame();
                     }
                 }
@@ -656,7 +668,7 @@ public class PVPModule : BattleModule
 
                             await UniTask.Delay(2000);  // Die 시간도 추가
 
-                            m_Win = false;
+                            m_Result = "Lose";
                             EndGame();
                             return;
                         }

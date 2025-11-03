@@ -6,13 +6,15 @@ public static class ClientDef
 {
     // 인게임
     public static readonly int SkillMaxCount = 3;
-    public static readonly float TurnTime = 60f;
-    public static readonly int MaxRound = 9;    // SkillMaxCount x 3 보다 항상 작거나 같아야 함!
+    public static readonly float TurnTime = 5f;
+    public static readonly int MaxRound = 2;    // SkillMaxCount x 3 보다 항상 작거나 같아야 함!
     public static readonly int MaxHeroLevel = 10;
     public static readonly int WinExp = 5;
     public static readonly int LoseExp = 2;
+    public static readonly int DrawExp = 1;
     public static readonly int WinGold = 1000;
-    public static readonly int LoseGold = 200;
+    public static readonly int LoseGold = 500;
+    public static readonly int DrawGold = 200;
 
     // 히어로
     public static readonly List<string> HeroNames = new List<string>
@@ -68,6 +70,7 @@ public class UserData_Hero
 
 public class UserData_Contents
 {
+    public bool IsFirstLogin = true;
     public DateTime LastLoginTime = DateTime.MinValue;
     public bool IsGotFreeGold = false;
 }

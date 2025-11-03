@@ -37,12 +37,16 @@ public class Popup_Result : UIElement
         if (Args.Count == 0)
             return;
 
-        bool isWin = (bool)Args[0];
+        string arg = (string)Args[0];
 
-        if (isWin)
+        if (arg == "Win")
             SetWin();
-        else
+        else if (arg == "Lose")
             SetLose();
+        else if (arg == "Draw")
+            SetDraw();
+        else
+            return;
 
         SetResult();
     }
@@ -78,13 +82,18 @@ public class Popup_Result : UIElement
         // Lose 보상
         RewardItems.Add(new ItemData("Exp", ClientDef.LoseExp));
         RewardItems.Add(new ItemData("Gold", ClientDef.LoseGold));
+    }
 
-        // Score 1 이상일 때만
-        if (DataManager.Instance.GetMyUserData().UserCommonData.Score > 0)
-        {
-            DataManager.Instance.GetMyUserData().UserCommonData.Score--;
-            RewardItems.Add(new ItemData("Score", -1));
-        }
+    private void SetDraw()
+    {
+        Text_Title.text = "DRAW!";
+
+        HeroUtil.AddHeroExp(ClientDef.LoseExp);
+        DataManager.Instance.GetMyUserData().UserCommonData.Gold += ClientDef.LoseGold;
+
+        // Draw 보상
+        RewardItems.Add(new ItemData("Exp", ClientDef.DrawExp));
+        RewardItems.Add(new ItemData("Gold", ClientDef.DrawGold));
     }
 
     private void SetResult()

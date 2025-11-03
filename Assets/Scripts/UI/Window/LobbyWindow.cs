@@ -51,6 +51,12 @@ public class LobbyWindow : UIElement
 
     public override void OnOpen(List<object> Args)
     {
+        // 첫 로그인이라면, 닉네임 설정
+        if (DataManager.Instance.GetMyUserData().UserContentsData.IsFirstLogin)
+        {
+            UIManager.Instance.Open<Popup_NickName>(UI.Popup, "Prefabs/UI/Popup/Popup_NickName");
+        }
+
         SetTopUI();
     }
 

@@ -11,7 +11,7 @@ public class BattleModule : MonoBehaviour
     protected GameObject m_CharacterRoot = null;
     protected GameObject m_CameraRoot = null;
     protected GameObject m_EnvironmentRoot = null;
-    protected bool m_Win = false;
+    protected string m_Result = string.Empty;
     #endregion
 
     #region Instance
@@ -85,7 +85,7 @@ public class BattleModule : MonoBehaviour
         Time.timeScale = 0f;
         IsStartGame = false;
 
-        List<object> args = new List<object> { m_Win };
+        List<object> args = new List<object> { m_Result };
         UIManager.Instance.Open<Popup_Result>(UI.Popup, "Prefabs/UI/Popup/Popup_Result", args);
 
         // Module Á¦°Å

@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -141,7 +142,7 @@ public class DataManager : Singleton<DataManager>
         {
             AccountCode = "Admin",
             UID = "Admin",
-            NickName = "Jaemin",
+            NickName = Guid.NewGuid().ToString("N").Substring(0, 8),
             Score = 0,
             Image = "0",
             Gold = 0
@@ -217,6 +218,7 @@ public class DataManager : Singleton<DataManager>
         // Contents
         UserData_Contents userData_Contents = new UserData_Contents()
         {
+            IsFirstLogin = true,
             LastLoginTime = Util.DateTimeNow,
             IsGotFreeGold = false
         };

@@ -319,12 +319,6 @@ public class UIManager : Singleton<UIManager>
             m_UIDictionary.TryRemove(typeof(LobbyWindow), out _);
         }
 
-        //if (m_UIDictionary.ContainsKey(typeof(TopWindow)))
-        //{
-        //    notRemove.Add(typeof(TopWindow), m_UIDictionary[typeof(TopWindow)]);
-        //    m_UIDictionary.TryRemove(typeof(TopWindow), out _);
-        //}
-
         foreach (var ui in m_UIDictionary)
         {
             if (ui.Value != null)
@@ -362,69 +356,6 @@ public class UIManager : Singleton<UIManager>
     {
         Open<Popup_System>(UI.Popup, "Prefabs/UI/Popup/Popup_System", new List<object> { Data });
     }
-
-    //public async UniTask OpenPurchasePopup(List<object> Args)
-    //{
-    //    Open<Popup_PackageInfo>(UI.Popup, "UI/Popup/Popup_PackageInfo", Args);
-    //}
-
-    //public void ShowToastMessage(string Str)
-    //{
-    //    Open<Ef_Message>(UI.Popup, "UI/Popup/Ef_Message", new List<object> { Str });
-    //}
-
-    //// 결제 터치 블락 최우선 순위
-    //public void SetPurchaseTouchBlock(bool isActive)
-    //{
-    //    if (isActive)
-    //    {
-    //        SetTouchBlock(isActive);
-    //        IsPurchaseTouchBlock = isActive;
-    //    }
-    //    else
-    //    {
-    //        IsPurchaseTouchBlock = isActive;
-    //        SetTouchBlock(isActive);
-    //    }
-    //}
-
-    //public void SetTouchBlock(bool isActive)
-    //{
-    //    // TitleScene이면 무시
-    //    if (SceneManager.GetActiveScene().name == "TitleScene")
-    //        return;
-
-    //    if (IsPurchaseTouchBlock)
-    //        return;
-
-    //    if (isActive)
-    //    {
-    //        var touchBlockWindow = GetOpened<TouchBlockWindow>();
-    //        if (touchBlockWindow != null)
-    //            touchBlockWindow.gameObject.SetActive(true);
-    //    }
-    //    else
-    //    {
-    //        var touchBlockWindow = GetOpened<TouchBlockWindow>();
-    //        if (touchBlockWindow != null)
-    //            touchBlockWindow.gameObject.SetActive(false);
-    //    }
-    //}
-
-    //public FadeWindow ShowFade(UnityAction Action = null)
-    //{
-    //    FadeWindow Window = GetOpened<FadeWindow>();
-
-    //    if (Window != null)
-    //        return Window;
-
-    //    if (Action != null)
-    //        Window = Open<FadeWindow>(UI.Fade, "Prefab/UI/Common/FadeWindow", new List<object>() { Action }, IsBundle: false);
-    //    else
-    //        Window = Open<FadeWindow>(UI.Fade, "Prefab/UI/Common/FadeWindow", IsBundle: false);
-
-    //    return Window;
-    //}
 
     #region Async
     public async UniTask<T> OpenAsync<T>(UI Depth, string PrefabPath, List<object> Args = null, bool SetFirst = false, bool IsBundle = true) where T : UIElement
