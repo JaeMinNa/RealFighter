@@ -2,13 +2,14 @@ using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using System;
 using System.Linq;
+using Unity.Android.Gradle.Manifest;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class PVPModule : BattleModule
 {
-    #region Member Property
+    #region Public Property
     // My UserData
     public GameObject Obj_MyHero { get; private set; }
     public int CurTurn { get; private set; }                        // 턴이 변경될 때 마다 1씩 증가
@@ -41,11 +42,14 @@ public class PVPModule : BattleModule
     public bool IsLeftPlayer { get; private set; }
     public bool IsAttackTurn { get; private set; }
     public bool IsBattle { get; private set; }
+    #endregion
 
+    #region Member Property
     private CinemachineCamera m_Cinemachine = null;
     private CinemachineSplineDolly m_SplineDolly = null;
     private PhotonController m_PhotonController_My = null;
     private PhotonController m_PhotonController_Enemy = null;
+    private int m_EnemySelectTime = 0;
     #endregion
 
     #region Unity Method
@@ -60,65 +64,61 @@ public class PVPModule : BattleModule
         {
             if (CurTime >= 0)
                 CurTime -= Time.deltaTime;
+
+            // AI 모드에서 상대의 랜덤 클릭
+            if(ClientDef.TurnTime - CurTime > m_EnemySelectTime)
+            {
+                // 선택을 안했을 때만
+                if (EnemySelectBtnNum == -1)
+                {
+                    // 상대의 공격턴
+                    if(!IsAttackTurn)
+                    {
+                        while (EnemySelectBtnNum == -1)
+                        {
+                            int value = RandomUtil.GetRandomIndex(0, 2);
+
+                            // 모든 스킬 횟수를 다 사용하고, 방어턴인 경우 바로 선택
+                            if (EnemyCanUseSkillCounts[0] == 0 &&
+                                EnemyCanUseSkillCounts[1] == 0 &&
+                                EnemyCanUseSkillCounts[2] == 0 &&
+                                IsAttackTurn)
+                                EnemySelectBtnNum = value;
+
+                            if (EnemyCanUseSkillCounts[value] > 0)
+                                EnemySelectBtnNum = value;
+                        }
+                    }
+                    // 상대의 방어턴
+                    else
+                    {
+                        int value = RandomUtil.GetRandomIndex(0, 2);
+                        EnemySelectBtnNum = value;
+                    }
+
+                    IsEnemyReady = true;
+                }
+            }
         }
         else
         {
             if(PhotonNetwork.IsMasterClient)
                 if (CurTime >= 0)
                     CurTime -= Time.deltaTime;
+
+            // 상대방의 강제종료 시
+            if(PhotonNetwork.CurrentRoom.PlayerCount < 2)
+            {
+                m_Result = "Win";
+                EndGame();
+            }
         }
 
+        // 시간 초과 시, 강제 준비 완료
         if (CurTime <= 0)
         {
             IsMyReady = true;
             IsEnemyReady = true;
-
-            // Button을 클릭하지 않으면 랜덤 클릭
-            //if (MySelectBtnNum == -1)
-            //{
-            //    while (MySelectBtnNum == -1)
-            //    {
-            //        int value = RandomUtil.GetRandomIndex(0, 2);
-
-            //        // 모든 스킬 횟수를 다 사용하고, 방어턴인 경우 바로 선택
-            //        if (MyCanUseSkillCounts[0] == 0 &&
-            //            MyCanUseSkillCounts[1] == 0 &&
-            //            MyCanUseSkillCounts[2] == 0 &&
-            //            !IsAttackTurn)
-            //        {
-            //            MySelectBtnNum = value;
-            //            break;
-            //        }
-
-            //        if (MyCanUseSkillCounts[value] > 0)
-            //            MySelectBtnNum = value;
-            //    }
-            //}
-
-            // 상대의 랜덤 클릭은 AI 모드에서만
-            //if(!PhotonNetwork.IsConnected)
-            //{
-            //    if (EnemySelectBtnNum == -1)
-            //    {
-            //        while (EnemySelectBtnNum == -1)
-            //        {
-            //            int value = RandomUtil.GetRandomIndex(0, 2);
-
-            //            // 모든 스킬 횟수를 다 사용하고, 방어턴인 경우 바로 선택
-            //            if(EnemyCanUseSkillCounts[0] == 0 &&
-            //                EnemyCanUseSkillCounts[1] == 0 &&
-            //                EnemyCanUseSkillCounts[2] == 0 && 
-            //                IsAttackTurn)
-            //            {
-            //                EnemySelectBtnNum = value;
-            //                break;
-            //            }
-
-            //            if (EnemyCanUseSkillCounts[value] > 0)
-            //                EnemySelectBtnNum = value;
-            //        }
-            //    }
-            //}
         }
 
         if(IsMyReady && IsEnemyReady && !IsBattle)
@@ -126,9 +126,7 @@ public class PVPModule : BattleModule
             Debug.LogWarning("전투 시작!");
 
             IsBattle = true;
-
             await StartBattle();
-
             NextTurn();
         }
     }
@@ -168,24 +166,42 @@ public class PVPModule : BattleModule
             {
                 Debug.LogWarning("Room 입장 실패");
 
+                await ScenesManager.Instance.LoadScene("LobbyScene");
+                await UniTask.Delay(100);
                 UIManager.Instance.OpenSystemPopup(new MessageData
                 {
                     Type = PopupType.OkOnly,
                     Message = "접속에 실패하였습니다.",
-                    OkAction = async () => { await ScenesManager.Instance.LoadScene("LobbyScene"); }
+                    OkAction = () =>
+                    {
+                        // UIRoot가 꼬이기 때문에 강제로 다시 설정
+                        var lobbyScene = GameObject.Find("SceneLoader").GetComponent<LobbyScene>();
+                        lobbyScene.SetUIRoot();
+                    }
                 });
+                PhotonManager.Instance.Disconnect(null);
                 return;      
             }
 
             // 상대방 접속 실패
             if (PhotonNetwork.CurrentRoom.PlayerCount < 2)
             {
+                Debug.LogWarning("상대방 찾기 실패");
+
+                await ScenesManager.Instance.LoadScene("LobbyScene");
+                await UniTask.Delay(100);
                 UIManager.Instance.OpenSystemPopup(new MessageData
                 {
                     Type = PopupType.OkOnly,
                     Message = "상대방을 찾을 수 없습니다.",
-                    OkAction = async () => { await ScenesManager.Instance.LoadScene("LobbyScene"); }
+                    OkAction = () =>
+                    {
+                        // UIRoot가 꼬이기 때문에 강제로 다시 설정
+                        var lobbyScene = GameObject.Find("SceneLoader").GetComponent<LobbyScene>();
+                        lobbyScene.SetUIRoot();
+                    }
                 });
+                PhotonManager.Instance.Disconnect(null);
                 return;
             }
 
@@ -209,12 +225,22 @@ public class PVPModule : BattleModule
                 || controllers.Length < 2
                 || !controllers.All(c => c.PhotonView != null && c.PhotonView.ViewID > 0))
             {
+                Debug.LogWarning("상대방과 동기화 실패");
+
+                await ScenesManager.Instance.LoadScene("LobbyScene");
+                await UniTask.Delay(100);
                 UIManager.Instance.OpenSystemPopup(new MessageData
                 {
                     Type = PopupType.OkOnly,
                     Message = "상대방과 동기화에 실패했습니다.",
-                    OkAction = async () => { await ScenesManager.Instance.LoadScene("LobbyScene"); }
+                    OkAction = () =>
+                    {
+                        // UIRoot가 꼬이기 때문에 강제로 다시 설정
+                        var lobbyScene = GameObject.Find("SceneLoader").GetComponent<LobbyScene>();
+                        lobbyScene.SetUIRoot();
+                    }
                 });
+                PhotonManager.Instance.Disconnect(null);
                 return;
             }
 
@@ -243,12 +269,22 @@ public class PVPModule : BattleModule
 
             if (string.IsNullOrEmpty(m_PhotonController_Enemy.MyNickName))
             {
+                Debug.LogWarning("상대방 데이터 로드 실패");
+
+                await ScenesManager.Instance.LoadScene("LobbyScene");
+                await UniTask.Delay(100);
                 UIManager.Instance.OpenSystemPopup(new MessageData
                 {
                     Type = PopupType.OkOnly,
                     Message = "상대방 데이터 로드를 실패했습니다.",
-                    OkAction = async () => { await ScenesManager.Instance.LoadScene("LobbyScene"); }
+                    OkAction = () =>
+                    {
+                        // UIRoot가 꼬이기 때문에 강제로 다시 설정
+                        var lobbyScene = GameObject.Find("SceneLoader").GetComponent<LobbyScene>();
+                        lobbyScene.SetUIRoot();
+                    }
                 });
+                PhotonManager.Instance.Disconnect(null);
                 return;
             }
 
@@ -309,8 +345,6 @@ public class PVPModule : BattleModule
     {
         if (!IsStartGame)
             return;
-
-        IsStartGame = true;
 
         // 서버 연결 해제
         if (PhotonNetwork.IsConnected)
@@ -392,6 +426,7 @@ public class PVPModule : BattleModule
         IsBattle = false;
         MySelectBtnNum = -1;
         EnemySelectBtnNum = -1;
+        m_EnemySelectTime = RandomUtil.GetRandomIndex(3, 15);
     }
 
     // 라운드 변경
@@ -399,11 +434,11 @@ public class PVPModule : BattleModule
     {
         CurRound++;
 
+        // 게임 종료
         if(CurRound > ClientDef.MaxRound)
         {
             await UniTask.Delay(2000);
 
-            // 나중에 무승부인 경우 추가
             if (CurHp > EnemyCurHp)
                 m_Result = "Win";
             else if (CurHp < EnemyCurHp)
@@ -547,7 +582,6 @@ public class PVPModule : BattleModule
 
                             m_Result = "Win";
                             EndGame();
-                            return;
                         }
 
                         // 콤보
@@ -670,7 +704,6 @@ public class PVPModule : BattleModule
 
                             m_Result = "Lose";
                             EndGame();
-                            return;
                         }
 
                         // 콤보

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Drawing;
 
 
 public class Popup_System : UIElement
@@ -9,6 +10,7 @@ public class Popup_System : UIElement
     #region Cashed Object
     [SerializeField] private TMP_Text Text_Title;
     [SerializeField] private TMP_Text Text_Message;
+    [SerializeField] private Image Img_Background;
     [SerializeField] private Button Btn_OK;
     [SerializeField] private Button Btn_Cancel;
     #endregion

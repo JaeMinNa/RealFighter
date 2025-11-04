@@ -15,4 +15,10 @@ public class LobbyScene : MonoBehaviour
 
         SoundManager.Instance.StartBGM("BGM_Lobby");
     }
+
+    // 서버가 연결이 끊겨서 로비로 오는 경우, UIRoot가 꼬이기 때문에 다시 설정
+    public void SetUIRoot()
+    {
+        UIManager.Instance.SetUIRoot(Root_UI);
+    }
 }

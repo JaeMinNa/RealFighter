@@ -6,8 +6,8 @@ public static class ClientDef
 {
     // 인게임
     public static readonly int SkillMaxCount = 3;
-    public static readonly float TurnTime = 5f;
-    public static readonly int MaxRound = 2;    // SkillMaxCount x 3 보다 항상 작거나 같아야 함!
+    public static readonly float TurnTime = 60f;
+    public static readonly int MaxRound = 9;    // SkillMaxCount x 3 보다 항상 작거나 같아야 함!
     public static readonly int MaxHeroLevel = 10;
     public static readonly int WinExp = 5;
     public static readonly int LoseExp = 2;

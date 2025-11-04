@@ -409,7 +409,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.03529412, g: 0.039215688, b: 0.05882353, a: 0.7921569}
+  m_Color: {r: 0.03529412, g: 0.039215688, b: 0.05882353, a: 0.8235294}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1134,5 +1134,6 @@ MonoBehaviour:
   UIParent: 0
   Text_Title: {fileID: 6186425010861868856}
   Text_Message: {fileID: 6602991417510701279}
+  Img_Background: {fileID: 5414910080883245446}
   Btn_OK: {fileID: 7920402883598957693}
   Btn_Cancel: {fileID: 3657215397999651652}
