@@ -64,6 +64,9 @@ public class Popup_SelectCharacter : UIElement
 
         // 单捞磐 历厘
         DataManager.Instance.SaveData();
+
+        // 第场 历厘
+        BackendManager.Instance.SaveData();
     }
 
     private void OnClick_Close()

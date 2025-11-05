@@ -137,13 +137,15 @@ public class DataManager : Singleton<DataManager>
     {
         m_DataLoader.MyUserData = new UserData();
 
+        string UID = Guid.NewGuid().ToString("N").Substring(0, 8);
+
         // Common
         UserData_Common userData_Common = new UserData_Common()
         {
-            AccountCode = "Admin",
-            UID = "Admin",
-            NickName = Guid.NewGuid().ToString("N").Substring(0, 8),
-            Score = 0,
+            AccountCode = UID,
+            UID = UID,
+            NickName = UID,
+            RankPoint = 0,
             Image = "0",
             Gold = 0
         };
@@ -238,7 +240,7 @@ public class DataManager : Singleton<DataManager>
             AccountCode = "AI",
             UID = "AI",
             NickName = TextUtil.GetRandomAINickName(),
-            Score = RandomUtil.GetRandomIndex(0, 5),
+            RankPoint = RandomUtil.GetRandomIndex(0, 5),
             Image = RandomUtil.GetRandomIndex(0, 4).ToString(),
             Gold = 0
         };

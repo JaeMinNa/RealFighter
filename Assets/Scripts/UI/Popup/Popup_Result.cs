@@ -64,7 +64,7 @@ public class Popup_Result : UIElement
 
         HeroUtil.AddHeroExp(ClientDef.WinExp);
         DataManager.Instance.GetMyUserData().UserCommonData.Gold += ClientDef.WinGold;
-        DataManager.Instance.GetMyUserData().UserCommonData.Score++;
+        DataManager.Instance.GetMyUserData().UserCommonData.RankPoint++;
 
         // Win 보상
         RewardItems.Add(new ItemData("Exp", ClientDef.WinExp));
@@ -109,7 +109,11 @@ public class Popup_Result : UIElement
         Text_CurExp.text = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp.ToString();
         Slider_CurExp.value = (float)DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp / (float)(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level * 10) * 100f;
 
+        // 데이터 저장
         DataManager.Instance.SaveData();
+
+        // 뒤끝 저장
+        BackendManager.Instance.SaveData();
     }
     #endregion
 

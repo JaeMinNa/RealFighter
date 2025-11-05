@@ -138,11 +138,14 @@ public class PVPModule : BattleModule
             PhotonManager.Instance.Disconnect(null);
 
         // 강제 종료 시, 패배 Score 1점 감소
-        if (DataManager.Instance.GetMyUserData().UserCommonData.Score > 0)
-            DataManager.Instance.GetMyUserData().UserCommonData.Score--;
+        if (DataManager.Instance.GetMyUserData().UserCommonData.RankPoint > 0)
+            DataManager.Instance.GetMyUserData().UserCommonData.RankPoint--;
 
         // 데이터 저장
         DataManager.Instance.SaveData();
+        
+        // 뒤끝 저장
+        BackendManager.Instance.SaveData();
     }
     #endregion
 
@@ -157,6 +160,7 @@ public class PVPModule : BattleModule
         // 상대 적 생성
         if (PhotonNetwork.IsConnected)
         {
+            Debug.LogWarning("PVP 배틀 접속 완료");
             Debug.LogWarning("상대방 접속 대기 중...");
 
             // 상대방 접속 까지 대기
@@ -259,7 +263,7 @@ public class PVPModule : BattleModule
 
             UserData_Common myCommonData = DataManager.Instance.GetMyUserData().UserCommonData;
             HeroData myHeroData = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero;
-            m_PhotonController_My.PhotonView.RPC("RPCSetMyData", RpcTarget.Others, myCommonData.NickName, myCommonData.Score, myCommonData.Image,
+            m_PhotonController_My.PhotonView.RPC("RPCSetMyData", RpcTarget.Others, myCommonData.NickName, myCommonData.RankPoint, myCommonData.Image,
                                                 myHeroData.HeroName,myHeroData.Skillproficiencies[0], myHeroData.Skillproficiencies[1], 
                                                 myHeroData.Skillproficiencies[2], myHeroData.Level, myHeroData.Exp, myHeroData.Grade, myHeroData.GradeExp);
 
@@ -293,7 +297,7 @@ public class PVPModule : BattleModule
             UserData_Common EnemyCommonData = new UserData_Common()
             { 
                 NickName = m_PhotonController_Enemy.MyNickName,
-                Score = m_PhotonController_Enemy. MyScore,
+                RankPoint = m_PhotonController_Enemy. MyScore,
                 Image = m_PhotonController_Enemy.MyImage
             };
 
@@ -323,6 +327,7 @@ public class PVPModule : BattleModule
         // AI 적 생성
         else
         {
+            Debug.LogWarning("AI 배틀 접속 완료");
             EnemyUserData = DataManager.Instance.GetAIUserData();
         }
 

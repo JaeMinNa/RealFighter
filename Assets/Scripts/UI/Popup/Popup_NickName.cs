@@ -140,6 +140,9 @@ public class Popup_NickName : UIElement
         // 데이터 저장
         DataManager.Instance.SaveData();
 
+        // 뒤끝 서버 저장
+        BackendManager.Instance.SaveData();
+
         // UI Refresh
         UIManager.Instance.Refresh();
 

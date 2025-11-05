@@ -70,7 +70,7 @@ public class LobbyWindow : UIElement
     private void SetTopUI()
     {
         Text_NickName.text = DataManager.Instance.GetMyUserData().UserCommonData.NickName;
-        Text_Score.text = DataManager.Instance.GetMyUserData().UserCommonData?.Score.ToString();
+        Text_Score.text = DataManager.Instance.GetMyUserData().UserCommonData?.RankPoint.ToString();
         Slider_Exp.value = (float)DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp / (float)(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level * 10) * 100f;
         Img_Character.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Character/Character_{DataManager.Instance.GetMyUserData().UserCommonData.Image}");
         Text_Level.text = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level.ToString();
@@ -159,6 +159,7 @@ public class LobbyWindow : UIElement
     private void OnClick_Ranking()
     {
         SoundManager.Instance.StartSFX("ButtonClick");
+        UIManager.Instance.Open<Popup_Rank>(UI.Popup, "Prefabs/UI/Popup/Popup_Rank");
     }
 
     private void OnClick_Setting()

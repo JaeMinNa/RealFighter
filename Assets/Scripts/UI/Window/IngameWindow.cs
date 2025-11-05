@@ -278,7 +278,7 @@ public class IngameWindow : UIElement
     private void SetUI_Player_Left(UserData userData)
     {
         Text_NickName_Left.text = userData.UserCommonData.NickName;
-        Text_Score_Left.text = userData.UserCommonData.Score.ToString();
+        Text_Score_Left.text = userData.UserCommonData.RankPoint.ToString();
         Text_Hp_Left.text = $"{(m_PVPModule.IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp)} <#afd9e9>/ {100}";
         Slider_Hp_Left.value = m_PVPModule.IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp;
         Img_Hero_Left.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Character/Character_{userData.UserCommonData.Image}");
@@ -289,7 +289,7 @@ public class IngameWindow : UIElement
     private void SetUI_Player_Right(UserData userData)
     {
         Text_NickName_Right.text = userData.UserCommonData.NickName;
-        Text_Score_Right.text = userData.UserCommonData.Score.ToString();
+        Text_Score_Right.text = userData.UserCommonData.RankPoint.ToString();
         Text_Hp_Right.text = $"{(!m_PVPModule.IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp)} <#ffc9d6>/ {100}";
         Slider_Hp_Right.value = !m_PVPModule.IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp;
         Img_Hero_Right.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Character/Character_{userData.UserCommonData.Image}");
@@ -399,8 +399,11 @@ public class IngameWindow : UIElement
                     PhotonManager.Instance.Disconnect(null);
 
                 // 강제 종료 시, 패배 Score 1점 감소
-                if (DataManager.Instance.GetMyUserData().UserCommonData.Score > 0)
-                    DataManager.Instance.GetMyUserData().UserCommonData.Score--;
+                if (DataManager.Instance.GetMyUserData().UserCommonData.RankPoint > 0)
+                    DataManager.Instance.GetMyUserData().UserCommonData.RankPoint--;
+
+                // 뒤끝 저장
+                BackendManager.Instance.SaveData();
 
                 await ScenesManager.Instance.LoadScene("LobbyScene");
             }

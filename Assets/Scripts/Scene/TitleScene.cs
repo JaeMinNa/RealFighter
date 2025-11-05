@@ -16,6 +16,9 @@ public class TitleScene : MonoBehaviour
         // 최초의 데이터 로드
         DataManager.Instance.LoadData();
 
+        // 뒤끝 서버 로그인
+        BackendManager.Instance.Login();
+
         // Title UI 셋팅
         UIManager.Instance.SetUIRoot(Root_UI);
         UIManager.Instance.SetActiveRoot(UI.BackGround, false);

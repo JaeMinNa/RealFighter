@@ -57,7 +57,7 @@ public class UserData_Common
     public string AccountCode = string.Empty;
     public string UID = string.Empty;
     public string NickName = string.Empty;
-    public int Score = 0;
+    public int RankPoint = 0;
     public string Image = string.Empty;
     public int Gold = 0;
 }
@@ -84,6 +84,14 @@ public class HeroData
     public int Exp = 0;
     public int Grade = 0;
     public int GradeExp = 0;
+}
+
+public class RankData
+{
+    public string NickName = string.Empty;
+    public int Rank = 0;
+    public int RankPoint = 0;
+    public string Image = string.Empty;
 }
 
 public class MessageData
