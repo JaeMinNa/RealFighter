@@ -9,6 +9,7 @@ using UnityEngine.UI;
 public class Popup_BattleLoading : UIElement
 {
     #region Cahsed Object
+    [SerializeField] private TMP_Text Text_PlayerCount = null;
     [SerializeField] private Button Btn_Close = null;
     #endregion
 
@@ -58,6 +59,8 @@ public class Popup_BattleLoading : UIElement
 
     public override void OnOpen(List<object> Args)
     {
+        Text_PlayerCount.gameObject.SetActive(false);
+
         // 서버 접속 시도 -> 상대 찾기
         PhotonManager.Instance.Connect(SuccessConnect, FailConnect);
     }
@@ -73,6 +76,13 @@ public class Popup_BattleLoading : UIElement
     {
         // 랜덤 방 입장 시도
         PhotonManager.Instance.JoinRandomRoom(SuccessJoinRandomRoom, FailJoinRandomRoom);
+
+        // 에디터 전용, 전체 서버 접속 인원 표시
+        if(GameManager.Instance.IsEditor)
+        {
+            Text_PlayerCount.text = $"[에디터 전용]  Players : {PhotonNetwork.CountOfPlayers}";
+            Text_PlayerCount.gameObject.SetActive(true);
+        }
     }
 
     private void FailConnect()

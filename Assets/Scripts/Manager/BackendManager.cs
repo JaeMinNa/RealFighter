@@ -283,7 +283,6 @@ public class BackendManager : Singleton<BackendManager>
             // JSON 데이터 파싱 성공
             try
             {
-                Debug.LogWarning("뒤끝 서버 랭킹 조회 성공!");
                 JsonData rankDataJson = bro.FlattenRows();
 
                 // 받아온 데이터의 개수가 0 -> 데이터가 없음

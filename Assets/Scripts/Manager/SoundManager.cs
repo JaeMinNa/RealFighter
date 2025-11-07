@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class SoundManager : Singleton<SoundManager>
 {
@@ -56,26 +57,46 @@ public class SoundManager : Singleton<SoundManager>
 
     protected override void CreateInstance()
     {
-        //var mainCamera = Camera.main;
         transform.AddComponent<AudioListener>();
         m_BGMAudioSource = transform.AddComponent<AudioSource>();
         m_PlayerSFXAuidoSource = transform.AddComponent<AudioSource>();
         for (int index = 0; index < m_EtcSFXAudioSources.Length; ++index)
             m_EtcSFXAudioSources[index] = transform.AddComponent<AudioSource>();
 
+        // AudioMixerGroup 불러오기
+        AudioMixer mixer = ResourceLoader.LoadAssetResources<AudioMixer>("AudioMixer/AudioMixer");
+        AudioMixerGroup[] bgmGroups = mixer.FindMatchingGroups("BGM");
+        AudioMixerGroup[] sfxGroups = mixer.FindMatchingGroups("SFX");
+        AudioMixerGroup bgmGroup = bgmGroups.Length > 0 ? bgmGroups[0] : null;
+        AudioMixerGroup sfxGroup = sfxGroups.Length > 0 ? sfxGroups[0] : null;
+
+        // AudioMixer 볼륨 설정
+        if(PlayerPrefs.GetInt("BGM") == 0)
+            mixer.SetFloat("BGM", 0f);
+        else
+            mixer.SetFloat("BGM", -80f);
+
+        if (PlayerPrefs.GetInt("SFX") == 0)
+            mixer.SetFloat("SFX", 0f);
+        else
+            mixer.SetFloat("SFX", -80f);
+
         // BGM
         m_BGMAudioSource.loop = true;
         m_BGMAudioSource.volume = m_StartVolume;
+        m_BGMAudioSource.outputAudioMixerGroup = bgmGroup;
 
         // SFX (Player)
         m_PlayerSFXAuidoSource.playOnAwake = false;
         m_PlayerSFXAuidoSource.volume = m_StartVolume;
+        m_PlayerSFXAuidoSource.outputAudioMixerGroup = sfxGroup;
 
         // SFX (Etc)
         for (int index = 0; index < m_EtcSFXAudioSources.Length; ++index)
         {
             m_EtcSFXAudioSources[index].playOnAwake = false;
             m_EtcSFXAudioSources[index].volume = m_StartVolume;
+            m_EtcSFXAudioSources[index].outputAudioMixerGroup = sfxGroup;
         }
 
         // BGM
@@ -143,6 +164,11 @@ public class SoundManager : Singleton<SoundManager>
         int value = RandomUtil.GetRandomIndex(0, sources.Count - 1);
 
         m_PlayerSFXAuidoSource.PlayOneShot(sources[value]);
+    }
+
+    public void SetBGMVolume(float value)
+    {
+
     }
     #endregion
 }

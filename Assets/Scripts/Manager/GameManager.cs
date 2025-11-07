@@ -90,6 +90,7 @@ public class GameManager : Singleton<GameManager>
         _ = DataManager.Instance;
         _ = ScenesManager.Instance;
         _ = PhotonManager.Instance;
+        _ = AdManager.Instance;
     }
 
     public void ExitGame()

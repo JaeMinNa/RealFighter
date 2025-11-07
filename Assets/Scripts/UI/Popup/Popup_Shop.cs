@@ -177,7 +177,7 @@ public class Popup_Shop : UIElement
             {
                 Type = PopupType.OkOnly,
                 Title = "알림",
-                Message = "무료 구매는 하루에 한번만 가능합니다.\n<size=40>* 00:00 시에 구매횟수가 초기화 됩니다.</size>"
+                Message = "무료 구매는 하루에 한번만 가능합니다.\n<size=40>* 00:00 시에 무료 구매 횟수가 초기화 됩니다.</size>"
             });
             return;
         }
@@ -199,37 +199,62 @@ public class Popup_Shop : UIElement
         {
             Type = PopupType.OkOnly,
             Title = "알림",
-            Message = "구매를 완료 하였습니다."
+            Message = "무료 구매를 완료 하였습니다."
         });
     }
 
     private void Buy_Gold_Ad()
     {
+        // 광고 구매 횟수 체크
+        if (DataManager.Instance.GetMyUserData().UserContentsData.AdGoldBuyCount >= 5)
+        {
+            UIManager.Instance.OpenSystemPopup(new MessageData
+            {
+                Type = PopupType.OkOnly,
+                Title = "알림",
+                Message = "광고 보상은 하루에 5번까지만 가능합니다.\n<size=40>* 00:00 시에 광고 보상 횟수가 초기화 됩니다.</size>"
+            });
+            return;
+        }
+
         // 광고 보기
+        AdManager.Instance.LoadRewardedAd(() =>
+        {
+            // 횟수 증가
+            DataManager.Instance.GetMyUserData().UserContentsData.AdGoldBuyCount++;
 
+            // 골드 증가
+            DataManager.Instance.GetMyUserData().UserCommonData.Gold += m_ShopData.Count;
 
+            // 데이터 저장
+            DataManager.Instance.SaveData();
 
-        // 골드 증가
-        DataManager.Instance.GetMyUserData().UserCommonData.Gold += m_ShopData.Count;
+            // UI 갱신
+            UIManager.Instance.Refresh();
 
-        // 데이터 저장
-        DataManager.Instance.SaveData();
+            // 완료 팝업
+            UIManager.Instance.OpenSystemPopup(new MessageData
+            {
+                Type = PopupType.OkOnly,
+                Title = "알림",
+                Message = "광고 보상을 획득하였습니다."
+            });
 
-        // UI 갱신
-        UIManager.Instance.Refresh();
+            return;
+        });
 
-        // 완료 팝업
+        // 광고 실패
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkOnly,
             Title = "알림",
-            Message = "구매를 완료 하였습니다."
+            Message = "광고를 불러오지 못했습니다."
         });
     }
     #endregion
 
     #region Button
-    private void OnClick_LeftBtn(int num)
+    public void OnClick_LeftBtn(int num)
     {
         SoundManager.Instance.StartSFX("ButtonClick");
 
@@ -273,8 +298,8 @@ public class Popup_Shop : UIElement
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkCancel,
-            Title = "구매",
-            Message = "정말 구매 하시겠습니까?",
+            Title = "무료 구매",
+            Message = "무료 구매를 하시겠습니까?",
             OkAction = () => { Buy_Gold_Free(); }
         });
     }
@@ -287,8 +312,8 @@ public class Popup_Shop : UIElement
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkCancel,
-            Title = "구매",
-            Message = "정말 구매 하시겠습니까?",
+            Title = "광고 보상",
+            Message = "광고를 시청하고 보상을 획득 하시겠습니까?",
             OkAction = () => { Buy_Gold_Ad(); }
         });
     }

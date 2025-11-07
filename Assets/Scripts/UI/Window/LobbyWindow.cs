@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System;
+using Cysharp.Threading.Tasks;
 
 public class LobbyWindow : UIElement
 {
@@ -18,6 +19,7 @@ public class LobbyWindow : UIElement
     [SerializeField] private TMP_Text Text_Grade = null;
     [SerializeField] private TMP_Text Text_Hero = null;
     [SerializeField] private TMP_Text Text_Gold = null;
+    [SerializeField] private Button Btn_Gold = null;
     [SerializeField] private Button Btn_Setting = null;
 
     [Header("Contents")]
@@ -42,6 +44,7 @@ public class LobbyWindow : UIElement
         Btn_Setting.onClick.AddListener(OnClick_Setting);   
         Btn_PVP.onClick.AddListener(OnClick_PVP);
         Btn_Training.onClick.AddListener(OnClick_Training);
+        Btn_Gold.onClick.AddListener(OnClcik_Gold);
     }
 
     public override void OnClose()
@@ -121,6 +124,7 @@ public class LobbyWindow : UIElement
         {
             // 일일 초기화
             userContentsData.IsGotFreeGold = false;
+            userContentsData.AdGoldBuyCount = 0;
         }
         else
         {
@@ -172,6 +176,15 @@ public class LobbyWindow : UIElement
     {
         SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Open<Popup_SelectCharacter>(UI.Popup, "Prefabs/UI/Popup/Popup_SelectCharacter");
+    }
+
+    private async void OnClcik_Gold()
+    {
+        SoundManager.Instance.StartSFX("ButtonClick");
+        var popup = UIManager.Instance.Open<Popup_Shop>(UI.Popup, "Prefabs/UI/Popup/Popup_Shop");
+
+        await UniTask.WaitUntil(() => popup != null);
+        popup.OnClick_LeftBtn(1);
     }
     #endregion
 }

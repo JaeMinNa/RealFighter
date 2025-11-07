@@ -222,7 +222,8 @@ public class DataManager : Singleton<DataManager>
         {
             IsFirstLogin = true,
             LastLoginTime = Util.DateTimeNow,
-            IsGotFreeGold = false
+            IsGotFreeGold = false,
+            AdGoldBuyCount = 0
         };
 
         m_DataLoader.MyUserData.UserContentsData = userData_Contents;
