@@ -1,4 +1,4 @@
-using BackEnd;
+ï»¿using BackEnd;
 using System;
 using System.Collections.Generic;
 using System.Xml;
@@ -40,7 +40,7 @@ public class Popup_Rank : UIElement
             UIManager.Instance.OpenSystemPopup(new MessageData
             {
                 Type = PopupType.OkOnly,
-                Message = "¼­¹ö ¿¬°áÀ» ½ÇÆĞ ÇÏ¿´½À´Ï´Ù.",
+                Message = "ì„œë²„ì— ì ‘ì†í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.",
                 OkAction = () =>
                 {
                     UIManager.Instance.Close<Popup_Rank>();
@@ -56,10 +56,10 @@ public class Popup_Rank : UIElement
 
     public override void OnOpen(List<object> Args)
     {
-        // ³ªÀÇ ·©Å·
+        // ë‚˜ì˜ ë­í‚¹
         MyRank.SetRank(m_MyRankData);
 
-        // À¯Àú ·©Å·
+        // ì „ì²´ ë­í‚¹
         for (int index = 0; index < m_RankDataList.Count; ++index)
         {
             var elementRank = Instantiate(m_ElementRank, Obj_RankContent.transform);

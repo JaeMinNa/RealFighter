@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Xml;
 using TMPro;
@@ -52,11 +52,11 @@ public class Popup_NickName : UIElement
         TextAsset csvFile = ResourceLoader.LoadAssetResources<TextAsset>("CSV/BannedWord/BannedWord");
         if (csvFile == null)
         {
-            Debug.LogError("±ÝÄ¢¾î CSV ÆÄÀÏÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+            Debug.LogError("ï¿½ï¿½Ä¢ï¿½ï¿½ CSV ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
             return;
         }
 
-        // ÁÙ ´ÜÀ§·Î ºÐ¸®
+        // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ð¸ï¿½
         string[] lines = csvFile.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var line in lines)
@@ -64,13 +64,13 @@ public class Popup_NickName : UIElement
             string word = line.Trim();
             if (!string.IsNullOrEmpty(word))
             {
-                // Áßº¹ ¹æÁö
+                // ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½
                 if (!m_BannedWords.Contains(word))
                     m_BannedWords.Add(word);
             }
         }
 
-        Debug.Log($"±ÝÄ¢¾î {m_BannedWords.Count}°³ ·Îµå ¿Ï·á");
+        Debug.Log($"ï¿½ï¿½Ä¢ï¿½ï¿½ {m_BannedWords.Count}ï¿½ï¿½ ï¿½Îµï¿½ ï¿½Ï·ï¿½");
     }
 
     private bool IsBannedNickName(string nickname)
@@ -100,53 +100,46 @@ public class Popup_NickName : UIElement
    
     private void OnClick_Ok()
     {
-        // ´Ð³×ÀÓÀ» ÀÔ·Â ¾ÈÇßÀ» ¶§
+        // ë‹‰ë„¤ìž„ ìž…ë ¥ ì•ˆí–ˆì„ ë•Œ
         if(string.IsNullOrEmpty(m_InputField.text))
         {
             UIManager.Instance.OpenSystemPopup(new MessageData
             {
                 Type = PopupType.OkOnly,
-                Message = "´Ð³×ÀÓÀ» ÀÔ·ÂÇÏ¼¼¿ä.",
+                Message = "ë‹‰ë„¤ìž„ì„ ìž…ë ¥í•˜ì„¸ìš”.",
             });
             return;
         }
 
-        // ±ÛÀÚ ¼ö Á¦ÇÑ
+        // ê¸€ìžìˆ˜ ì œí•œ
         if (m_InputField.text.Length > 10 || m_InputField.text.Length < 2)
         {
             UIManager.Instance.OpenSystemPopup(new MessageData
             {
                 Type = PopupType.OkOnly,
-                Message = "2 ~ 9 ±ÛÀÚÀÇ ´Ð³×ÀÓÀ» ÀÔ·ÂÇÏ¼¼¿ä.",
+                Message = "2 ~ 9 ê¸€ìžìˆ˜ ë‹‰ë„¤ìž„ì„ ìž…ë ¥í•˜ì„¸ìš”.",
             });
             return;
         }
 
-        // ºÎÀûÀûÇÑ ´Ð³×ÀÓ
+        // ê¸ˆì¹™ì–´
         if (IsBannedNickName(m_InputField.text))
         {
             UIManager.Instance.OpenSystemPopup(new MessageData
             {
                 Type = PopupType.OkOnly,
-                Message = "ºÎÀûÀýÇÑ ´Ð³×ÀÓÀº »ç¿ëÇÒ ¼ö ¾ø½À´Ï´Ù.",
+                Message = "ë¶€ì ì ˆí•œ ë‹‰ë„¤ìž„ ìž…ë‹ˆë‹¤.",
             });
             return;
         }
 
-        // ´Ð³×ÀÓ ¼³Á¤
         DataManager.Instance.GetMyUserData().UserCommonData.NickName = m_Text.text;
         DataManager.Instance.GetMyUserData().UserContentsData.IsFirstLogin = false;
-
-        // µ¥ÀÌÅÍ ÀúÀå
         DataManager.Instance.SaveData();
-
-        // µÚ³¡ ¼­¹ö ÀúÀå
         BackendManager.Instance.SaveData();
-
-        // UI Refresh
         UIManager.Instance.Refresh();
-
         SoundManager.Instance.StartSFX("ButtonClick");
+
         UIManager.Instance.Close<Popup_NickName>();
     }
     #endregion

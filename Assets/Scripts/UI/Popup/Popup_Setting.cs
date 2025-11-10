@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -137,7 +137,7 @@ public class Popup_Setting : UIElement
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkCancel,
-            Message = "°ÔÀÓ µ¥ÀÌÅÍ¸¦ ¿ÏÀüÈ÷ »èÁ¦ ÇÏ½Ã°Ú½À´Ï±î?",
+            Message = "ì •ë§ ëª¨ë“  ë°ì´í„°ë¥¼ ì‚­ì œ í•˜ì‹œê² ìŠµë‹ˆê¹Œ?",
             OkAction = () => { DataManager.Instance.DeleteData(); }
         });
     }
@@ -148,7 +148,7 @@ public class Popup_Setting : UIElement
         UIManager.Instance.OpenSystemPopup(new MessageData
         { 
             Type = PopupType.OkCancel, 
-            Message = "°ÔÀÓÀ» Á¾·á ÇÏ½Ã°Ú½À´Ï±î?", 
+            Message = "ê²Œìž„ì„ ì¢…ë£Œ í•˜ì‹œê² ìŠµë‹ˆê¹Œ?", 
             OkAction = () => { DataManager.Instance.ExitGame(); }  
         });
     }

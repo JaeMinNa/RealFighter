@@ -1,4 +1,4 @@
-using Photon.Pun;
+ï»¿using Photon.Pun;
 using UnityEngine;
 
 public class PhotonController : MonoBehaviour, IPunObservable
@@ -15,6 +15,7 @@ public class PhotonController : MonoBehaviour, IPunObservable
     public int MyHeroGradeExp { get; private set; } = 0;
 
     private PVPModule m_pvpModule = null;
+    private IngameWindow m_IngameWindow = null;
 
     private void Awake()
     {
@@ -31,7 +32,7 @@ public class PhotonController : MonoBehaviour, IPunObservable
                 return;
         }
 
-        // ³»°¡ º¸³¾ ¶§
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
         if (stream.IsWriting)
         {
             // Ingame Data
@@ -39,7 +40,7 @@ public class PhotonController : MonoBehaviour, IPunObservable
             stream.SendNext(m_pvpModule.MySelectBtnNum);
             stream.SendNext(PhotonNetwork.IsMasterClient? m_pvpModule.CurTime : 0);
         }
-        // ³»°¡ ¹ÞÀ» ¶§
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
         else
         {
             // Ingame Data
@@ -47,7 +48,7 @@ public class PhotonController : MonoBehaviour, IPunObservable
             m_pvpModule.EnemySelectBtnNum = (int)stream.ReceiveNext();
             float curTime = (float)stream.ReceiveNext();
 
-            // ¸¶½ºÅÍ°¡ ¾Æ´Ñ ÂÊ¸¸ CurTime ¹Ý¿µ
+            // ï¿½ï¿½ï¿½ï¿½ï¿½Í°ï¿½ ï¿½Æ´ï¿½ ï¿½Ê¸ï¿½ CurTime ï¿½Ý¿ï¿½
             if (!PhotonNetwork.IsMasterClient)
                 m_pvpModule.CurTime = curTime;
         }
@@ -68,6 +69,16 @@ public class PhotonController : MonoBehaviour, IPunObservable
         MyHeroExp = exp;
         MyHeroGrade = grade;
         MyHeroGradeExp = gradeExp;
+    }
+
+    [PunRPC]
+    public void RPCPlayEmoticon(bool isLeft, int num)
+    {
+        if (m_IngameWindow == null)
+            m_IngameWindow = UIManager.Instance.GetOpened<IngameWindow>();
+
+        if (m_IngameWindow != null)
+            m_IngameWindow.SetEmoticon(isLeft, num);
     }
     #endregion
 }

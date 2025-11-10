@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -22,6 +22,7 @@ public class IngameWindow : UIElement
     [Header("Under")]
     [SerializeField] private Button Btn_Ready = null;
     [SerializeField] private Button Btn_Exit = null;
+    [SerializeField] private Button[] Btn_Emoticons = null;
 
     [Header("Player_Left")]
     [SerializeField] private TMP_Text Text_NickName_Left = null;
@@ -31,6 +32,7 @@ public class IngameWindow : UIElement
     [SerializeField] private Image Img_Hero_Left = null;
     [SerializeField] private TMP_Text Text_Level_Left = null;
     [SerializeField] private TMP_Text Text_Hero_Left = null;
+    [SerializeField] private Image Img_Emoticon_Left = null;
 
     [Header("Player_Right")]
     [SerializeField] private TMP_Text Text_NickName_Right = null;
@@ -40,6 +42,7 @@ public class IngameWindow : UIElement
     [SerializeField] private Image Img_Hero_Right = null;
     [SerializeField] private TMP_Text Text_Level_Right = null;
     [SerializeField] private TMP_Text Text_Hero_Right = null;
+    [SerializeField] private Image Img_Emoticon_Right = null;
 
     [Header("SkillInfo")]
     [SerializeField] private GameObject Obj_MySkillInfoPanel = null;
@@ -108,6 +111,12 @@ public class IngameWindow : UIElement
             Btn_MyDefences[index].onClick.AddListener(() => OnClick_MyDefences(capturedIndex));
         }
 
+        for (int index = 0; index < Btn_Emoticons.Length; ++index)
+        {
+            int capturedIndex = index;
+            Btn_Emoticons[index].onClick.AddListener(() => OnClick_Emoticon(capturedIndex));
+        }
+
         Btn_Exit.onClick.AddListener(OnClick_Exit);
         Btn_Ready.onClick.AddListener(OnClick_Ready);
     }
@@ -125,6 +134,8 @@ public class IngameWindow : UIElement
         SetUI_DangerIcon();
 
         SkillImage.gameObject.SetActive(false);
+        Img_Emoticon_Left.gameObject.SetActive(false);
+        Img_Emoticon_Right.gameObject.SetActive(false);
     }
 
     public override void OnRefresh()
@@ -176,7 +187,7 @@ public class IngameWindow : UIElement
         Obj_MyCritical.SetActive(false);
         Obj_EnemyCritical.SetActive(false);
 
-        // UI À§Ä¡ ¼³Á¤
+        // UI ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
         if(m_PVPModule.IsLeftPlayer)
         {
             Obj_MySkillInfoPanel.GetComponent<RectTransform>().anchorMax = new Vector2(0f, 0.5f);
@@ -200,7 +211,7 @@ public class IngameWindow : UIElement
             Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(-600f, 250f, 0f);
         }
 
-        // ¸ðµç »ç¿ë°¡´ÉÇÑ ¹öÆ° È°¼ºÈ­
+        // ï¿½ï¿½ï¿½ ï¿½ï¿½ë°¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° È°ï¿½ï¿½È­
         for (int Index = 0; Index < Btn_MyAttacks.Length; ++Index)
         {
             if (m_PVPModule.MyCanUseSkillCounts[Index] > 0)
@@ -216,7 +227,7 @@ public class IngameWindow : UIElement
 
         Btn_Ready.interactable = true;
 
-        // ¸ðµç ¹öÆ° ÃÊ±â ÀÌ¹ÌÁö
+        // ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° ï¿½Ê±ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½
         foreach (var btn in Btn_MyAttacks)
             btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_n");
 
@@ -267,6 +278,26 @@ public class IngameWindow : UIElement
         await UniTask.Delay((int)(time * 1000));
 
         SkillImage.gameObject.SetActive(false);
+    }
+
+    public async void SetEmoticon(bool isLeft, int num)
+    {
+        SoundManager.Instance.StartSFX("ButtonEmoticon");
+
+        if (isLeft)
+        {
+            Img_Emoticon_Left.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Emoticon/Emoticon_{num}");
+            Img_Emoticon_Left.gameObject.SetActive(true);
+            await UniTask.Delay(1500);
+            Img_Emoticon_Left.gameObject.SetActive(false);
+        }
+        else
+        {
+            Img_Emoticon_Right.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Emoticon/Emoticon_{num}");
+            Img_Emoticon_Right.gameObject.SetActive(true);
+            await UniTask.Delay(1500);
+            Img_Emoticon_Right.gameObject.SetActive(false);
+        }
     }
     #endregion
 
@@ -358,7 +389,7 @@ public class IngameWindow : UIElement
 
         SoundManager.Instance.StartSFX("ButtonClick");
 
-        // ±âº» Image·Î ÃÊ±âÈ­
+        // ï¿½âº» Imageï¿½ï¿½ ï¿½Ê±ï¿½È­
         foreach (var btn in Btn_MyAttacks)
             btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_n");
 
@@ -375,7 +406,7 @@ public class IngameWindow : UIElement
 
         SoundManager.Instance.StartSFX("ButtonClick");
 
-        // ±âº» Image·Î ÃÊ±âÈ­
+        // ï¿½âº» Imageï¿½ï¿½ ï¿½Ê±ï¿½È­
         foreach (var btn in Btn_MyDefences)
             btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_n");
 
@@ -392,17 +423,15 @@ public class IngameWindow : UIElement
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkCancel,
-            Message = "°ÔÀÓÀ» Æ÷±âÇÏ°í ·Îºñ·Î ³ª°¡½Ã°Ú½À´Ï±î?",
+            Message = "íŒ¨ë„í‹°ë¥¼ ë°›ê³  ì •ë§ ë‚˜ê°€ì‹œê² ìŠµë‹ˆê¹Œ?",
             OkAction = async () => 
             {
                 if (PhotonNetwork.IsConnected)
                     PhotonManager.Instance.Disconnect(null);
 
-                // °­Á¦ Á¾·á ½Ã, ÆÐ¹è Score 1Á¡ °¨¼Ò
                 if (DataManager.Instance.GetMyUserData().UserCommonData.RankPoint > 0)
                     DataManager.Instance.GetMyUserData().UserCommonData.RankPoint--;
 
-                // µÚ³¡ ÀúÀå
                 BackendManager.Instance.SaveData();
 
                 await ScenesManager.Instance.LoadScene("LobbyScene");
@@ -415,7 +444,6 @@ public class IngameWindow : UIElement
         if (m_PVPModule.IsMyReady)
             return;
 
-        // ¹öÆ° Å¬¸¯ÇÏÁö ¾Ê¾ÒÀ¸¸é ¸®ÅÏ
         if (m_PVPModule.MySelectBtnNum == -1)
             return;
 
@@ -423,8 +451,6 @@ public class IngameWindow : UIElement
 
         m_PVPModule.IsMyReady = true;
         Btn_Ready.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_TextButton_Square01_Gray");
-
-        // ·¹µð ¿Ï·á ½Ã, ¸ðµç ¹öÆ° ºñÈ°¼ºÈ­
         Btn_Ready.interactable = false;
 
         foreach (var btn in Btn_MyAttacks)
@@ -432,6 +458,44 @@ public class IngameWindow : UIElement
 
         foreach (var btn in Btn_MyDefences)
             btn.interactable = false;
+    }
+
+    private void OnClick_Emoticon(int num)
+    {
+        if(!PhotonNetwork.IsConnected)
+        {
+            if(m_PVPModule.IsLeftPlayer)
+            {
+                if (Img_Emoticon_Left.gameObject.activeSelf)
+                    return;
+
+                SetEmoticon(true, num);
+            }
+            else
+            {
+                if (Img_Emoticon_Right.gameObject.activeSelf)
+                    return;
+
+                SetEmoticon(false, num);
+            }
+        }
+        else
+        {
+            if (m_PVPModule.IsLeftPlayer)
+            {
+                if (Img_Emoticon_Left.gameObject.activeSelf)
+                    return;
+
+                m_PVPModule.PhotonController_My.PhotonView.RPC("RPCPlayEmoticon", RpcTarget.All, true, num);
+            }
+            else
+            {
+                if (Img_Emoticon_Right.gameObject.activeSelf)
+                    return;
+
+                m_PVPModule.PhotonController_My.PhotonView.RPC("RPCPlayEmoticon", RpcTarget.All, false, num);
+            }
+        }
     }
     #endregion
 }

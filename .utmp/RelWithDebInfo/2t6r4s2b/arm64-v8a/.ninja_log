@@ -1,10 +1,19 @@
 # ninja log v5
 58	2249	7835491590830338	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	b516b46f62fe4b73
-38	2314	7835491591170057	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	1ad4320b3b33850c
-107	2330	7835491591734480	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	32e5e115cdb3fd5d
-0	2452	7835491593824221	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	159fd5bebaaac923
-148	2478	7835491594043656	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	e835df86bd4cef34
-81	2633	7835491595780943	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	c56f57aae0343ead
 176	2738	7835491596800498	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	c6f3deb6f8b45828
-19	2850	7835491597584048	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	88e8cdf159510448
+38	2314	7835491591170057	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	1ad4320b3b33850c
 2851	3183	7835491601070930	E:/Git/Github/RealFighter/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/2t6r4s2b/obj/arm64-v8a/libgame.so	cecbcfd2bdac7c90
+107	2330	7835491591734480	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	32e5e115cdb3fd5d
+148	2478	7835491594043656	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	e835df86bd4cef34
+0	2452	7835491593824221	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	159fd5bebaaac923
+81	2633	7835491595780943	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	c56f57aae0343ead
+19	2850	7835491597584048	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	88e8cdf159510448
+20	5262	7844916690234298	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	b516b46f62fe4b73
+165	5275	7844916690234298	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	32e5e115cdb3fd5d
+90	5440	7844916691560970	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	c6f3deb6f8b45828
+1	5442	7844916691780381	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	159fd5bebaaac923
+40	5498	7844916693056964	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	1ad4320b3b33850c
+195	5872	7844916693814936	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	e835df86bd4cef34
+123	6432	7844916701349345	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	c56f57aae0343ead
+62	6497	7844916702209231	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	88e8cdf159510448
+6497	6849	7844916706853444	E:/Git/Github/RealFighter/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/2t6r4s2b/obj/arm64-v8a/libgame.so	cecbcfd2bdac7c90

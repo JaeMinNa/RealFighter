@@ -1,10 +1,8 @@
-using Cysharp.Threading.Tasks;
+ï»¿using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using System;
 using System.Linq;
-using Unity.Android.Gradle.Manifest;
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PVPModule : BattleModule
@@ -12,7 +10,7 @@ public class PVPModule : BattleModule
     #region Public Property
     // My UserData
     public GameObject Obj_MyHero { get; private set; }
-    public int CurTurn { get; private set; }                        // ÅÏÀÌ º¯°æµÉ ¶§ ¸¶´Ù 1¾¿ Áõ°¡
+    public int CurTurn { get; private set; }           
     public int CurRound { get; private set; }
     public float CurTime { get; set; } = 30f;
     public int CurHp { get; private set; }
@@ -42,13 +40,16 @@ public class PVPModule : BattleModule
     public bool IsLeftPlayer { get; private set; }
     public bool IsAttackTurn { get; private set; }
     public bool IsBattle { get; private set; }
+
+    // Photon
+    public PhotonController PhotonController_My { get; private set; } = null;
+    public PhotonController PhotonController_Enemy { get; private set; } = null;
+
     #endregion
 
     #region Member Property
     private CinemachineCamera m_Cinemachine = null;
     private CinemachineSplineDolly m_SplineDolly = null;
-    private PhotonController m_PhotonController_My = null;
-    private PhotonController m_PhotonController_Enemy = null;
     private int m_EnemySelectTime = 0;
     #endregion
 
@@ -65,20 +66,20 @@ public class PVPModule : BattleModule
             if (CurTime >= 0)
                 CurTime -= Time.deltaTime;
 
-            // AI ¸ğµå¿¡¼­ »ó´ëÀÇ ·£´ı Å¬¸¯
+            // AI ï¿½ï¿½å¿¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½
             if(ClientDef.TurnTime - CurTime > m_EnemySelectTime)
             {
-                // ¼±ÅÃÀ» ¾ÈÇßÀ» ¶§¸¸
+                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 if (EnemySelectBtnNum == -1)
                 {
-                    // »ó´ëÀÇ °ø°İÅÏ
+                    // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                     if(!IsAttackTurn)
                     {
                         while (EnemySelectBtnNum == -1)
                         {
                             int value = RandomUtil.GetRandomIndex(0, 2);
 
-                            // ¸ğµç ½ºÅ³ È½¼ö¸¦ ´Ù »ç¿ëÇÏ°í, ¹æ¾îÅÏÀÎ °æ¿ì ¹Ù·Î ¼±ÅÃ
+                            // ï¿½ï¿½ï¿½ ï¿½ï¿½Å³ È½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï°ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ù·ï¿½ ï¿½ï¿½ï¿½ï¿½
                             if (EnemyCanUseSkillCounts[0] == 0 &&
                                 EnemyCanUseSkillCounts[1] == 0 &&
                                 EnemyCanUseSkillCounts[2] == 0 &&
@@ -89,7 +90,7 @@ public class PVPModule : BattleModule
                                 EnemySelectBtnNum = value;
                         }
                     }
-                    // »ó´ëÀÇ ¹æ¾îÅÏ
+                    // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
                     else
                     {
                         int value = RandomUtil.GetRandomIndex(0, 2);
@@ -106,7 +107,7 @@ public class PVPModule : BattleModule
                 if (CurTime >= 0)
                     CurTime -= Time.deltaTime;
 
-            // »ó´ë¹æÀÇ °­Á¦Á¾·á ½Ã
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
             if(PhotonNetwork.CurrentRoom.PlayerCount < 2)
             {
                 m_Result = "Win";
@@ -114,7 +115,7 @@ public class PVPModule : BattleModule
             }
         }
 
-        // ½Ã°£ ÃÊ°ú ½Ã, °­Á¦ ÁØºñ ¿Ï·á
+        // ï¿½Ã°ï¿½ ï¿½Ê°ï¿½ ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½Øºï¿½ ï¿½Ï·ï¿½
         if (CurTime <= 0)
         {
             IsMyReady = true;
@@ -123,7 +124,7 @@ public class PVPModule : BattleModule
 
         if(IsMyReady && IsEnemyReady && !IsBattle)
         {
-            Debug.LogWarning("ÀüÅõ ½ÃÀÛ!");
+            Debug.LogWarning("ë°°í‹€ ì‹œì‘!");
 
             IsBattle = true;
             await StartBattle();
@@ -133,18 +134,18 @@ public class PVPModule : BattleModule
 
     private void OnApplicationQuit()
     {
-        // ¼­¹ö ¿¬°á ÇØÁ¦
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (PhotonNetwork.IsConnected)
             PhotonManager.Instance.Disconnect(null);
 
-        // °­Á¦ Á¾·á ½Ã, ÆĞ¹è Score 1Á¡ °¨¼Ò
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½, ï¿½Ğ¹ï¿½ Score 1ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (DataManager.Instance.GetMyUserData().UserCommonData.RankPoint > 0)
             DataManager.Instance.GetMyUserData().UserCommonData.RankPoint--;
 
-        // µ¥ÀÌÅÍ ÀúÀå
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         DataManager.Instance.SaveData();
         
-        // µÚ³¡ ÀúÀå
+        // ï¿½Ú³ï¿½ ï¿½ï¿½ï¿½ï¿½
         BackendManager.Instance.SaveData();
     }
     #endregion
@@ -154,31 +155,31 @@ public class PVPModule : BattleModule
     {
         await base.StartGame();
 
-        // °ÔÀÓ ½ÃÀÛ ½Ã, ÃÖÃÊ ÇÑ¹ø¸¸ ½ÇÇàµÇ´Â °Íµé
+        // ìµœì´ˆ í•œë²ˆë§Œ ì‹¤í–‰
         InitialGame();
 
-        // »ó´ë Àû »ı¼º
+        // PVP ëª¨ë“œ
         if (PhotonNetwork.IsConnected)
         {
-            Debug.LogWarning("PVP ¹èÆ² Á¢¼Ó ¿Ï·á");
-            Debug.LogWarning("»ó´ë¹æ Á¢¼Ó ´ë±â Áß...");
+            Debug.LogWarning("PVP ë°°í‹€ ì‹œì‘!");
+            Debug.LogWarning("ìƒëŒ€ë°© ì ‘ì†ê¹Œì§€ ëŒ€ê¸°...");
 
-            // »ó´ë¹æ Á¢¼Ó ±îÁö ´ë±â
+            // Room ì…ì¥ ì‹¤íŒ¨
             await UniTask.WhenAny(UniTask.WaitUntil(() => PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.PlayerCount >= 2),UniTask.Delay(TimeSpan.FromSeconds(10)));
 
             if (PhotonNetwork.CurrentRoom == null)
             {
-                Debug.LogWarning("Room ÀÔÀå ½ÇÆĞ");
+                Debug.LogWarning("Room ì…ì¥ ì‹¤íŒ¨");
 
                 await ScenesManager.Instance.LoadScene("LobbyScene");
                 await UniTask.Delay(100);
                 UIManager.Instance.OpenSystemPopup(new MessageData
                 {
                     Type = PopupType.OkOnly,
-                    Message = "Á¢¼Ó¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.",
+                    Message = "Room ì…ì¥ì— ì‹¤íŒ¨ í–ˆìŠµë‹ˆë‹¤.",
                     OkAction = () =>
                     {
-                        // UIRoot°¡ ²¿ÀÌ±â ¶§¹®¿¡ °­Á¦·Î ´Ù½Ã ¼³Á¤
+                        // UIRootë¥¼ ì°¾ì„ ìˆ˜ ì—†ì–´ì„œ, ì„ì‹œë¡œ ê°•ì œë¡œ ì‹¤í–‰
                         var lobbyScene = GameObject.Find("SceneLoader").GetComponent<LobbyScene>();
                         lobbyScene.SetUIRoot();
                     }
@@ -187,20 +188,20 @@ public class PVPModule : BattleModule
                 return;      
             }
 
-            // »ó´ë¹æ Á¢¼Ó ½ÇÆĞ
+            // ìƒëŒ€ë°©ì„ ì°¾ì„ ìˆ˜ ì—†ìŒ
             if (PhotonNetwork.CurrentRoom.PlayerCount < 2)
             {
-                Debug.LogWarning("»ó´ë¹æ Ã£±â ½ÇÆĞ");
+                Debug.LogWarning("ìƒëŒ€ë°©ì„ ì°¾ì„ ìˆ˜ ì—†ìŒ");
 
                 await ScenesManager.Instance.LoadScene("LobbyScene");
                 await UniTask.Delay(100);
                 UIManager.Instance.OpenSystemPopup(new MessageData
                 {
                     Type = PopupType.OkOnly,
-                    Message = "»ó´ë¹æÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù.",
+                    Message = "ìƒëŒ€ë°©ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.",
                     OkAction = () =>
                     {
-                        // UIRoot°¡ ²¿ÀÌ±â ¶§¹®¿¡ °­Á¦·Î ´Ù½Ã ¼³Á¤
+                        // UIRootë¥¼ ì°¾ì„ ìˆ˜ ì—†ì–´ì„œ, ì„ì‹œë¡œ ê°•ì œë¡œ ì‹¤í–‰
                         var lobbyScene = GameObject.Find("SceneLoader").GetComponent<LobbyScene>();
                         lobbyScene.SetUIRoot();
                     }
@@ -209,11 +210,11 @@ public class PVPModule : BattleModule
                 return;
             }
 
-            Debug.LogWarning("»ó´ë¹æ Á¢¼Ó ¿Ï·á!");
+            Debug.LogWarning("ìƒëŒ€ë°© ì°¾ê¸° ì™„ë£Œ!");
 
-            // PhotonController »ı¼º
+            // PhotonController ìƒì„±
             PhotonNetwork.Instantiate("Prefabs/Photon/PhotonController", Vector3.zero, Quaternion.identity).GetComponent<PhotonController>();
-            Debug.LogWarning("PhotonController »ı¼º ¿Ï·á!");
+            Debug.LogWarning("ë‚˜ì˜ PhotonController ìƒì„± ì™„ë£Œ!");
 
             await UniTask.WhenAny(UniTask.WaitUntil(() =>
             {
@@ -229,17 +230,17 @@ public class PVPModule : BattleModule
                 || controllers.Length < 2
                 || !controllers.All(c => c.PhotonView != null && c.PhotonView.ViewID > 0))
             {
-                Debug.LogWarning("»ó´ë¹æ°ú µ¿±âÈ­ ½ÇÆĞ");
+                Debug.LogWarning("ìƒëŒ€ë°© PhotonControllerë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŒ");
 
                 await ScenesManager.Instance.LoadScene("LobbyScene");
                 await UniTask.Delay(100);
                 UIManager.Instance.OpenSystemPopup(new MessageData
                 {
                     Type = PopupType.OkOnly,
-                    Message = "»ó´ë¹æ°ú µ¿±âÈ­¿¡ ½ÇÆĞÇß½À´Ï´Ù.",
+                    Message = "ìƒëŒ€ë°© ë°ì´í„° ìƒì„±ì— ì‹¤íŒ¨ í–ˆìŠµë‹ˆë‹¤.",
                     OkAction = () =>
                     {
-                        // UIRoot°¡ ²¿ÀÌ±â ¶§¹®¿¡ °­Á¦·Î ´Ù½Ã ¼³Á¤
+                        // UIRootë¥¼ ì°¾ì„ ìˆ˜ ì—†ì–´ì„œ, ì„ì‹œë¡œ ê°•ì œë¡œ ì‹¤í–‰
                         var lobbyScene = GameObject.Find("SceneLoader").GetComponent<LobbyScene>();
                         lobbyScene.SetUIRoot();
                     }
@@ -248,7 +249,7 @@ public class PVPModule : BattleModule
                 return;
             }
 
-            Debug.LogWarning("µ¿±âÈ­ ÁØºñ ¿Ï·á!");
+            Debug.LogWarning("ìƒëŒ€ë°© ë°ì´í„° ìƒì„± ì™„ë£Œ!");
 
             foreach (var c in controllers)
             {
@@ -256,34 +257,34 @@ public class PVPModule : BattleModule
                     continue;
 
                 if (c.PhotonView.IsMine)
-                    m_PhotonController_My = c;          // ³»°¡ ¼ÒÀ¯ÇÑ ÄÁÆ®·Ñ·¯
+                    PhotonController_My = c;         
                 else
-                    m_PhotonController_Enemy = c;     // »ó´ë ÄÁÆ®·Ñ·¯
+                    PhotonController_Enemy = c;   
             }
 
             UserData_Common myCommonData = DataManager.Instance.GetMyUserData().UserCommonData;
             HeroData myHeroData = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero;
-            m_PhotonController_My.PhotonView.RPC("RPCSetMyData", RpcTarget.Others, myCommonData.NickName, myCommonData.RankPoint, myCommonData.Image,
+            PhotonController_My.PhotonView.RPC("RPCSetMyData", RpcTarget.Others, myCommonData.NickName, myCommonData.RankPoint, myCommonData.Image,
                                                 myHeroData.HeroName,myHeroData.Skillproficiencies[0], myHeroData.Skillproficiencies[1], 
                                                 myHeroData.Skillproficiencies[2], myHeroData.Level, myHeroData.Exp, myHeroData.Grade, myHeroData.GradeExp);
 
-            Debug.LogWarning("»ó´ë¹æ µ¥ÀÌÅÍ ·Îµå ´ë±â Áß...");
+            Debug.LogWarning("ìƒëŒ€ë°© ë°ì´í„° ë¶ˆëŸ¬ì˜¤ëŠ” ì¤‘...");
 
-            await UniTask.WhenAny(UniTask.WaitUntil(() => !string.IsNullOrEmpty(m_PhotonController_Enemy.MyNickName)),UniTask.Delay(TimeSpan.FromSeconds(10)));
+            await UniTask.WhenAny(UniTask.WaitUntil(() => !string.IsNullOrEmpty(PhotonController_Enemy.MyNickName)),UniTask.Delay(TimeSpan.FromSeconds(10)));
 
-            if (string.IsNullOrEmpty(m_PhotonController_Enemy.MyNickName))
+            if (string.IsNullOrEmpty(PhotonController_Enemy.MyNickName))
             {
-                Debug.LogWarning("»ó´ë¹æ µ¥ÀÌÅÍ ·Îµå ½ÇÆĞ");
+                Debug.LogWarning("ìƒëŒ€ë°© ë°ì´í„° ë¶ˆëŸ¬ì˜¤ê¸° ì‹¤íŒ¨");
 
                 await ScenesManager.Instance.LoadScene("LobbyScene");
                 await UniTask.Delay(100);
                 UIManager.Instance.OpenSystemPopup(new MessageData
                 {
                     Type = PopupType.OkOnly,
-                    Message = "»ó´ë¹æ µ¥ÀÌÅÍ ·Îµå¸¦ ½ÇÆĞÇß½À´Ï´Ù.",
+                    Message = "ìƒëŒ€ë°© ë°ì´í„° ë¶ˆëŸ¬ì˜¤ê¸°ì— ì‹¤íŒ¨ í–ˆìŠµë‹ˆë‹¤.",
                     OkAction = () =>
                     {
-                        // UIRoot°¡ ²¿ÀÌ±â ¶§¹®¿¡ °­Á¦·Î ´Ù½Ã ¼³Á¤
+                        // UIRootë¥¼ ì°¾ì„ ìˆ˜ ì—†ì–´ì„œ, ì„ì‹œë¡œ ê°•ì œë¡œ ì‹¤í–‰
                         var lobbyScene = GameObject.Find("SceneLoader").GetComponent<LobbyScene>();
                         lobbyScene.SetUIRoot();
                     }
@@ -292,23 +293,23 @@ public class PVPModule : BattleModule
                 return;
             }
 
-            Debug.LogWarning("»ó´ë¹æ µ¥ÀÌÅÍ ·Îµå ¿Ï·á!");
+            Debug.LogWarning("ìƒëŒ€ë°© ë°ì´í„° ë¶ˆëŸ¬ì˜¤ê¸° ì™„ë£Œ!");
 
             UserData_Common EnemyCommonData = new UserData_Common()
             { 
-                NickName = m_PhotonController_Enemy.MyNickName,
-                RankPoint = m_PhotonController_Enemy. MyScore,
-                Image = m_PhotonController_Enemy.MyImage
+                NickName = PhotonController_Enemy.MyNickName,
+                RankPoint = PhotonController_Enemy. MyScore,
+                Image = PhotonController_Enemy.MyImage
             };
 
             HeroData EnemyHero = new HeroData()
             {
-                HeroName = m_PhotonController_Enemy.MyHeroName,
-                Skillproficiencies = m_PhotonController_Enemy.MyHeroSkillproficiencies,
-                Level = m_PhotonController_Enemy.MyHeroLevel,
-                Exp = m_PhotonController_Enemy.MyHeroExp,
-                Grade = m_PhotonController_Enemy.MyHeroGrade,
-                GradeExp = m_PhotonController_Enemy.MyHeroGradeExp
+                HeroName = PhotonController_Enemy.MyHeroName,
+                Skillproficiencies = PhotonController_Enemy.MyHeroSkillproficiencies,
+                Level = PhotonController_Enemy.MyHeroLevel,
+                Exp = PhotonController_Enemy.MyHeroExp,
+                Grade = PhotonController_Enemy.MyHeroGrade,
+                GradeExp = PhotonController_Enemy.MyHeroGradeExp
             };
 
             UserData_Hero EnemyUserHeroData = new UserData_Hero()
@@ -324,25 +325,24 @@ public class PVPModule : BattleModule
 
             EnemyUserData = EnemyData;
         }
-        // AI Àû »ı¼º
+        // AI ëª¨ë“œ
         else
         {
-            Debug.LogWarning("AI ¹èÆ² Á¢¼Ó ¿Ï·á");
+            Debug.LogWarning("AI ë°°í‹€ ì‹œì‘!");
             EnemyUserData = DataManager.Instance.GetAIUserData();
         }
 
-        // ÇÊµå »ı¼º
+        // ë§µ ìƒì„±
         var field = ResourceLoader.LoadAssetResources<GameObject>("Prefabs/Map/MainField");
         Instantiate(field, Vector3.zero, Quaternion.identity, m_EnvironmentRoot.transform);
         Feild = field.GetComponent<MainFeild>();
 
-        // È÷¾î·Î »ı¼º
+        // íˆì–´ë¡œ ìƒì„±
         CreateHeroes();
 
-        // Ä«¸Ş¶ó È¿°ú
+        // ì¹´ë©”ë¼ ì…‹íŒ…
         await SetCameraMove();
 
-        // ¸ğµç ÁØºñ°¡ ¿Ï·á µÇ¾úÀ» ¶§
         IsStartGame = true;
     }
 
@@ -351,7 +351,6 @@ public class PVPModule : BattleModule
         if (!IsStartGame)
             return;
 
-        // ¼­¹ö ¿¬°á ÇØÁ¦
         if (PhotonNetwork.IsConnected)
             PhotonManager.Instance.Disconnect(null);
 
@@ -365,10 +364,9 @@ public class PVPModule : BattleModule
     #region Private Method
 
     #region Initial
-    // ÃÖÃÊ ÇÑ¹ø¸¸ ½ÇÇà µÇ´Â °Íµé
+    // ìµœì´ˆ í•œë²ˆë§Œ ì‹¤í–‰
     private void InitialGame()
     {
-        // ÃÖÃÊ ÇÑ¹ø¸¸ ÃÊ±âÈ­ ÇÏ´Â °Íµé
         CurTurn = 0;
         CurRound = 1;
         CurHp = 100;
@@ -392,7 +390,7 @@ public class PVPModule : BattleModule
             EnemyCanUseSkillCounts[index] = ClientDef.SkillMaxCount;
         }
 
-        // PlayerÀÇ À§Ä¡ °áÁ¤
+        // Player ìœ„ì¹˜ ì„¤ì •
         if(!PhotonNetwork.IsConnected)
         {
             var randomIndex = RandomUtil.GetRandomIndex(0, 1);
@@ -422,7 +420,7 @@ public class PVPModule : BattleModule
         }
     }
 
-    // ÅÏ º¯°æ ½Ã, ½ÇÇàµÇ´Â °Íµé
+    // í„´ ë§ˆë‹¤ ì‹¤í–‰
     private void StartTurn()
     {
         CurTime = ClientDef.TurnTime;
@@ -434,12 +432,11 @@ public class PVPModule : BattleModule
         m_EnemySelectTime = RandomUtil.GetRandomIndex(3, 15);
     }
 
-    // ¶ó¿îµå º¯°æ
+    // ë¼ìš´ë“œ ë§ˆë‹¤ ì‹¤í–‰
     private async void NextRound()
     {
         CurRound++;
 
-        // °ÔÀÓ Á¾·á
         if(CurRound > ClientDef.MaxRound)
         {
             await UniTask.Delay(2000);
@@ -455,17 +452,15 @@ public class PVPModule : BattleModule
         }
     }
 
-    // ÅÏ º¯°æ
     private void NextTurn()
     {
-        Debug.LogWarning("ÅÏ Á¾·á!");
+        Debug.LogWarning("í„´ ì‹œì‘!");
 
         StartTurn();
 
         CurTurn++;
         IsAttackTurn = !IsAttackTurn;
 
-        // CurTurnÀÌ 2ÀÇ ¹è¼öÀÏ ¶§ ´ÙÀ½ ¶ó¿îµå·Î
         if (CurTurn % 2 == 0)
         {
             NextRound();
@@ -534,13 +529,13 @@ public class PVPModule : BattleModule
 
                     if (EnemyCurHp <= 0)
                     {
-                        // Die Sound Ãß°¡ ÇØ¾ß µÊ 
+                        // Die Sound 
 
 
 
                         EnemyHeroAnim.Anim.SetTrigger("Die");
 
-                        await UniTask.Delay(2000);  // Die ½Ã°£µµ Ãß°¡
+                        await UniTask.Delay(2000);  // Die ì‹œê°„ ë³€ê²½
 
                         m_Result = "Win";
                         EndGame();
@@ -567,7 +562,7 @@ public class PVPModule : BattleModule
                     await UniTask.Delay((int)(MyHeroAnim.SkillTimes[MySelectBtnNum] * 1000));
                     SoundManager.Instance.StartSFX_Punch();
 
-                    // °ø°İ ¼º°ø ½Ã
+                    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
                     if (MySelectBtnNum != EnemySelectBtnNum)
                     {
                         EffectUtil.StartShake(0.1f, 0.2f);
@@ -578,18 +573,17 @@ public class PVPModule : BattleModule
 
                         if (EnemyCurHp <= 0)
                         {
-                            // Die Sound Ãß°¡
+                            // Die Sound 
 
 
                             EnemyHeroAnim.Anim.SetTrigger("Die");
 
-                            await UniTask.Delay(2000);  // Die ½Ã°£µµ Ãß°¡
+                            await UniTask.Delay(2000);  // Die ì‹œê°„ ë³€ê²½
 
                             m_Result = "Win";
                             EndGame();
                         }
 
-                        // ÄŞº¸
                         if (IsMyCombo)
                         {
                             MyCombo++;
@@ -656,12 +650,12 @@ public class PVPModule : BattleModule
 
                     if (CurHp <= 0)
                     {
-                        // Die Sound Ãß°¡
+                        // Die Sound 
 
 
                         MyHeroAnim.Anim.SetTrigger("Die");
 
-                        await UniTask.Delay(2000);  // Die ½Ã°£µµ Ãß°¡
+                        await UniTask.Delay(2000);  // Die ì‹œê°„ ë³€ê²½
 
                         m_Result = "Lose";
                         EndGame();
@@ -689,7 +683,7 @@ public class PVPModule : BattleModule
                     await UniTask.Delay((int)(EnemyHeroAnim.SkillTimes[EnemySelectBtnNum] * 1000));
                     SoundManager.Instance.StartSFX_Punch();
 
-                    // °ø°İ ¼º°ø ½Ã
+                    // ê³µê²©
                     if (MySelectBtnNum != EnemySelectBtnNum)
                     {
                         EffectUtil.StartShake(0.1f, 0.2f);
@@ -700,18 +694,17 @@ public class PVPModule : BattleModule
 
                         if (CurHp <= 0)
                         {
-                            // Die Sound Ãß°¡
+                            // Die Sound 
 
 
                             MyHeroAnim.Anim.SetTrigger("Die");
 
-                            await UniTask.Delay(2000);  // Die ½Ã°£µµ Ãß°¡
+                            await UniTask.Delay(2000);  // Die ì‹œê°„ ë³€ê²½
 
                             m_Result = "Lose";
                             EndGame();
                         }
 
-                        // ÄŞº¸
                         if (IsEnemyCombo)
                         {
                             EnemyCombo++;
@@ -757,13 +750,9 @@ public class PVPModule : BattleModule
         m_SplineDolly = GameObject.FindWithTag("Cinemachine").GetComponent<CinemachineSplineDolly>();
         m_Cinemachine.Follow = Feild.GetTransfromField();
 
-        // Ä«¸Ş¶ó ¿òÁ÷ÀÓ ½ÃÀÛ
         await StartCinemachine();
-
-        // ½Ã³×¸Ó½Å ºñÈ°¼ºÈ­
         m_Cinemachine.gameObject.SetActive(false);
 
-        // ¸ŞÀÎ Ä«¸Ş¶ó ¼³Á¤
         if(IsLeftPlayer)
         {
             Camera.main.transform.position = new Vector3(-1.3f, 2.8f, -0.7f);
@@ -791,7 +780,7 @@ public class PVPModule : BattleModule
             await UniTask.Yield(PlayerLoopTiming.Update);
         }
 
-        m_SplineDolly.CameraPosition = 1f; // ¸¶Áö¸· À§Ä¡ º¸Á¤
+        m_SplineDolly.CameraPosition = 1f;
     }
     #endregion
 

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -91,6 +91,8 @@ public class GameManager : Singleton<GameManager>
         _ = ScenesManager.Instance;
         _ = PhotonManager.Instance;
         _ = AdManager.Instance;
+        _ = BackendManager.Instance;
+        _ = LocalPushManager.Instance;
     }
 
     public void ExitGame()
@@ -232,7 +234,7 @@ public class GameManager : Singleton<GameManager>
 
     ////        switch (Datas[0])
     ////        {
-    ////            // À¯Àú ±âº» µ¥ÀÌÅÍ
+    ////            // ï¿½ï¿½ï¿½ï¿½ ï¿½âº» ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     ////            case nameof(UserData_Common): User.SetUserCommonData(Util.ToObjectJson<UserData_Common>(Datas[1])); break;
     ////        }
     ////    }

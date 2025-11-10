@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -37,7 +37,7 @@ public class DataManager : Singleton<DataManager>
         }
     }
 
-    // ÇöÀç ¾ÀÀÇ DataLoader
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ DataLoader
     private DataLoader m_DataLoader = null;
 
     #region Override Method
@@ -65,7 +65,7 @@ public class DataManager : Singleton<DataManager>
 
         ES3.Save("UserData", m_DataLoader);
 
-        Debug.LogWarning("UserData ÀúÀå ¼º°ø");
+        Debug.LogWarning("UserData ì €ì¥ ì™„ë£Œ!");
     }
 
     [ContextMenu("Load Data")]
@@ -81,11 +81,11 @@ public class DataManager : Singleton<DataManager>
         {
             ES3.LoadInto("UserData", m_DataLoader);
 
-            Debug.LogWarning("UserData ·Îµå ¼º°ø");
+            Debug.LogWarning("UserData ë¶ˆëŸ¬ì˜¤ê¸° ì™„ë£Œ!");
         }
         else
         {
-            Debug.LogWarning("UserData ·Îµå ½ÇÆĞ");
+            Debug.LogWarning("UserData ë¶ˆëŸ¬ì˜¤ê¸° ì‹¤íŒ¨");
 
             SetUserData();
         }
@@ -93,19 +93,17 @@ public class DataManager : Singleton<DataManager>
 
     public void DeleteData()
     {
-        // µ¥ÀÌÅÍ »èÁ¦
+        // ë°ì´í„° ì œê±°
         ES3.DeleteFile("SaveFile.txt");
-        Debug.LogWarning("UserData »èÁ¦ ¼º°ø");
+        Debug.LogWarning("UserData ì œê±° ì™„ë£Œ");
 
-        // PlayerPrefs »èÁ¦
+        // PlayerPrefs ï¿½ï¿½ï¿½ï¿½
         PlayerPrefs.DeleteAll();
-        Debug.LogWarning("PlayerPrefs »èÁ¦ ¼º°ø");
+        Debug.LogWarning("PlayerPrefs ì œê±° ì™„ë£Œ");
 
-        // °ÔÀÓ Á¾·á
         ExitGame();
     }
 
-    // ÇöÀç ¾À¿¡¼­ DataLoader¸¦ »õ·Î ¼³Á¤ÇØ ÁØ´Ù.
     public void SetDataLoader()
     {
         m_DataLoader = GameObject.Find("DataLoader").GetComponent<DataLoader>();
@@ -132,7 +130,6 @@ public class DataManager : Singleton<DataManager>
     #endregion
 
     #region Private Method
-    // ÀúÀåµÈ µ¥ÀÌÅÍ°¡ ¾øÀ» ¶§, ÃÖÃÊ·Î ºÒ·¯¿À´Â À¯Àú µ¥ÀÌÅÍ
     private void SetUserData()
     {
         m_DataLoader.MyUserData = new UserData();
@@ -228,7 +225,7 @@ public class DataManager : Singleton<DataManager>
 
         m_DataLoader.MyUserData.UserContentsData = userData_Contents;
 
-        Debug.LogWarning("UserData »ı¼º ¼º°ø");
+        Debug.LogWarning("UserData ì„¤ì • ì™„ë£Œ!");
     }
 
     private UserData SetAIUserData()
@@ -256,7 +253,7 @@ public class DataManager : Singleton<DataManager>
 
         AIUserData.UserHeroData = aiData_Hero;
 
-        Debug.LogWarning("EnemyUserData »ı¼º ¼º°ø");
+        Debug.LogWarning("AI EnemyUserData ì„¤ì • ì™„ë£Œ");
 
         return AIUserData;
     }

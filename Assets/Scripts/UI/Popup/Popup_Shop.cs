@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -78,11 +78,11 @@ public class Popup_Shop : UIElement
     #region Private Method
     private void SetLeftBtn(Button btn, bool isOn)
     {
-        // ¹öÆ° È¿°ú ºñÈ°¼ºÈ­
+        // ï¿½ï¿½Æ° È¿ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­
         btn.transform.GetChild(0).gameObject.SetActive(false);
         btn.transform.GetChild(1).gameObject.SetActive(false);
 
-        // ¹öÆ° È¿°ú È°¼ºÈ­
+        // ï¿½ï¿½Æ° È¿ï¿½ï¿½ È°ï¿½ï¿½È­
         if(isOn)
             btn.transform.GetChild(1).gameObject.SetActive(true);
         else
@@ -114,14 +114,14 @@ public class Popup_Shop : UIElement
         {
             int capturedIndex = index;
              
-            // ¹«·á °ñµå
+            // Gold
             if(capturedIndex == 0)
             {
                 var elementShop = Instantiate(m_ElementShop, Trans_GoldContent);
                 elementShop.GetComponent<ElementShop>().SetShop(m_ShopList_Gold[index]);
                 elementShop.GetComponent<ElementShop>().SetButton(() => OnClick_Buy_Gold_Free(capturedIndex));
             }
-            // ±¤°í °ñµå
+            // Ad
             else if (capturedIndex == 1)
             {
                 var elementShop = Instantiate(m_ElementShop, Trans_GoldContent);
@@ -134,121 +134,122 @@ public class Popup_Shop : UIElement
 
     private void Buy_Hero()
     {
-        // °¡Ã­ µî±Ş ¼³Á¤ ¿¡·¯
         if(m_GachaGrade == -1)
         {
             UIManager.Instance.OpenSystemPopup(new MessageData
             {
                 Type = PopupType.OkOnly,
-                Title = "¾Ë¸²",
-                Message = "Gacha µî±Ş ¼³Á¤ ¿À·ù ÀÔ´Ï´Ù."
+                Title = "ì•Œë¦¼",
+                Message = "íˆì–´ë¡œ ë“±ê¸‰ ë°ì´í„°ë¥¼ ë¶ˆëŸ¬ì˜¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."
             });
             return;
         }
 
-        // °ñµå È®ÀÎ
+        // Gold ì²´í¬
         if (DataManager.Instance.GetMyUserData().UserCommonData.Gold < m_ShopData.Price)
         {
             UIManager.Instance.OpenSystemPopup(new MessageData
             {
                 Type = PopupType.OkOnly,
-                Title = "¾Ë¸²",
-                Message = "GOLD°¡ ºÎÁ·ÇÕ´Ï´Ù."
+                Title = "ì•Œë¦¼",
+                Message = "GOLDê°€ ë¶€ì¡±í•©ë‹ˆë‹¤."
             });
             return;
         }
 
-        // °ñµå °¨¼Ò
         DataManager.Instance.GetMyUserData().UserCommonData.Gold -= m_ShopData.Price;
 
-        // °¡Ã­
+        // ê°€ì±  
         UIManager.Instance.Open<Popup_Gacha_Hero>(UI.Popup, "Prefabs/UI/Popup/Popup_Gacha_Hero", new List<object> { m_GachaGrade } );
 
-        // UI °»½Å
+        // UI ê°±ì‹ 
         UIManager.Instance.Refresh();
     }
 
     private void Buy_Gold_Free()
     {
-        // ¿À´Ã ÀÌ¹Ì ±¸¸ÅÇß´ÂÁö È®ÀÎ
-        if(DataManager.Instance.GetMyUserData().UserContentsData.IsGotFreeGold)
+        // ê¸°ì¡´ì— ì˜ˆì•½ëœ ë¡œì»¬ í‘¸ì‹œ ì œê±°
+        LocalPushManager.Instance.CancelPushNotification(LocalPushType.FreeGold);
+
+        // í‘¸ì‹œë¥¼ ë³´ë‚¼ ì‹œê°„ ê³„ì‚°
+        DateTime RewardTime = Util.DateTimeNow.Date.AddDays(1);
+        //RewardTime = RewardTime.AddSeconds(30);  // Test ìš©
+
+        LocalPushManager.Instance.SchedulePushNotification(
+            LocalPushType.FreeGold,
+            "Free Gold!",
+            "ë¬´ë£Œ Goldë¥¼ ë°›ì„ ìˆ˜ ìˆìŠµë‹ˆë‹¤! ë°›ìœ¼ëŸ¬ ì˜¤ì„¸ìš”~",
+            RewardTime);
+
+        Debug.LogWarning($"Local Push Sucess! Send Push on {RewardTime}");
+
+        // ì´ë¯¸ ì˜¤ëŠ˜ ë°›ì•˜ëŠ”ì§€ ì²´í¬
+        if (DataManager.Instance.GetMyUserData().UserContentsData.IsGotFreeGold)
         {
             UIManager.Instance.OpenSystemPopup(new MessageData
             {
                 Type = PopupType.OkOnly,
-                Title = "¾Ë¸²",
-                Message = "¹«·á ±¸¸Å´Â ÇÏ·ç¿¡ ÇÑ¹ø¸¸ °¡´ÉÇÕ´Ï´Ù.\n<size=40>* 00:00 ½Ã¿¡ ¹«·á ±¸¸Å È½¼ö°¡ ÃÊ±âÈ­ µË´Ï´Ù.</size>"
+                Title = "ì•Œë¦¼",
+                Message = "ì˜¤ëŠ˜ ì´ë¯¸ ë¬´ë£Œ ê³¨ë“œë¥¼ íšë“ í–ˆìŠµë‹ˆë‹¤.\n<size=40>* 00:00ì‹œì— ë‹¤ì‹œ íšë“í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.</size>"
             });
             return;
         }
 
-        // ±¸¸Å ¿Ï·á
         DataManager.Instance.GetMyUserData().UserContentsData.IsGotFreeGold = true;
-
-        // °ñµå Áõ°¡
         DataManager.Instance.GetMyUserData().UserCommonData.Gold += m_ShopData.Count;
-
-        // µ¥ÀÌÅÍ ÀúÀå
         DataManager.Instance.SaveData();
 
-        // UI °»½Å
+        // UI ê°±ì‹ 
         UIManager.Instance.Refresh();
 
-        // ¿Ï·á ÆË¾÷
+        // ì™„ë£Œ íŒì—…
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkOnly,
-            Title = "¾Ë¸²",
-            Message = "¹«·á ±¸¸Å¸¦ ¿Ï·á ÇÏ¿´½À´Ï´Ù."
+            Title = "ì•Œë¦¼",
+            Message = "ë¬´ë£Œ ê³¨ë“œë¥¼ íšë“ í–ˆìŠµë‹ˆë‹¤."
         });
     }
 
     private void Buy_Gold_Ad()
     {
-        // ±¤°í ±¸¸Å È½¼ö Ã¼Å©
+        // ê´‘ê³  íšŸìˆ˜ ì²´í¬
         if (DataManager.Instance.GetMyUserData().UserContentsData.AdGoldBuyCount >= 5)
         {
             UIManager.Instance.OpenSystemPopup(new MessageData
             {
                 Type = PopupType.OkOnly,
-                Title = "¾Ë¸²",
-                Message = "±¤°í º¸»óÀº ÇÏ·ç¿¡ 5¹ø±îÁö¸¸ °¡´ÉÇÕ´Ï´Ù.\n<size=40>* 00:00 ½Ã¿¡ ±¤°í º¸»ó È½¼ö°¡ ÃÊ±âÈ­ µË´Ï´Ù.</size>"
+                Title = "ì•Œë¦¼",
+                Message = "ì˜¤ëŠ˜ ì´ë¯¸ ëª¨ë“  ê´‘ê³  ê³¨ë“œë¥¼ ë°›ì•˜ìŠµë‹ˆë‹¤.\n<size=40>* 00:00ì‹œì— ë‹¤ì‹œ íšë“í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.</size>"
             });
             return;
         }
 
-        // ±¤°í º¸±â
+        // ê´‘ê³  
         AdManager.Instance.LoadRewardedAd(() =>
         {
-            // È½¼ö Áõ°¡
             DataManager.Instance.GetMyUserData().UserContentsData.AdGoldBuyCount++;
-
-            // °ñµå Áõ°¡
             DataManager.Instance.GetMyUserData().UserCommonData.Gold += m_ShopData.Count;
-
-            // µ¥ÀÌÅÍ ÀúÀå
             DataManager.Instance.SaveData();
-
-            // UI °»½Å
             UIManager.Instance.Refresh();
 
-            // ¿Ï·á ÆË¾÷
+            // ì™„ë£Œ
             UIManager.Instance.OpenSystemPopup(new MessageData
             {
                 Type = PopupType.OkOnly,
-                Title = "¾Ë¸²",
-                Message = "±¤°í º¸»óÀ» È¹µæÇÏ¿´½À´Ï´Ù."
+                Title = "ì•Œë¦¼",
+                Message = "ê´‘ê³  ê³¨ë“œë¥¼ íšë“ í–ˆìŠµë‹ˆë‹¤."
             });
 
             return;
         });
 
-        // ±¤°í ½ÇÆĞ
+        // ê´‘ê³  ë¶ˆëŸ¬ì˜¤ê¸° ì‹¤íŒ¨
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkOnly,
-            Title = "¾Ë¸²",
-            Message = "±¤°í¸¦ ºÒ·¯¿ÀÁö ¸øÇß½À´Ï´Ù."
+            Title = "ì•Œë¦¼",
+            Message = "ê´‘ê³  ë¶ˆëŸ¬ì˜¤ê¸°ë¥¼ ì‹¤íŒ¨ í–ˆìŠµë‹ˆë‹¤."
         });
     }
     #endregion
@@ -258,13 +259,10 @@ public class Popup_Shop : UIElement
     {
         SoundManager.Instance.StartSFX("ButtonClick");
 
-        // ¹öÆ° ¼³Á¤
         for (int index = 0; index < LeftBtnList.Count; ++index)
             SetLeftBtn(LeftBtnList[index], false);
 
         SetLeftBtn(LeftBtnList[num], true);
-
-        // ÄÁÅÙÃ÷ ¼³Á¤
         SetContent(ContentList[num]);
     }
 
@@ -273,7 +271,6 @@ public class Popup_Shop : UIElement
         SoundManager.Instance.StartSFX("ButtonClick");
         m_ShopData = m_ShopList_Hero[num];
 
-        // °¡Ã­ µî±Ş ¼³Á¤
         if (num == 0)    // Normal
             m_GachaGrade = 0;
         else if (num == 1)  // Rare
@@ -284,8 +281,8 @@ public class Popup_Shop : UIElement
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkCancel,
-            Title = "±¸¸Å",
-            Message = "Á¤¸» ±¸¸Å ÇÏ½Ã°Ú½À´Ï±î?",
+            Title = "êµ¬ë§¤",
+            Message = "Heroë¥¼ êµ¬ë§¤ í•˜ì‹œê² ìŠµë‹ˆê¹Œ?",
             OkAction = () => { Buy_Hero(); }
         });
     }
@@ -298,8 +295,8 @@ public class Popup_Shop : UIElement
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkCancel,
-            Title = "¹«·á ±¸¸Å",
-            Message = "¹«·á ±¸¸Å¸¦ ÇÏ½Ã°Ú½À´Ï±î?",
+            Title = "êµ¬ë§¤",
+            Message = "ë¬´ë£Œ ê³¨ë“œë¥¼ íšë“ í•˜ì‹œê² ìŠµë‹ˆê¹Œ?",
             OkAction = () => { Buy_Gold_Free(); }
         });
     }
@@ -312,8 +309,8 @@ public class Popup_Shop : UIElement
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkCancel,
-            Title = "±¤°í º¸»ó",
-            Message = "±¤°í¸¦ ½ÃÃ»ÇÏ°í º¸»óÀ» È¹µæ ÇÏ½Ã°Ú½À´Ï±î?",
+            Title = "ê´‘ê³  ë³´ìƒ",
+            Message = "ê´‘ê³ ë¥¼ ì‹œì²­í•˜ê³ , ê³¨ë“œë¥¼ íšë“ í•˜ì‹œê² ìŠµë‹ˆê¹Œ?",
             OkAction = () => { Buy_Gold_Ad(); }
         });
     }

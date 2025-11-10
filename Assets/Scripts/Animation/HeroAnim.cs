@@ -1,8 +1,8 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class HeroAnim : MonoBehaviour
 {
-    // Hit ¾Ö´Ï¸ÞÀÌ¼ÇÀÌ ½ÇÇà ½Ã°£
+    // Hit ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½
     [Header("Animation Hit Times")]
     [field: SerializeField] public float[] SkillTimes { get; private set; }
     [field: SerializeField] public float CriticalTime { get; private set; }

@@ -1,4 +1,4 @@
-using NUnit.Framework;
+ï»¿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 
@@ -26,7 +26,7 @@ public static class TextUtil
         return value.ToString("#,##0");
     }
 
-    // float¸¦ 00:00.0 ÃÊ ÇüÅÂ·Î ³ªÅ¸³»±â
+    // floatï¿½ï¿½ 00:00.0 ï¿½ï¿½ ï¿½ï¿½ï¿½Â·ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½ï¿½ï¿½
     public static string ConvertTime(float time)
     {
         TimeSpan timeSpan = TimeSpan.FromSeconds(time);
@@ -42,7 +42,7 @@ public static class TextUtil
     public static string GetRandomAINickName()
     {
         List<string> nickNames = new List<string> 
-        { "°¨ÀÚÄ¨", "»§¼ÅÆ²ÀÓ", "°í¾çÀÌ¹ß", "ÂüÄ¡¸¶¿äÀåÀÎ", "Çªµé", "´Ş·Á¶óº´¾Æ¸®", "NoobSlayer9000", "PotatoKing", "Lazyzz", "asddd" };
+        { "ê°ìì£¼ë¨¹", "ì œì£¼ë„ì•„ì¹¨", "ë ˆì´ìŠ¤", "ë‚˜ì´í…", "êµ¿ê°", "ï¿½Ş·ï¿½ï¿½óº´¾Æ¸ï¿½", "NoobSlayer9000", "PotatoKing", "Lazyzz", "asddd" };
 
         var randomIndex = RandomUtil.GetRandomIndex(0, nickNames.Count - 1);
 

@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+ï»¿using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -277,7 +277,7 @@ public class UIManager : Singleton<UIManager>
 
     public T GetOpened<T>() where T : UIElement
     {
-        // async opening ÁßÀÎ °æ¿ì
+        // async opening ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         if (m_AsyncOpeningStatus.ContainsKey(typeof(T)) && m_AsyncOpeningStatus[typeof(T)])
             return null;
 
@@ -347,9 +347,6 @@ public class UIManager : Singleton<UIManager>
             if (Elements.Value != null && Elements.Value.gameObject.activeInHierarchy)
                 Elements.Value.OnRefresh();
         }
-
-        // ³×Æ®¿öÅ© Åë½Å ÈÄ Refresh µÇ¸é¼­ »ç¶óÁø ¸®½º³Ê Àçµî·Ï
-        //TutorialManager.Instance.AddTargetUIListeners().Forget();
     }
 
     public void OpenSystemPopup(MessageData Data)

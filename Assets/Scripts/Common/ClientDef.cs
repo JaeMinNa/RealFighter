@@ -1,13 +1,13 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
 public static class ClientDef
 {
-    // ÀÎ°ÔÀÓ
+    // ì¸ê²Œì„
     public static readonly int SkillMaxCount = 3;
     public static readonly float TurnTime = 60f;
-    public static readonly int MaxRound = 9;    // SkillMaxCount x 3 º¸´Ù Ç×»ó ÀÛ°Å³ª °°¾Æ¾ß ÇÔ!
+    public static readonly int MaxRound = 9;    // SkillMaxCount x 3 ë³´ë‹¤ ë¬´ì¡°ê±´ ê°™ê±°ë‚˜ ì»¤ì•¼ ëœë‹¤!!
     public static readonly int MaxHeroLevel = 10;
     public static readonly int WinExp = 5;
     public static readonly int LoseExp = 2;
@@ -16,14 +16,14 @@ public static class ClientDef
     public static readonly int LoseGold = 500;
     public static readonly int DrawGold = 200;
 
-    // È÷¾î·Î
+    // íˆì–´ë¡œ
     public static readonly List<string> HeroNames = new List<string>
     {
         "REX", "BLAZE", "DRAKE", "DOMINICK", "MAVERICK", "STEELTON", "IRIS", "SERENA", "ORIANNA", "JIN"
     };
     public static readonly int MaxGradeExp = 3;
 
-    // »óÁ¡
+    // Shop
     public static readonly List<ShopData> ShopList_Hero = new List<ShopData>
     {
         new ShopData("NORMAL HERO PACK", 3000, 1, 2),
@@ -35,20 +35,18 @@ public static class ClientDef
         new ShopData("AD GOLD", 0, 2000)
     };
 
-    // ·Îºñ
+    // Photon
     public static readonly float RoomWaitTime = 10f;
+
+    // LocalPush
+    public static readonly string LOCALKEY_Push_FreeGold = string.Empty;
 }
 
 #region UserData
 public class UserData
 {
-    // À¯ÀúÀÇ ±âº» Á¤º¸
     public UserData_Common UserCommonData = null;
-
-    // À¯ÀúÀÇ È÷¾î·Î Á¤º¸
     public UserData_Hero UserHeroData = null;
-
-    // À¯ÀúÀÇ ÄÁÅÙÃ÷ Á¤º¸
     public UserData_Contents UserContentsData = null;
 }
 
@@ -109,6 +107,15 @@ public enum PopupType
 
     OkOnly,
     OkCancel,
+
+    Max
+}
+
+public enum LocalPushType
+{
+    None,
+
+    FreeGold,
 
     Max
 }

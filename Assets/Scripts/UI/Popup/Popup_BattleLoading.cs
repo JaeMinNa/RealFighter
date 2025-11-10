@@ -1,4 +1,4 @@
-using Photon.Pun;
+ï»¿using Photon.Pun;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -30,11 +30,11 @@ public class Popup_BattleLoading : UIElement
             {
                 m_IsGameStart = true;
 
-                // °ÔÀÓ ½ÃÀÛ (AI)
+                // AI ëª¨ë“œ ì‹œì‘
                 PhotonManager.Instance.Disconnect(async () => { await ScenesManager.Instance.LoadScene("GameScene"); });
             }
 
-            // ¼­¹ö¿¡ Á¢¼ÓÇÏ¿´°í, ¹æ¿¡ 2¸íÀÌ ÀÖÀ» ¶§ °ÔÀÓ½ÃÀÛ
+            // PVP ëª¨ë“œ ì‹œì‘
             if(PhotonNetwork.InRoom && PhotonNetwork.IsConnected 
                 && PhotonNetwork.CurrentRoom.PlayerCount == 2 && !m_IsGameStart)
             {
@@ -61,7 +61,7 @@ public class Popup_BattleLoading : UIElement
     {
         Text_PlayerCount.gameObject.SetActive(false);
 
-        // ¼­¹ö Á¢¼Ó ½Ãµµ -> »ó´ë Ã£±â
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ãµï¿½ -> ï¿½ï¿½ï¿½ Ã£ï¿½ï¿½
         PhotonManager.Instance.Connect(SuccessConnect, FailConnect);
     }
 
@@ -74,62 +74,53 @@ public class Popup_BattleLoading : UIElement
     #region Private Method
     private void SuccessConnect()
     {
-        // ·£´ı ¹æ ÀÔÀå ½Ãµµ
+        // Room ëœë¤ ìƒì„±
         PhotonManager.Instance.JoinRandomRoom(SuccessJoinRandomRoom, FailJoinRandomRoom);
 
-        // ¿¡µğÅÍ Àü¿ë, ÀüÃ¼ ¼­¹ö Á¢¼Ó ÀÎ¿ø Ç¥½Ã
+        // ì—ë””í„° ì „ìš© 
         if(GameManager.Instance.IsEditor)
         {
-            Text_PlayerCount.text = $"[¿¡µğÅÍ Àü¿ë]  Players : {PhotonNetwork.CountOfPlayers}";
+            Text_PlayerCount.text = $"[ì—ë””í„° ì „ìš©]  Players : {PhotonNetwork.CountOfPlayers}";
             Text_PlayerCount.gameObject.SetActive(true);
         }
     }
 
     private void FailConnect()
     {
-        // ¼­¹ö Á¢¼Ó ½ÇÆĞ
         UIManager.Instance.Close<Popup_BattleLoading>();
 
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkOnly,
-            Title = "¾Ë¸²",
-            Message = "¼­¹ö Á¢¼Ó¿¡ ½ÇÆĞÇß½À´Ï´Ù. Àá½ÃÈÄ, ´Ù½Ã ½ÃµµÇØ ÁÖ¼¼¿ä."
+            Title = "ì•Œë¦¼",
+            Message = "ì„œë²„ ì ‘ì†ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤."
         });
     }
 
     private void SuccessJoinRandomRoom()
     {
-        // ¹æ ÀÔÀå ¼º°ø
         m_IsRoom = true;
-
-        // ÇÃ·¹ÀÌ¾î 2¸íÀÌ ÀÖ´Ù¸é °ÔÀÓ ½ÃÀÛ
     }
 
     private void FailJoinRandomRoom()
     {
-        // ¹æ »ı¼º
         PhotonManager.Instance.CreateRoom(SuccessCreateRoom, FailCreateRoom);
     }
 
     private void SuccessCreateRoom()
     {
-        // ¹æ »ı¼º ¼º°ø
         m_IsRoom = true;
-
-        // ÇÃ·¹ÀÌ¾î 2¸íÀÌ ÀÖ´Ù¸é °ÔÀÓ ½ÃÀÛ
     }
 
     private void FailCreateRoom()
     {
-        // ¹æ »ı¼º ½ÇÆĞ
         UIManager.Instance.Close<Popup_BattleLoading>();
 
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
             Type = PopupType.OkOnly,
-            Title = "¾Ë¸²",
-            Message = "¹æ »ı¼º¿¡ ½ÇÆĞÇß½À´Ï´Ù. Àá½ÃÈÄ, ´Ù½Ã ½ÃµµÇØ ÁÖ¼¼¿ä."
+            Title = "ì•Œë¦¼",
+            Message = "Room ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤."
         });
     }
     #endregion
@@ -140,10 +131,7 @@ public class Popup_BattleLoading : UIElement
         SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Close<Popup_BattleLoading>();
 
-        // ¹æ ³ª°¡±â
         PhotonManager.Instance.LeaveRoom(null);
-
-        // ¼­¹ö ¿¬°á ÇØÁ¦
         PhotonManager.Instance.Disconnect(null);
     }
     #endregion

@@ -1,9 +1,7 @@
-using BackEnd;
+ï»¿using BackEnd;
 using UnityEngine;
 using LitJson;
-using NUnit.Framework;
 using System.Collections.Generic;
-using UnityEditor.Overlays;
 
 public class BackendManager : Singleton<BackendManager>
 {
@@ -60,7 +58,7 @@ public class BackendManager : Singleton<BackendManager>
         BackendReturnObject bro = Backend.BMember.CustomSignUp(DataManager.Instance.GetMyUserData().UserCommonData.UID, "1234");
         if (bro.IsSuccess())
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö È¸¿ø°¡ÀÔ ¼º°ø!");
+            Debug.LogWarning("ë’¤ë ì„œë²„ íšŒì›ê°€ì… ì„±ê³µ!");
 
             InsertData();
             SaveData();
@@ -68,7 +66,7 @@ public class BackendManager : Singleton<BackendManager>
         }
         else
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö È¸¿ø°¡ÀÔ ½ÇÆĞ");
+            Debug.LogWarning("ë’¤ë ì„œë²„ íšŒì›ê°€ì… ì‹¤íŒ¨");
         }
     }
 
@@ -77,11 +75,11 @@ public class BackendManager : Singleton<BackendManager>
         BackendReturnObject bro = Backend.BMember.CustomLogin(DataManager.Instance.GetMyUserData().UserCommonData.UID, "1234");
         if (bro.IsSuccess())
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö ·Î±×ÀÎ ¼º°ø!");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë¡œê·¸ì¸ ì„±ê³µ!");
         }
         else
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö ·Î±×ÀÎ ½ÇÆĞ");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë¡œê·¸ì¸ ì‹¤íŒ¨");
 
             SignUp();
         }
@@ -92,11 +90,11 @@ public class BackendManager : Singleton<BackendManager>
         BackendReturnObject bro = Backend.BMember.LoginWithTheBackendToken();
         if (bro.IsSuccess())
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö ÀÚµ¿ ·Î±×ÀÎ ¼º°ø!");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ìë™ ë¡œê·¸ì¸ ì„±ê³µ!");
         }
         else
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö ÀÚµ¿ ·Î±×ÀÎ ½ÇÆĞ");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ìë™ ë¡œê·¸ì¸ ì‹¤íŒ¨");
         }
     }
 
@@ -104,43 +102,43 @@ public class BackendManager : Singleton<BackendManager>
     {
         BackendReturnObject bro = Backend.BMember.WithdrawAccount();
 
-        Debug.LogWarning("µÚ³¡ ¼­¹ö ¾ÆÀÌµğ »èÁ¦ ¿Ï·á!");
+        Debug.LogWarning("ë’¤ë ì„œë²„ ì•„ì´ë”” ì‚­ì œ ì™„ë£Œ!");
     }
 
     public void SaveData()
     {
         if (!Backend.IsInitialized)
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö¿Í ¿¬°áÀÌ ²÷¾îÁü");
+            Debug.LogWarning("ë’¤ë ì„œë²„ì™€ ì—°ê²°ì´ ëŠì–´ì§");
             return;
         }
 
-        // À¯Àú µ¥ÀÌÅÍ ÀúÀå
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         Param param = GetUserDataParam();
         BackendReturnObject bro = Backend.GameData.Update("USER_DATA", new Where(), param);
 
         if (bro.IsSuccess())
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö µ¥ÀÌÅÍ ÀúÀå ¼º°ø!");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë°ì´í„° ì €ì¥ ì„±ê³µ!");
         }
         else
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö µ¥ÀÌÅÍ ÀúÀå ½ÇÆĞ");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë°ì´í„° ì €ì¥ ì‹¤íŒ¨");
         }
 
-        // ·©Å· µ¥ÀÌÅÍ ÀúÀå
+        // ï¿½ï¿½Å· ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         SaveMyRank();
 
-        // ´Ğ³×ÀÓ ÀúÀå
+        // ï¿½Ğ³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         Backend.BMember.UpdateNickname(DataManager.Instance.GetMyUserData().UserCommonData.NickName);
     }
 
-    // ¼­¹ö·ÎºÎÅÍ µ¥ÀÌÅÍ¸¦ ºÒ·¯¿Í¼­ ParsingÇÏ´Â ÇÔ¼ö
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Îºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½Ò·ï¿½ï¿½Í¼ï¿½ Parsingï¿½Ï´ï¿½ ï¿½Ô¼ï¿½
     public void LoadData()
     {
         if (!Backend.IsInitialized)
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö¿Í ¿¬°áÀÌ ²÷¾îÁü");
+            Debug.LogWarning("ë’¤ë ì„œë²„ì™€ ì—°ê²°ì´ ëŠì–´ì§");
             return;
         }
 
@@ -148,30 +146,30 @@ public class BackendManager : Singleton<BackendManager>
 
         if (bro.IsSuccess())
         {
-            // ¼­¹ö¿¡¼­ ºÒ·¯¿Â Json µ¥ÀÌÅÍ¸¦ ÆÄ½Ì
-            // Json µ¥ÀÌÅÍ Áß, rowsÀÇ °ª¸¸ °¡Á®¿È
-            Debug.LogWarning("µÚ³¡ ¼­¹ö µ¥ÀÌÅÍ ·Îµå ¼º°ø!");
+            // ì„œë²„ì—ì„œ ë¶ˆëŸ¬ì˜¨ Json ë°ì´í„°ë¥¼ íŒŒì‹±
+            // Json ë°ì´í„° ì¤‘, rowsì˜ ê°’ë§Œ ê°€ì ¸ì˜´
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë°ì´í„° ë¡œë“œ ì„±ê³µ!");
             ParsingData(bro.GetReturnValuetoJSON()["rows"][0]);
         }
         else
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö µ¥ÀÌÅÍ ·Îµå ½ÇÆĞ");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë°ì´í„° ë¡œë“œ ì‹¤íŒ¨");
         }
     }
 
-    // È¸¿ø °¡ÀÔÀ» ÇÒ ¶§, µ¥ÀÌÅÍ Å×ÀÌºí¿¡ Ãß°¡ÇÏ´Â ÇÔ¼ö
+    // È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìºï¿½ï¿½ ï¿½ß°ï¿½ï¿½Ï´ï¿½ ï¿½Ô¼ï¿½
     public void InsertData()
     {
         Param param = GetUserDataParam();
-        BackendReturnObject bro = Backend.GameData.Insert("USER_DATA", param); // µ¥ÀÌÅÍ Å×ÀÌºíÀÇ ÀÌ¸§
+        BackendReturnObject bro = Backend.GameData.Insert("USER_DATA", param); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìºï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½
 
         if (bro.IsSuccess())
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö µ¥ÀÌÅÍ Ãß°¡ ¼º°ø!");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë°ì´í„° ì¶”ê°€ ì„±ê³µ!");
         }
         else
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö µ¥ÀÌÅÍ Ãß°¡ ½ÇÆĞ");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë°ì´í„° ì¶”ê°€ ì‹¤íŒ¨");
         }
     }
 
@@ -179,16 +177,16 @@ public class BackendManager : Singleton<BackendManager>
     {
         string rowInDate = string.Empty;
 
-        // ·©Å· µ¥ÀÌÅÍ¸¦ ¾÷µ¥ÀÌÆ®ÇÏ·Á¸é °ÔÀÓ µ¥ÀÌÅÍ¿¡¼­ »ç¿ëÇÏ´Â µ¥ÀÌÅÍÀÇ inDate °ª ÇÊ¿ä
+        // ë­í‚¹ ë°ì´í„°ë¥¼ ì—…ë°ì´íŠ¸í•˜ë ¤ë©´ ê²Œì„ ë°ì´í„°ì—ì„œ ì‚¬ìš©í•˜ëŠ” ë°ì´í„°ì˜ inDate ê°’ í•„ìš”
         BackendReturnObject bro = Backend.GameData.GetMyData("USER_DATA", new Where());
 
         if (!bro.IsSuccess())
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö ·©Å· ¾÷µ¥ÀÌÆ®¸¦ À§ÇÑ µ¥ÀÌÅÍ Á¶È¸ Áß ¹®Á¦ ¹ß»ı");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë­í‚¹ ì—…ë°ì´íŠ¸ë¥¼ ìœ„í•œ ë°ì´í„° ì¡°íšŒ ì¤‘ ë¬¸ì œ ë°œìƒ");
             return;
         }
 
-        Debug.LogWarning("µÚ³¡ ¼­¹ö ·©Å· ¾÷µ¥ÀÌÆ®¸¦ À§ÇÑ µ¥ÀÌÅÍ Á¶È¸ ¼º°ø!");
+        Debug.LogWarning("ë’¤ë ì„œë²„ ë­í‚¹ ì—…ë°ì´íŠ¸ë¥¼ ìœ„í•œ ë°ì´í„° ì¡°íšŒ ì„±ê³µ!");
 
         if (bro.FlattenRows().Count > 0)
         {
@@ -196,7 +194,7 @@ public class BackendManager : Singleton<BackendManager>
         }
         else
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö ·©Å· ¾÷µ¥ÀÌÆ®¸¦ À§ÇÑ µ¥ÀÌÅÍ°¡ Á¸ÀçÇÏÁö ¾ÊÀ½");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë­í‚¹ ì—…ë°ì´íŠ¸ë¥¼ ìœ„í•œ ë°ì´í„°ê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŒ");
         }
 
         Param param = new Param()
@@ -204,22 +202,22 @@ public class BackendManager : Singleton<BackendManager>
             {"RankPoint",  DataManager.Instance.GetMyUserData().UserCommonData.RankPoint}
         };
 
-        // ÇØ´ç µ¥ÀÌÅÍÅ×ÀÌºíÀÇ µ¥ÀÌÅÍ¸¦ °»½ÅÇÏ°í, ·©Å· µ¥ÀÌÅÍ Á¤º¸ °»½Å
+        // í•´ë‹¹ ë°ì´í„°í…Œì´ë¸”ì˜ ë°ì´í„°ë¥¼ ê°±ì‹ í•˜ê³ , ë­í‚¹ ë°ì´í„° ì •ë³´ ê°±ì‹ 
         bro = Backend.URank.User.UpdateUserScore(RANK_UUID, "USER_DATA", rowInDate, param);
 
         if (bro.IsSuccess())
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö ·©Å· µî·Ï ¼º°ø!");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë­í‚¹ ë“±ë¡ ì„±ê³µ!");
         }
         else
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö ·©Å· µî·Ï ½ÇÆĞ");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë­í‚¹ ë“±ë¡ ì‹¤íŒ¨");
         }
     }
 
     public RankData GetMyRankData()
     {
-        // ³» ·©Å· Á¤º¸ ºÒ·¯¿À±â
+        // ë‚´ ë­í‚¹ ì •ë³´ ë¶ˆëŸ¬ì˜¤ê¸° 
         BackendReturnObject bro = Backend.URank.User.GetMyRank(RANK_UUID);
 
         if (bro.IsSuccess())
@@ -228,16 +226,16 @@ public class BackendManager : Singleton<BackendManager>
             {
                 JsonData rankDataJson = bro.FlattenRows();
 
-                // ¹Ş¾Æ¿Â µ¥ÀÌÅÍÀÇ °³¼ö°¡ 0 -> µ¥ÀÌÅÍ°¡ ¾øÀ½
+                // ë°›ì•„ì˜¨ ë°ì´í„°ì˜ ê°œìˆ˜ê°€ 0 -> ë°ì´í„°ê°€ ì—†ìŒ
                 if (rankDataJson.Count <= 0)
                 {
-                    Debug.LogWarning("µÚ³¡ ¼­¹ö ³ªÀÇ ·©Å· µ¥ÀÌÅÍ°¡ Á¸ÀçÇÏÁö ¾ÊÀ½");
+                    Debug.LogWarning("ë’¤ë ì„œë²„ ë‚˜ì˜ ë­í‚¹ ë°ì´í„°ê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŒ");
                     return null;
 
                 }
                 else
                 {
-                    Debug.LogWarning("µÚ³¡ ¼­¹ö ³ªÀÇ ·©Å· Á¶È¸ ¼º°ø!");
+                    Debug.LogWarning("ë’¤ë ì„œë²„ ë‚˜ì˜ ë­í‚¹ ì¡°íšŒ ì„±ê³µ!");
 
                     RankData data = new RankData() 
                     {
@@ -245,28 +243,28 @@ public class BackendManager : Singleton<BackendManager>
                         Rank = int.Parse(rankDataJson[0]["rank"].ToString()),
                         RankPoint = int.Parse(rankDataJson[0]["score"].ToString()),
 
-                        // Ãß°¡ Ç×¸ñ µ¥ÀÌÅÍ
+                        // ï¿½ß°ï¿½ ï¿½×¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                         Image = rankDataJson[0]["CharacterImg"].ToString()
                     };
 
                     return data;
 
-                    // º¹¼ö µ¥ÀÌÅÍÀÇ Ãß°¡ Ç×¸ñ »ç¿ë ½Ã
+                    // ë³µìˆ˜ ë°ì´í„°ì˜ ì¶”ê°€ í•­ëª© ì‚¬ìš© ì‹œ
                     //string[] extraData = rankDataJson[i]["WinLose"].ToString().Split("|");
                     //_win = int.Parse(extraData[0].ToString());
                     //_lose = int.Parse(extraData[1].ToString());
                 }
             }
-            // ³ªÀÇ ·©Å· Á¤º¸ JSON µ¥ÀÌÅÍ ÆÄ½Ì¿¡ ½ÇÆĞÇßÀ» ¶§
+            // ë‚˜ì˜ ë­í‚¹ ì •ë³´ JSON ë°ì´í„° íŒŒì‹±ì— ì‹¤íŒ¨í–ˆì„ ë•Œ
             catch (System.Exception e)
             {
-                Debug.LogWarning($"µÚ³¡ ¼­¹ö ³ªÀÇ ·©Å· µ¥ÀÌÅÍ ÆÄ½Ì ½ÇÆĞ : {e}");
+                Debug.LogWarning($"ë’¤ë ì„œë²„ ë‚˜ì˜ ë­í‚¹ ë°ì´í„° íŒŒì‹± ì‹¤íŒ¨ : {e}");
                 return null;
             }
         }
         else
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö ³ªÀÇ ·©Å· µ¥ÀÌÅÍ ºÒ·¯¿À±â ½ÇÆĞ");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë‚˜ì˜ ë­í‚¹ ë°ì´í„° ë¶ˆëŸ¬ì˜¤ê¸° ì‹¤íŒ¨");
             return null;
         }
     }
@@ -275,31 +273,31 @@ public class BackendManager : Singleton<BackendManager>
     {
         int maxRankList = 50;
 
-        // ·©Å· Å×ÀÌºí¿¡ ÀÖ´Â À¯ÀúÀÇ offset ~ offset + limit ¼øÀ§ ·©Å· Á¤º¸¸¦ ºÒ·¯¿È
+        // ë­í‚¹ í…Œì´ë¸”ì— ìˆëŠ” ìœ ì €ì˜ offset ~ offset + limit ìˆœìœ„ ë­í‚¹ ì •ë³´ë¥¼ ë¶ˆëŸ¬ì˜´
         BackendReturnObject bro = Backend.URank.User.GetRankList(RANK_UUID, maxRankList, 0);
 
         if (bro.IsSuccess())
         {
-            // JSON µ¥ÀÌÅÍ ÆÄ½Ì ¼º°ø
+            // JSON ë°ì´í„° íŒŒì‹± ì„±ê³µ
             try
             {
                 JsonData rankDataJson = bro.FlattenRows();
 
-                // ¹Ş¾Æ¿Â µ¥ÀÌÅÍÀÇ °³¼ö°¡ 0 -> µ¥ÀÌÅÍ°¡ ¾øÀ½
+                // ë°›ì•„ì˜¨ ë°ì´í„°ì˜ ê°œìˆ˜ê°€ 0 -> ë°ì´í„°ê°€ ì—†ìŒ
                 if (rankDataJson.Count <= 0)
                 {
-                    Debug.LogWarning("µÚ³¡ ¼­¹ö ·©Å· µ¥ÀÌÅÍ°¡ Á¸ÀçÇÏÁö ¾ÊÀ½");
+                    Debug.LogWarning("ë’¤ë ì„œë²„ ë­í‚¹ ë°ì´í„°ê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŒ");
 
                     return null;
                 }
                 else
                 {
-                    Debug.LogWarning("µÚ³¡ ¼­¹ö ·©Å· Á¶È¸ ¼º°ø!");
+                    Debug.LogWarning("ë’¤ë ì„œë²„ ë­í‚¹ ì¡°íšŒ ì„±ê³µ!");
 
                     List<RankData> rankData = new List<RankData>();
                     int rankCount = rankDataJson.Count;
 
-                    // ¹Ş¾Æ¿Â rank µ¥ÀÌÅÍÀÇ ¼ıÀÚ¸¸Å­ µ¥ÀÌÅÍ Ãâ·Â
+                    // ë°›ì•„ì˜¨ rank ë°ì´í„°ì˜ ìˆ«ìë§Œí¼ ë°ì´í„° ì¶œë ¥
                     for (int index = 0; index < rankCount; ++index)
                     {
                         RankData data = new RankData()
@@ -308,13 +306,13 @@ public class BackendManager : Singleton<BackendManager>
                             Rank = int.Parse(rankDataJson[index]["rank"].ToString()),
                             RankPoint = int.Parse(rankDataJson[index]["score"].ToString()),
 
-                            // Ãß°¡ Ç×¸ñ µ¥ÀÌÅÍ
+                            // ì¶”ê°€ í•­ëª© ë°ì´í„°
                             Image = rankDataJson[index]["CharacterImg"].ToString()
                         };
 
                         rankData.Add(data);
 
-                        // º¹¼ö µ¥ÀÌÅÍÀÇ Ãß°¡ Ç×¸ñ »ç¿ë ½Ã
+                        // ë³µìˆ˜ ë°ì´í„°ì˜ ì¶”ê°€ í•­ëª© ì‚¬ìš© ì‹œ
                         //string[] extraData = rankDataJson[i]["WinLose"].ToString().Split("|");
                         //_win = int.Parse(extraData[0].ToString());
                         //_lose = int.Parse(extraData[1].ToString());
@@ -323,16 +321,16 @@ public class BackendManager : Singleton<BackendManager>
                     return rankData;
                 }
             }
-            // JSON µ¥ÀÌÅÍ ÆÄ½Ì ½ÇÆĞ
+            // JSON ë°ì´í„° íŒŒì‹± ì‹¤íŒ¨
             catch (System.Exception e)
             {
-                Debug.LogWarning($"µÚ³¡ ¼­¹ö ·©Å· µ¥ÀÌÅÍ ÆÄ½Ì ½ÇÆĞ : {e}");
+                Debug.LogWarning($"ë’¤ë ì„œë²„ ë­í‚¹ ë°ì´í„° íŒŒì‹± ì‹¤íŒ¨ : {e}");
                 return null;
             }
         }
         else
         {
-            Debug.LogWarning("µÚ³¡ ¼­¹ö ·©Å· µ¥ÀÌÅÍ ºÒ·¯¿À±â ½ÇÆĞ");
+            Debug.LogWarning("ë’¤ë ì„œë²„ ë­í‚¹ ë°ì´í„° ë¶ˆëŸ¬ì˜¤ê¸° ì‹¤íŒ¨");
             return null;
         }
     }
@@ -341,28 +339,28 @@ public class BackendManager : Singleton<BackendManager>
     #region Private Method
     private void BackendSetup()
     {
-        // µÚ³¡ ÃÊ±âÈ­
+        // ë’¤ë ì´ˆê¸°í™”
         BackendReturnObject bro = Backend.Initialize();
 
-        // µÚ³¡ ÃÊ±âÈ­¿¡ ´ëÇÑ ÀÀ´ä°ª
+        // ë’¤ë ì´ˆê¸°í™”ì— ëŒ€í•œ ì‘ë‹µê°’
         if (bro.IsSuccess())
         {
-            Debug.Log("µÚ³¡ ¼­¹ö ¿¬µ¿ ¼º°ø : " + bro); // ¼º°øÀÏ °æ¿ì statusCode 204 Success
+            Debug.Log("ë’¤ë ì„œë²„ ì—°ë™ ì„±ê³µ : " + bro); // ì„±ê³µì¼ ê²½ìš° statusCode 204 Success
         }
         else
         {
-            Debug.LogError("µÚ³¡ ¼­¹ö ¿¬µ¿ ½ÇÆĞ : " + bro); // ½ÇÆĞÀÏ °æ¿ì statusCode 400´ë ¿¡·¯ ¹ß»ı
+            Debug.LogError("ë’¤ë ì„œë²„ ì—°ë™ ì‹¤íŒ¨ : " + bro); // ì‹¤íŒ¨ì¼ ê²½ìš° statusCode 400ëŒ€ ì—ëŸ¬ ë°œìƒ
         }
     }
 
-    // param : µ¥ÀÌÅÍ¸¦ ¼Û¼ö½ÅÇÒ ¶§ »ç¿ëÇÏ´Â class
+    // param : ë°ì´í„°ë¥¼ ì†¡ìˆ˜ì‹ í•  ë•Œ ì‚¬ìš©í•˜ëŠ” class
     private Param GetUserDataParam()
     {
         Param param = new Param();
         param.Add("RankPoint", DataManager.Instance.GetMyUserData().UserCommonData.RankPoint);
         param.Add("CharacterImg", DataManager.Instance.GetMyUserData().UserCommonData.Image);
 
-        // ·©Å· µ¥ÀÌÅÍ¿¡¼­ º¹¼ö µ¥ÀÌÅÍÀÇ Ãß°¡ Ç×¸ñ »ç¿ë ½Ã
+        // ë­í‚¹ ë°ì´í„°ì—ì„œ ë³µìˆ˜ ë°ì´í„°ì˜ ì¶”ê°€ í•­ëª© ì‚¬ìš© ì‹œ
         //param.Add("WinLose", GameManager.I.DataManager.GameData.Win.ToString() + "|" + GameManager.I.DataManager.GameData.Lose.ToString());
 
         return param;
@@ -370,15 +368,15 @@ public class BackendManager : Singleton<BackendManager>
 
     private void ParsingData(JsonData json)
     {
-        // ÆÄ½ÌµÈ µ¥ÀÌÅÍ¸¦ ÀúÀå
+        // íŒŒì‹±ëœ ë°ì´í„°ë¥¼ ì €ì¥
         //GameManager.I.DataManager.GameData.RankPoint = int.Parse(json["RankPoint"][0].ToString());
 
-        // ·©Å· µ¥ÀÌÅÍ¿¡¼­ º¹¼ö µ¥ÀÌÅÍÀÇ Ãß°¡ Ç×¸ñ »ç¿ë ½Ã
+        // ë­í‚¹ ë°ì´í„°ì—ì„œ ë³µìˆ˜ ë°ì´í„°ì˜ ì¶”ê°€ í•­ëª© ì‚¬ìš© ì‹œ
         //string[] extraData = json["extraData"].ToString().Split("|");
         //GameManager.I.DataManager.GameData.Win = int.Parse(extraData[0].ToString());
         //GameManager.I.DataManager.GameData.Lose = int.Parse(extraData[1].ToString());
 
-        //GameDataÀÇ º¯¼ö°¡ ¹è¿­ÀÌ¶ó¸é ?
+        //GameDataì˜ ë³€ìˆ˜ê°€ ë°°ì—´ì´ë¼ë©´ ?
         //for (int i = 0; i < json["Items"]["L"].Count; i++)
         //{
         //    GameManager.I.DataManager.GameData.Items[i] = int.Parse(json["Items"]["L"][i][0].ToString());

@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+ï»¿using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -63,14 +63,14 @@ public class SoundManager : Singleton<SoundManager>
         for (int index = 0; index < m_EtcSFXAudioSources.Length; ++index)
             m_EtcSFXAudioSources[index] = transform.AddComponent<AudioSource>();
 
-        // AudioMixerGroup ºÒ·¯¿À±â
+        // AudioMixerGroup ï¿½Ò·ï¿½ï¿½ï¿½ï¿½ï¿½
         AudioMixer mixer = ResourceLoader.LoadAssetResources<AudioMixer>("AudioMixer/AudioMixer");
         AudioMixerGroup[] bgmGroups = mixer.FindMatchingGroups("BGM");
         AudioMixerGroup[] sfxGroups = mixer.FindMatchingGroups("SFX");
         AudioMixerGroup bgmGroup = bgmGroups.Length > 0 ? bgmGroups[0] : null;
         AudioMixerGroup sfxGroup = sfxGroups.Length > 0 ? sfxGroups[0] : null;
 
-        // AudioMixer º¼·ý ¼³Á¤
+        // AudioMixer ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if(PlayerPrefs.GetInt("BGM") == 0)
             mixer.SetFloat("BGM", 0f);
         else
@@ -114,11 +114,12 @@ public class SoundManager : Singleton<SoundManager>
         m_SfxDic.Add("Win", ResourceLoader.LoadAssetResources<AudioClip>("Sound/SFX/Ingame/Win"));
         m_SfxDic.Add("Lose", ResourceLoader.LoadAssetResources<AudioClip>("Sound/SFX/Ingame/Lose"));
         m_SfxDic.Add("StartGame", ResourceLoader.LoadAssetResources<AudioClip>("Sound/SFX/Ingame/StartGame"));
+        m_SfxDic.Add("ButtonEmoticon", ResourceLoader.LoadAssetResources<AudioClip>("Sound/SFX/UI/ButtonEmoticon"));
     }
     #endregion
 
     #region Public Method
-    // »ç¿îµå°¡ °Å¸®¿¡ µû¶ó º¼·ý Á¶ÀýÀÌ ÇÊ¿äÇÒ ¶§
+    // ï¿½ï¿½ï¿½å°¡ ï¿½Å¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½ï¿½
     public void StartSFX(string name, Vector3 position)
     {
         var MyCharacter = GameObject.Find($"{DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.HeroName}(Clone)");
@@ -135,7 +136,7 @@ public class SoundManager : Singleton<SoundManager>
         m_SoundNum++;
     }
 
-    // Player¿¡¼­ Ãâ·ÂµÇ´Â »ç¿îµå
+    // Playerï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ÂµÇ´ï¿½ ï¿½ï¿½ï¿½ï¿½
     public void StartSFX(string name)
     {
         m_PlayerSFXAuidoSource.PlayOneShot(m_SfxDic[name]);
