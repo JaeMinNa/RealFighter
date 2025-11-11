@@ -42,7 +42,7 @@ public static class TextUtil
     public static string GetRandomAINickName()
     {
         List<string> nickNames = new List<string> 
-        { "감자주먹", "제주도아침", "레이스", "나이텐", "굿감", "�޷��󺴾Ƹ�", "NoobSlayer9000", "PotatoKing", "Lazyzz", "asddd" };
+        { "감자주먹", "제주도아침", "레이스", "나이텐", "굿감", "공대생", "NoobSlayer9000", "PotatoKing", "Lazyzz", "asddd" };
 
         var randomIndex = RandomUtil.GetRandomIndex(0, nickNames.Count - 1);
 

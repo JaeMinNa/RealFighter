@@ -97,7 +97,7 @@ public class DataManager : Singleton<DataManager>
         ES3.DeleteFile("SaveFile.txt");
         Debug.LogWarning("UserData 제거 완료");
 
-        // PlayerPrefs ����
+        // PlayerPrefs 제거
         PlayerPrefs.DeleteAll();
         Debug.LogWarning("PlayerPrefs 제거 완료");
 
