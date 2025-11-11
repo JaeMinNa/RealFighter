@@ -37,6 +37,7 @@ public class Popup_Shop : UIElement
     private GameObject m_ElementShop = null;
     private ShopData m_ShopData = null;
     private int m_GachaGrade = -1;
+    private bool m_IsAdCheck = false;
     #endregion
 
     #region Override Method
@@ -225,9 +226,12 @@ public class Popup_Shop : UIElement
             return;
         }
 
+        m_IsAdCheck = true;
+
         // 광고 
         AdManager.Instance.LoadRewardedAd(() =>
         {
+            m_IsAdCheck = true;
             DataManager.Instance.GetMyUserData().UserContentsData.AdGoldBuyCount++;
             DataManager.Instance.GetMyUserData().UserCommonData.Gold += m_ShopData.Count;
             DataManager.Instance.SaveData();
@@ -241,15 +245,7 @@ public class Popup_Shop : UIElement
                 Message = "광고 골드를 획득 했습니다."
             });
 
-            return;
-        });
-
-        // 광고 불러오기 실패
-        UIManager.Instance.OpenSystemPopup(new MessageData
-        {
-            Type = PopupType.OkOnly,
-            Title = "알림",
-            Message = "광고 불러오기를 실패 했습니다."
+            m_IsAdCheck = false;
         });
     }
     #endregion
@@ -303,6 +299,9 @@ public class Popup_Shop : UIElement
 
     private void OnClick_Buy_Gold_Ad(int num)
     {
+        if (m_IsAdCheck)
+            return;
+
         SoundManager.Instance.StartSFX("ButtonClick");
         m_ShopData = m_ShopList_Gold[num];
 

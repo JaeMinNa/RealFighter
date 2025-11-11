@@ -1,8 +1,15 @@
 fileFormatVersion: 2
 guid: 992270185d6596c4192010a59c601f49
+AssetOrigin:
+  serializedVersion: 1
+  productId: 291338
+  packageName: Free Viking Folk Music Pack
+  packageVersion: 1.0
+  assetPath: Assets/Viking Music Pack/Loops/4. Frostbound Horizons.wav
+  uploadId: 680243
 AudioImporter:
   externalObjects: {}
-  serializedVersion: 7
+  serializedVersion: 8
   defaultSettings:
     serializedVersion: 2
     loadType: 0
@@ -12,7 +19,16 @@ AudioImporter:
     quality: 1
     conversionMode: 0
     preloadAudioData: 0
-  platformSettingOverrides: {}
+  platformSettingOverrides:
+    Android:
+      serializedVersion: 2
+      loadType: 2
+      sampleRateSetting: 0
+      sampleRateOverride: 44100
+      compressionFormat: 1
+      quality: 0.5
+      conversionMode: 0
+      preloadAudioData: 0
   forceToMono: 0
   normalize: 1
   loadInBackground: 0
@@ -21,10 +37,3 @@ AudioImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 291338
-  packageName: Free Viking Folk Music Pack
-  packageVersion: 1.0
-  assetPath: Assets/Viking Music Pack/Loops/4. Frostbound Horizons.wav
-  uploadId: 680243

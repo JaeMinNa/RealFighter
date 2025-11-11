@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System;
 using GoogleMobileAds.Api;
 
@@ -58,7 +58,7 @@ public class AdManager : Singleton<AdManager>
     #endregion
 
     #region Banner
-    //±¤°í ·Îµå, »ç¿ë ½Ã È£Ãâ
+    // ë°°ë„ˆ ê´‘ê³  ë¡œë“œ (ì²˜ìŒ í˜¸ì¶œ ì‹œ)
     public void LoadBannerAd()
     {
         if (m_BannerView == null)
@@ -72,7 +72,7 @@ public class AdManager : Singleton<AdManager>
         m_BannerView.LoadAd(adRequest);
     }
 
-    //±¤°í º¸¿©ÁÖ±â
+    // ë°°ë„ˆ ê´‘ê³  ìƒì„±
     private void CreateBannerView()
     {
         Debug.LogWarning("Creating banner view");
@@ -84,12 +84,12 @@ public class AdManager : Singleton<AdManager>
 
         m_BannerView = new BannerView(m_AdBannerUnitId, AdSize.Banner, AdPosition.Bottom);
 
-        //ÀûÀÀÇü ¹è³Ê(²ËÂù »çÀÌÁî)
-        //AdSize adaptiveSize = AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
-        //_bannerView = new BannerView(_adBannerUnitId, adaptiveSize, AdPosition.Bottom);
+        // ì°¸ê³ : ì•„ë˜ëŠ” ë°˜ì‘í˜•(Adaptive) ë°°ë„ˆ ìƒì„± ì˜ˆì‹œ
+        // AdSize adaptiveSize = AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
+        // _bannerView = new BannerView(_adBannerUnitId, adaptiveSize, AdPosition.Bottom);
     }
 
-    //±¤°í Ç¥½Ã
+    // ë°°ë„ˆ ê´‘ê³  í‘œì‹œ
     private void ShowBannerAd()
     {
         if (m_BannerView != null)
@@ -103,7 +103,7 @@ public class AdManager : Singleton<AdManager>
         }
     }
 
-    //±¤°í ¼û±â±â
+    // ë°°ë„ˆ ê´‘ê³  ìˆ¨ê¸°ê¸°
     private void HideBannerAd()
     {
         if (m_BannerView != null)
@@ -113,7 +113,7 @@ public class AdManager : Singleton<AdManager>
         }
     }
 
-    //±¤°í Á¦°Å
+    // ë°°ë„ˆ ê´‘ê³  ì œê±°
     private void DestroyBannerAd()
     {
         if (m_BannerView != null)
@@ -124,6 +124,7 @@ public class AdManager : Singleton<AdManager>
         }
     }
 
+    // ë°°ë„ˆ ê´‘ê³  ì´ë²¤íŠ¸ ë“±ë¡
     private void ListenToBannerAdEvents()
     {
         m_BannerView.OnBannerAdLoaded += () =>
@@ -150,11 +151,11 @@ public class AdManager : Singleton<AdManager>
         {
             Debug.LogWarning("Banner view was clicked.");
         };
-        m_BannerView.OnAdFullScreenContentOpened += (null);
+        m_BannerView.OnAdFullScreenContentOpened += () =>
         {
             Debug.LogWarning("Banner view full screen content opened.");
         };
-        m_BannerView.OnAdFullScreenContentClosed += (null);
+        m_BannerView.OnAdFullScreenContentClosed += () =>
         {
             Debug.LogWarning("Banner view full screen content closed.");
         };
@@ -162,7 +163,7 @@ public class AdManager : Singleton<AdManager>
     #endregion
 
     #region Reward
-    //»ç¿ë ½Ã, È£Ãâ
+    // ë¦¬ì›Œë“œ ê´‘ê³  ë¡œë“œ ë° í‘œì‹œ
     public void LoadRewardedAd(Action action)
     {
         if (m_IsLoadingReward) return;
@@ -170,27 +171,36 @@ public class AdManager : Singleton<AdManager>
 
         m_Action = action;
 
-        // Clean up the old ad before loading a new one.
+        // ì´ì „ ê´‘ê³  ê°ì²´ê°€ ë‚¨ì•„ ìˆë‹¤ë©´ ì •ë¦¬
         if (m_RewardedAd != null)
         {
             m_RewardedAd.Destroy();
             m_RewardedAd = null;
         }
 
-        // create our request used to load the ad.
+        // ê´‘ê³  ìš”ì²­ ìƒì„±
         var adRequest = new AdRequest();
 
-        // send the request to load the ad.
+        // ê´‘ê³  ìš”ì²­ ì „ì†¡
         RewardedAd.Load(m_AdRewardUnitId, adRequest,
             (RewardedAd ad, LoadAdError error) =>
             {
                 m_IsLoadingReward = false;
 
-                // if error is not null, the load request failed.
+                // ì—ëŸ¬ ì²˜ë¦¬
                 if (error != null || ad == null)
                 {
                     Debug.LogError("Rewarded ad failed to load an ad " +
                                    "with error : " + error);
+
+                    // ê´‘ê³  ë¶ˆëŸ¬ì˜¤ê¸° ì‹¤íŒ¨
+                    UIManager.Instance.OpenSystemPopup(new MessageData
+                    {
+                        Type = PopupType.OkOnly,
+                        Title = "ì•Œë¦¼",
+                        Message = "ê´‘ê³  ë¶ˆëŸ¬ì˜¤ê¸°ë¥¼ ì‹¤íŒ¨ í–ˆìŠµë‹ˆë‹¤."
+                    });
+
                     return;
                 }
 
@@ -203,6 +213,7 @@ public class AdManager : Singleton<AdManager>
             });
     }
 
+    // ë¦¬ì›Œë“œ ê´‘ê³  í‘œì‹œ
     private void ShowRewardedAd()
     {
         if (m_RewardedAd != null && m_RewardedAd.CanShowAd())
@@ -211,7 +222,7 @@ public class AdManager : Singleton<AdManager>
             {
                 Debug.Log($"User earned reward: {reward.Amount} {reward.Type}");
                 m_Action?.Invoke();
-                m_Action = null;  
+                m_Action = null;
             });
         }
         else
@@ -221,36 +232,31 @@ public class AdManager : Singleton<AdManager>
         }
     }
 
+    // ë¦¬ì›Œë“œ ê´‘ê³  ì´ë²¤íŠ¸ ë“±ë¡
     private void RegisterEventHandlers(RewardedAd ad)
     {
-        // Raised when the ad is estimated to have earned money.
         ad.OnAdPaid += (AdValue adValue) =>
         {
             Debug.LogWarning(String.Format("Rewarded ad paid {0} {1}.",
                 adValue.Value,
                 adValue.CurrencyCode));
         };
-        // Raised when an impression is recorded for an ad.
         ad.OnAdImpressionRecorded += () =>
         {
             Debug.LogWarning("Rewarded ad recorded an impression.");
         };
-        // Raised when a click is recorded for an ad.
         ad.OnAdClicked += () =>
         {
             Debug.LogWarning("Rewarded ad was clicked.");
         };
-        // Raised when an ad opened full screen content.
         ad.OnAdFullScreenContentOpened += () =>
         {
             Debug.LogWarning("Rewarded ad full screen content opened.");
         };
-        // Raised when the ad closed full screen content.
         ad.OnAdFullScreenContentClosed += () =>
         {
             Debug.LogWarning("Rewarded ad full screen content closed.");
         };
-        // Raised when the ad failed to open full screen content.
         ad.OnAdFullScreenContentFailed += (AdError error) =>
         {
             Debug.LogError("Rewarded ad failed to open full screen content " +
@@ -265,7 +271,7 @@ public class AdManager : Singleton<AdManager>
     {
         if (m_IsTestMode)
         {
-            // Å×½ºÆ® ID (±×´ë·Î »ç¿ë)
+            // í…ŒìŠ¤íŠ¸ìš© ê´‘ê³  ë‹¨ìœ„ ID
 #if UNITY_ANDROID
             m_AdRewardUnitId = "ca-app-pub-3940256099942544/5224354917";
             m_AdBannerUnitId = "ca-app-pub-3940256099942544/6300978111";
@@ -279,7 +285,7 @@ public class AdManager : Singleton<AdManager>
         }
         else
         {
-            // ±¤°í ID (¼öÁ¤ÇØ¾ß ÇÔ)
+            // ì‹¤ì œ ë°°í¬ìš© ê´‘ê³  ë‹¨ìœ„ ID (ìˆ˜ì • í•„ìš”)
 #if UNITY_ANDROID
             m_AdRewardUnitId = "ca-app-pub-5906820670754550/8653741011";
             m_AdBannerUnitId = "ca-app-pub-5906820670754550/8624255011";
@@ -292,7 +298,8 @@ public class AdManager : Singleton<AdManager>
 #endif
         }
 
+        // Google Mobile Ads SDK ì´ˆê¸°í™”
         MobileAds.Initialize((InitializationStatus initStatus) => { });
     }
-#endregion
+    #endregion
 }
