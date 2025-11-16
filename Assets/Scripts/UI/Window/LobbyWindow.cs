@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -41,7 +41,7 @@ public class LobbyWindow : UIElement
         Btn_Hero.onClick.AddListener(OnClick_Hero);
         Btn_Shop.onClick.AddListener(OnClick_Shop);
         Btn_Ranking.onClick.AddListener(OnClick_Ranking);
-        Btn_Setting.onClick.AddListener(OnClick_Setting);   
+        Btn_Setting.onClick.AddListener(OnClick_Setting);
         Btn_PVP.onClick.AddListener(OnClick_PVP);
         Btn_Training.onClick.AddListener(OnClick_Training);
         Btn_Gold.onClick.AddListener(OnClcik_Gold);
@@ -49,18 +49,26 @@ public class LobbyWindow : UIElement
 
     public override void OnClose()
     {
-        
+
     }
 
-    public override void OnOpen(List<object> Args)
+    public async override void OnOpen(List<object> Args)
     {
-        // Ã¹ ·Î±×ÀÎÀÌ¶ó¸é, ´Ğ³×ÀÓ ¼³Á¤
-        if (DataManager.Instance.GetMyUserData().UserContentsData.IsFirstLogin)
-        {
-            UIManager.Instance.Open<Popup_NickName>(UI.Popup, "Prefabs/UI/Popup/Popup_NickName");
-        }
-
         SetTopUI();
+
+        // íŠœí† ë¦¬ì–¼ ì‹œì‘
+        if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 0)
+        {
+            //ì²« ë¡œê·¸ì¸ì´ë¼ë©´ ë‹‰ë„¤ì„ ì„¤ì • íŒì—… ì˜¤í”ˆ
+            if (DataManager.Instance.GetMyUserData().UserContentsData.IsFirstLogin)
+                UIManager.Instance.Open<Popup_NickName>(UI.Popup, "Prefabs/UI/Popup/Popup_NickName");
+            else
+                await TutorialManager.Instance.StartTutorial(TutorialStep.LobbyChat_0);
+        }
+        else if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 2)
+            await TutorialManager.Instance.StartTutorial(TutorialStep.LobbyChat_2);
+        else if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 3)
+            await TutorialManager.Instance.StartTutorial(TutorialStep.LobbyChat_4);
     }
 
     public override void OnRefresh()
@@ -119,16 +127,13 @@ public class LobbyWindow : UIElement
         if (userContentsData == null)
             return;
 
-        // ¿À´Ã Ã¹ ·Î±×ÀÎ
+        // ì˜¤ëŠ˜ì´ ì²« ë¡œê·¸ì¸ì¸ì§€ í™•ì¸
         if (Util.DateTimeNow.Date != userContentsData.LastLoginTime.Date)
         {
-            // ÀÏÀÏ ÃÊ±âÈ­
+            // í•˜ë£¨ ì´ˆê¸°í™”
             userContentsData.IsGotFreeGold = false;
             userContentsData.AdGoldBuyCount = 0;
-        }
-        else
-        {
-
+            userContentsData.TutorialIndex = 0;
         }
 
         userContentsData.LastLoginTime = Util.DateTimeNow;
@@ -136,7 +141,7 @@ public class LobbyWindow : UIElement
     #endregion
 
     #region Button
-    private void OnClick_PVP()
+    public void OnClick_PVP()
     {
         SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Open<Popup_BattleLoading>(UI.Popup, "Prefabs/UI/Popup/Popup_BattleLoading");
@@ -154,7 +159,7 @@ public class LobbyWindow : UIElement
         UIManager.Instance.Open<Popup_Hero>(UI.Popup, "Prefabs/UI/Popup/Popup_Hero");
     }
 
-    private void OnClick_Shop()
+    public void OnClick_Shop()
     {
         SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Open<Popup_Shop>(UI.Popup, "Prefabs/UI/Popup/Popup_Shop");

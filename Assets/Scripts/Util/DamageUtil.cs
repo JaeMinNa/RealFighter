@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public static class DamageUtil
 {
@@ -7,16 +7,16 @@ public static class DamageUtil
         if (num > 2 || num < 0)
             return 0;
 
-        // ±âº» µ¥¹ÌÁö
+        // ê¸°ë³¸ ë°ë¯¸ì§€
         int defaultDamage = 10;
 
-        // µî±Ş µ¥¹ÌÁö
+        // ë“±ê¸‰ ë°ë¯¸ì§€
         int gradeDamage = data.Grade * 3;
 
-        // ¼÷·Ãµµ µ¥¹ÌÁö
+        // ìˆ™ë ¨ë„ ë°ë¯¸ì§€
         int proficiencyDamage = data.Skillproficiencies[num] < 1001 ? (int)((float)data.Skillproficiencies[num] * 0.01f) : 10;
 
-        // µ¥¹ÌÁö °è»ê = ±âº» µ¥¹ÌÁö + ·¹º§ µ¥¹ÌÁö + ¼÷·Ãµµ µ¥¹ÌÁö + µî±Ş µ¥¹ÌÁö
+        // ë°ë¯¸ì§€ ê³„ì‚°
         int damage = defaultDamage + (data.Level - 1) + proficiencyDamage + gradeDamage;
 
         return damage;

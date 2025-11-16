@@ -41,8 +41,11 @@ public static class TextUtil
     #region AI
     public static string GetRandomAINickName()
     {
-        List<string> nickNames = new List<string> 
-        { "감자주먹", "제주도아침", "레이스", "나이텐", "굿감", "공대생", "NoobSlayer9000", "PotatoKing", "Lazyzz", "asddd" };
+        List<string> nickNames = 
+            new List<string> { "감자주먹", "제주도아침", "레이스", "나이텐", "굿감", "공대생", "NoobSlayer900", 
+                "PotatoKing", "Lazyzz", "asddd", "달빛검객", "밤하늘토끼", "불꽃반달", "도토리", "초코송이러버", 
+                "푸른산호", "은빛여우", "바람남", "새벽냥", "눈물젤리", "ShadowStrike", "MoonRunner", "PixelCrush", 
+                "SilentArrow", "NovaPunch", "DriftAce", "FireMint", "BlueComet", "SnackMaster", "HoneyToast", "인생레전드", "재미있을까" };
 
         var randomIndex = RandomUtil.GetRandomIndex(0, nickNames.Count - 1);
 

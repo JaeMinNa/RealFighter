@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+Ôªøusing System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +12,9 @@ public class Popup_Result : UIElement
     [SerializeField] private Slider Slider_CurExp = null;
     [SerializeField] private Button Btn_Home = null;
     [SerializeField] private GameObject Obj_RewardSlots = null;
+
+    [Header("Tutorial")]
+    public Transform Trans_LobbyButton = null;
     #endregion
 
     #region Member Property
@@ -29,10 +32,10 @@ public class Popup_Result : UIElement
 
     public override void OnClose()
     {
-        
+
     }
 
-    public override void OnOpen(List<object> Args)
+    public async override void OnOpen(List<object> Args)
     {
         if (Args.Count == 0)
             return;
@@ -49,11 +52,14 @@ public class Popup_Result : UIElement
             return;
 
         SetResult();
+
+        if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 1)
+            await TutorialManager.Instance.StartTutorial(TutorialStep.IngameChat_13);
     }
 
     public override void OnRefresh()
     {
-        
+
     }
     #endregion
 
@@ -66,7 +72,7 @@ public class Popup_Result : UIElement
         DataManager.Instance.GetMyUserData().UserCommonData.Gold += ClientDef.WinGold;
         DataManager.Instance.GetMyUserData().UserCommonData.RankPoint++;
 
-        // Win ∫∏ªÛ
+        // Win Î≥¥ÏÉÅ
         RewardItems.Add(new ItemData("Exp", ClientDef.WinExp));
         RewardItems.Add(new ItemData("Gold", ClientDef.WinGold));
         RewardItems.Add(new ItemData("Score", 1));
@@ -78,10 +84,12 @@ public class Popup_Result : UIElement
 
         HeroUtil.AddHeroExp(ClientDef.LoseExp);
         DataManager.Instance.GetMyUserData().UserCommonData.Gold += ClientDef.LoseGold;
+        DataManager.Instance.GetMyUserData().UserCommonData.RankPoint--;
 
-        // Lose ∫∏ªÛ
+        // Lose Î≥¥ÏÉÅ
         RewardItems.Add(new ItemData("Exp", ClientDef.LoseExp));
         RewardItems.Add(new ItemData("Gold", ClientDef.LoseGold));
+        RewardItems.Add(new ItemData("Score", -1));
     }
 
     private void SetDraw()
@@ -91,14 +99,14 @@ public class Popup_Result : UIElement
         HeroUtil.AddHeroExp(ClientDef.LoseExp);
         DataManager.Instance.GetMyUserData().UserCommonData.Gold += ClientDef.LoseGold;
 
-        // Draw ∫∏ªÛ
+        // Draw Î≥¥ÏÉÅ
         RewardItems.Add(new ItemData("Exp", ClientDef.DrawExp));
         RewardItems.Add(new ItemData("Gold", ClientDef.DrawGold));
     }
 
     private void SetResult()
     {
-        // ∏ÆøˆµÂ ΩΩ∑‘
+        // Î≥¥ÏÉÅ Ïä¨Î°Ø ÏÉùÏÑ±
         for (int Index = 0; Index < RewardItems.Count; ++Index)
         {
             var obj = Instantiate(m_slotObj, Obj_RewardSlots.transform);
@@ -107,18 +115,20 @@ public class Popup_Result : UIElement
 
         Text_CurLevel.text = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level.ToString();
         Text_CurExp.text = DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp.ToString();
-        Slider_CurExp.value = (float)DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp / (float)(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level * 10) * 100f;
+        Slider_CurExp.value =
+            (float)DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp
+            / (float)(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Level * 10) * 100f;
 
-        // µ•¿Ã≈Õ ¿˙¿Â
+        // Î°úÏª¨ Îç∞Ïù¥ÌÑ∞ Ï†ÄÏû•
         DataManager.Instance.SaveData();
 
-        // µ⁄≥° ¿˙¿Â
+        // ÏÑúÎ≤Ñ Îç∞Ïù¥ÌÑ∞ Ï†ÄÏû•
         BackendManager.Instance.SaveData();
     }
     #endregion
 
     #region Button
-    private async void OnClick_Home()
+    public async void OnClick_Home()
     {
         SoundManager.Instance.StartSFX("ButtonClick");
         Time.timeScale = 1f;

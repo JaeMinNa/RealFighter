@@ -29,6 +29,12 @@ public class Popup_Shop : UIElement
     [SerializeField] private List<GameObject> ContentList = new List<GameObject>();
     [SerializeField] private Transform Trans_HeroContent = null;
     [SerializeField] private Transform Trans_GoldContent = null;
+
+    [Header("Tutorial")]
+    [HideInInspector] public Transform Trans_HeroPack_0 = null;
+
+    [Header("Cheat")]
+    [SerializeField] private Button Btn_Cheat = null;
     #endregion
 
     #region Member Property
@@ -54,6 +60,7 @@ public class Popup_Shop : UIElement
             LeftBtnList[index].onClick.AddListener(() => OnClick_LeftBtn(capturedIndex));
         }
 
+        Btn_Cheat.onClick.AddListener(OnClick_Cheat);
         Btn_Close.onClick.AddListener(OnClick_Close);
     }
 
@@ -64,6 +71,9 @@ public class Popup_Shop : UIElement
 
     public override void OnOpen(List<object> Args)
     {
+        // 에디터 전용 Gold Cheat
+        Btn_Cheat.gameObject.SetActive(GameManager.Instance.IsEditor);
+        
         Text_Gold.text = DataManager.Instance.GetMyUserData().UserCommonData.Gold.ToString();
 
         SetShopList();
@@ -79,11 +89,9 @@ public class Popup_Shop : UIElement
     #region Private Method
     private void SetLeftBtn(Button btn, bool isOn)
     {
-        // ��ư ȿ�� ��Ȱ��ȭ
         btn.transform.GetChild(0).gameObject.SetActive(false);
         btn.transform.GetChild(1).gameObject.SetActive(false);
 
-        // ��ư ȿ�� Ȱ��ȭ
         if(isOn)
             btn.transform.GetChild(1).gameObject.SetActive(true);
         else
@@ -108,6 +116,9 @@ public class Popup_Shop : UIElement
             var elementShop = Instantiate(m_ElementShop, Trans_HeroContent);
             elementShop.GetComponent<ElementShop>().SetShop(m_ShopList_Hero[index]);
             elementShop.GetComponent<ElementShop>().SetButton(() => OnClick_Buy_Hero(capturedIndex));
+
+            if (index == 0)
+                Trans_HeroPack_0 = elementShop.transform;
         }
 
         // Gold
@@ -174,7 +185,6 @@ public class Popup_Shop : UIElement
 
         // 푸시를 보낼 시간 계산
         DateTime RewardTime = Util.DateTimeNow.Date.AddDays(1);
-        //RewardTime = RewardTime.AddSeconds(30);  // Test 용
 
         LocalPushManager.Instance.SchedulePushNotification(
             LocalPushType.FreeGold,
@@ -191,7 +201,7 @@ public class Popup_Shop : UIElement
             {
                 Type = PopupType.OkOnly,
                 Title = "알림",
-                Message = "오늘 이미 무료 골드를 획득 했습니다.\n<size=40>* 00:00시에 다시 획득할 수 있습니다.</size>"
+                Message = "오늘 이미 무료 GOLD를 획득 했습니다.\n<size=40>* 00:00시에 다시 획득할 수 있습니다.</size>"
             });
             return;
         }
@@ -208,7 +218,7 @@ public class Popup_Shop : UIElement
         {
             Type = PopupType.OkOnly,
             Title = "알림",
-            Message = "무료 골드를 획득 했습니다."
+            Message = "무료 GOLD를 획득 했습니다."
         });
     }
 
@@ -236,15 +246,6 @@ public class Popup_Shop : UIElement
             DataManager.Instance.GetMyUserData().UserCommonData.Gold += m_ShopData.Count;
             DataManager.Instance.SaveData();
             UIManager.Instance.Refresh();
-
-            // 완료
-            UIManager.Instance.OpenSystemPopup(new MessageData
-            {
-                Type = PopupType.OkOnly,
-                Title = "알림",
-                Message = "광고 골드를 획득 했습니다."
-            });
-
             m_IsAdCheck = false;
         });
     }
@@ -262,7 +263,7 @@ public class Popup_Shop : UIElement
         SetContent(ContentList[num]);
     }
 
-    private void OnClick_Buy_Hero(int num)
+    public void OnClick_Buy_Hero(int num)
     {
         SoundManager.Instance.StartSFX("ButtonClick");
         m_ShopData = m_ShopList_Hero[num];
@@ -278,7 +279,7 @@ public class Popup_Shop : UIElement
         {
             Type = PopupType.OkCancel,
             Title = "구매",
-            Message = "Hero를 구매 하시겠습니까?",
+            Message = "히어로를 구매 하시겠습니까?",
             OkAction = () => { Buy_Hero(); }
         });
     }
@@ -292,7 +293,7 @@ public class Popup_Shop : UIElement
         {
             Type = PopupType.OkCancel,
             Title = "구매",
-            Message = "무료 골드를 획득 하시겠습니까?",
+            Message = "무료 GOLD를 획득 하시겠습니까?",
             OkAction = () => { Buy_Gold_Free(); }
         });
     }
@@ -309,9 +310,17 @@ public class Popup_Shop : UIElement
         {
             Type = PopupType.OkCancel,
             Title = "광고 보상",
-            Message = "광고를 시청하고, 골드를 획득 하시겠습니까?",
+            Message = "광고를 시청하고, GOLD를 획득 하시겠습니까?",
             OkAction = () => { Buy_Gold_Ad(); }
         });
+    }
+
+    private void OnClick_Cheat()
+    {
+        SoundManager.Instance.StartSFX("ButtonClick");
+        DataManager.Instance.GetMyUserData().UserCommonData.Gold += 10000;
+        DataManager.Instance.SaveData();
+        UIManager.Instance.Refresh();
     }
 
     private void OnClick_Close()

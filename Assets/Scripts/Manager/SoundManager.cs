@@ -115,6 +115,7 @@ public class SoundManager : Singleton<SoundManager>
         m_SfxDic.Add("Lose", ResourceLoader.LoadAssetResources<AudioClip>("Sound/SFX/Ingame/Lose"));
         m_SfxDic.Add("StartGame", ResourceLoader.LoadAssetResources<AudioClip>("Sound/SFX/Ingame/StartGame"));
         m_SfxDic.Add("ButtonEmoticon", ResourceLoader.LoadAssetResources<AudioClip>("Sound/SFX/UI/ButtonEmoticon"));
+        m_SfxDic.Add("Text", ResourceLoader.LoadAssetResources<AudioClip>("Sound/SFX/UI/Text"));
     }
     #endregion
 

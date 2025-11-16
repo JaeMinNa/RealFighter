@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -13,6 +13,9 @@ public class Popup_System : UIElement
     [SerializeField] private Image Img_Background;
     [SerializeField] private Button Btn_OK;
     [SerializeField] private Button Btn_Cancel;
+
+    [Header("Tutorial")]
+    public Transform Trans_OkButton = null;
     #endregion
 
     #region Member Property
@@ -74,7 +77,7 @@ public class Popup_System : UIElement
     #endregion
 
     #region Button Event
-    private void OnClick_OK()
+    public void OnClick_OK()
     {
         SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Close<Popup_System>();

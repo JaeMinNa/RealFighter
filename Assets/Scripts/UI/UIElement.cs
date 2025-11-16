@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+Ôªøusing Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,13 +8,9 @@ public abstract class UIElement : MonoBehaviour
     public RectTransform RectTransform;
     public UI UIParent;
 
-    // √ ±‚»≠
     public abstract void Init();
-    // UI∞° ø≠∏± ∂ß »£√‚
     public abstract void OnOpen(List<object> Args);
-    // UI∞° ¥›»˙ ∂ß »£√‚
     public abstract void OnClose();
-    // UI ∞ªΩ≈
     public abstract void OnRefresh();
 
     #region Async

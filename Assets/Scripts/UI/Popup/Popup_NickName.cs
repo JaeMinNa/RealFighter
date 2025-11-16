@@ -22,15 +22,15 @@ public class Popup_NickName : UIElement
 
     #region Override Method
     public override void Init()
-    { 
+    {
         Btn_Ok.onClick.AddListener(OnClick_Ok);
 
         LoadBannedWords();
     }
 
-    public override void OnClose()
+    public async override void OnClose()
     {
-
+        await TutorialManager.Instance.StartTutorial(TutorialStep.LobbyChat_0);
     }
 
     public override void OnOpen(List<object> Args)
@@ -52,11 +52,11 @@ public class Popup_NickName : UIElement
         TextAsset csvFile = ResourceLoader.LoadAssetResources<TextAsset>("CSV/BannedWord/BannedWord");
         if (csvFile == null)
         {
-            Debug.LogError("��Ģ�� CSV ������ ã�� �� �����ϴ�.");
+            Debug.LogError("금칙어 CSV 파일을 찾지 못했습니다.");
             return;
         }
 
-        // �� ������ �и�
+        // 줄 단위로 파싱
         string[] lines = csvFile.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var line in lines)
@@ -64,13 +64,13 @@ public class Popup_NickName : UIElement
             string word = line.Trim();
             if (!string.IsNullOrEmpty(word))
             {
-                // �ߺ� ����
+                // 중복 방지
                 if (!m_BannedWords.Contains(word))
                     m_BannedWords.Add(word);
             }
         }
 
-        Debug.Log($"��Ģ�� {m_BannedWords.Count}�� �ε� �Ϸ�");
+        Debug.Log($"금칙어 {m_BannedWords.Count}개 로드 완료");
     }
 
     private bool IsBannedNickName(string nickname)
@@ -89,19 +89,14 @@ public class Popup_NickName : UIElement
     {
         m_Text.text = m_InputField.text;
     }
-
-    //public void EnterButton()
-    //{
-    //    gameStartPanel.SetActive(false);
-    //}
     #endregion
 
     #region Button
-   
+
     private void OnClick_Ok()
     {
         // 닉네임 입력 안했을 때
-        if(string.IsNullOrEmpty(m_InputField.text))
+        if (string.IsNullOrEmpty(m_InputField.text))
         {
             UIManager.Instance.OpenSystemPopup(new MessageData
             {
@@ -128,7 +123,18 @@ public class Popup_NickName : UIElement
             UIManager.Instance.OpenSystemPopup(new MessageData
             {
                 Type = PopupType.OkOnly,
-                Message = "부적절한 닉네임 입니다.",
+                Message = "부적절한 닉네임입니다.",
+            });
+            return;
+        }
+
+        // 뒤끝 서버 닉네임 수정
+        if (!BackendManager.Instance.UpdateNickname(m_InputField.text))
+        {
+            UIManager.Instance.OpenSystemPopup(new MessageData
+            {
+                Type = PopupType.OkOnly,
+                Message = "이미 존재하거나, 사용할 수 없는 닉네임입니다.",
             });
             return;
         }
@@ -136,7 +142,6 @@ public class Popup_NickName : UIElement
         DataManager.Instance.GetMyUserData().UserCommonData.NickName = m_Text.text;
         DataManager.Instance.GetMyUserData().UserContentsData.IsFirstLogin = false;
         DataManager.Instance.SaveData();
-        BackendManager.Instance.SaveData();
         UIManager.Instance.Refresh();
         SoundManager.Instance.StartSFX("ButtonClick");
 

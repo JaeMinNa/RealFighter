@@ -105,6 +105,30 @@ public class BackendManager : Singleton<BackendManager>
         Debug.LogWarning("뒤끝 서버 아이디 삭제 완료!");
     }
 
+    // 닉네임 변경을 시도하고, 성공 여부를 bool 값으로 반환
+    public bool UpdateNickname(string nickName)
+    {
+        BackendReturnObject bro = Backend.BMember.UpdateNickname(nickName);
+
+        if (bro.IsSuccess())
+        {
+            Debug.LogWarning($"뒤끝 서버 닉네임 변경 성공 : {nickName}");
+            return true;
+        }
+        else
+        {
+            if (bro.GetStatusCode() == "409")
+            {
+                Debug.LogWarning("뒤끝 서버 이미 사용 중인 닉네임");
+                return false;
+            }
+            else
+            {
+                Debug.LogWarning($"뒤끝 서버 닉네임 변경 실패 (기타 오류) : {bro}");
+                return false;
+            }
+        }
+    }
     public void SaveData()
     {
         if (!Backend.IsInitialized)
@@ -113,7 +137,7 @@ public class BackendManager : Singleton<BackendManager>
             return;
         }
 
-        // ���� ������ ����
+        // 유저 데이터 저장
         Param param = GetUserDataParam();
         BackendReturnObject bro = Backend.GameData.Update("USER_DATA", new Where(), param);
 
@@ -126,14 +150,11 @@ public class BackendManager : Singleton<BackendManager>
             Debug.LogWarning("뒤끝 서버 데이터 저장 실패");
         }
 
-        // ��ŷ ������ ����
+        // 랭킹 데이터 저장
         SaveMyRank();
-
-        // �г��� ����
-        Backend.BMember.UpdateNickname(DataManager.Instance.GetMyUserData().UserCommonData.NickName);
     }
 
-    // �����κ��� �����͸� �ҷ��ͼ� Parsing�ϴ� �Լ�
+    // 서버로부터 데이터를 불러와서 Parsing하는 함수
     public void LoadData()
     {
         if (!Backend.IsInitialized)
@@ -157,11 +178,11 @@ public class BackendManager : Singleton<BackendManager>
         }
     }
 
-    // ȸ�� ������ �� ��, ������ ���̺�� �߰��ϴ� �Լ�
+    // 회원 가입한 후 첫 데이터 삽입을 위한 함수
     public void InsertData()
     {
         Param param = GetUserDataParam();
-        BackendReturnObject bro = Backend.GameData.Insert("USER_DATA", param); // ������ ���̺��� �̸�
+        BackendReturnObject bro = Backend.GameData.Insert("USER_DATA", param); // USER_DATA 테이블 이름
 
         if (bro.IsSuccess())
         {
@@ -237,22 +258,17 @@ public class BackendManager : Singleton<BackendManager>
                 {
                     Debug.LogWarning("뒤끝 서버 나의 랭킹 조회 성공!");
 
-                    RankData data = new RankData() 
+                    RankData data = new RankData()
                     {
                         NickName = rankDataJson[0]["nickname"].ToString(),
                         Rank = int.Parse(rankDataJson[0]["rank"].ToString()),
                         RankPoint = int.Parse(rankDataJson[0]["score"].ToString()),
 
-                        // �߰� �׸� ������
+                        // 추가 항목 데이터
                         Image = rankDataJson[0]["CharacterImg"].ToString()
                     };
 
                     return data;
-
-                    // 복수 데이터의 추가 항목 사용 시
-                    //string[] extraData = rankDataJson[i]["WinLose"].ToString().Split("|");
-                    //_win = int.Parse(extraData[0].ToString());
-                    //_lose = int.Parse(extraData[1].ToString());
                 }
             }
             // 나의 랭킹 정보 JSON 데이터 파싱에 실패했을 때
@@ -271,14 +287,13 @@ public class BackendManager : Singleton<BackendManager>
 
     public List<RankData> GetRankDataList()
     {
-        int maxRankList = 50;
+        int maxRankList = ClientDef.RankingCount;
 
         // 랭킹 테이블에 있는 유저의 offset ~ offset + limit 순위 랭킹 정보를 불러옴
         BackendReturnObject bro = Backend.URank.User.GetRankList(RANK_UUID, maxRankList, 0);
 
         if (bro.IsSuccess())
         {
-            // JSON 데이터 파싱 성공
             try
             {
                 JsonData rankDataJson = bro.FlattenRows();
@@ -297,7 +312,6 @@ public class BackendManager : Singleton<BackendManager>
                     List<RankData> rankData = new List<RankData>();
                     int rankCount = rankDataJson.Count;
 
-                    // 받아온 rank 데이터의 숫자만큼 데이터 출력
                     for (int index = 0; index < rankCount; ++index)
                     {
                         RankData data = new RankData()
@@ -311,17 +325,11 @@ public class BackendManager : Singleton<BackendManager>
                         };
 
                         rankData.Add(data);
-
-                        // 복수 데이터의 추가 항목 사용 시
-                        //string[] extraData = rankDataJson[i]["WinLose"].ToString().Split("|");
-                        //_win = int.Parse(extraData[0].ToString());
-                        //_lose = int.Parse(extraData[1].ToString());
                     }
 
                     return rankData;
                 }
             }
-            // JSON 데이터 파싱 실패
             catch (System.Exception e)
             {
                 Debug.LogWarning($"뒤끝 서버 랭킹 데이터 파싱 실패 : {e}");

@@ -7029,6 +7029,7 @@ GameObject:
   m_Component:
   - component: {fileID: 286563592947798906}
   - component: {fileID: -8287717236755460215}
+  - component: {fileID: 8285095401405077244}
   m_Layer: 5
   m_Name: IngameWindow
   m_TagString: Untagged
@@ -7138,6 +7139,23 @@ MonoBehaviour:
   Text_EnemyCombo: {fileID: 3348353166508779829}
   Obj_EnemyCritical: {fileID: 8956997812850520280}
   SkillImage: {fileID: 5035895078702461442}
+--- !u!114 &8285095401405077244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286563592947798853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7219e70427a508345a891d713683a546, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Trans_BattleButton: {fileID: 0}
+  Trans_AttackButton: {fileID: 9127574215101099489}
+  Trans_DeffenceButton: {fileID: 7869259858456578692}
+  Trans_Ready: {fileID: 4606407599900481352}
+  Trans_ShopButton: {fileID: 0}
 --- !u!1 &286563592953732317
 GameObject:
   m_ObjectHideFlags: 0
@@ -12731,7 +12749,7 @@ MonoBehaviour:
   id: 
   isRelative: 0
   isFrom: 0
-  isIndependentUpdate: 0
+  isIndependentUpdate: 1
   autoKill: 1
   autoGenerate: 1
   isActive: 1
@@ -17282,7 +17300,7 @@ MonoBehaviour:
   id: 
   isRelative: 0
   isFrom: 0
-  isIndependentUpdate: 0
+  isIndependentUpdate: 1
   autoKill: 1
   autoGenerate: 1
   isActive: 1
@@ -23592,7 +23610,7 @@ MonoBehaviour:
   id: 
   isRelative: 0
   isFrom: 0
-  isIndependentUpdate: 0
+  isIndependentUpdate: 1
   autoKill: 1
   autoGenerate: 1
   isActive: 1
@@ -24110,7 +24128,7 @@ MonoBehaviour:
   id: 
   isRelative: 0
   isFrom: 0
-  isIndependentUpdate: 0
+  isIndependentUpdate: 1
   autoKill: 1
   autoGenerate: 1
   isActive: 1
@@ -26132,7 +26150,7 @@ MonoBehaviour:
   id: 
   isRelative: 0
   isFrom: 0
-  isIndependentUpdate: 0
+  isIndependentUpdate: 1
   autoKill: 1
   autoGenerate: 1
   isActive: 1
@@ -26594,7 +26612,7 @@ MonoBehaviour:
   id: 
   isRelative: 0
   isFrom: 0
-  isIndependentUpdate: 0
+  isIndependentUpdate: 1
   autoKill: 1
   autoGenerate: 1
   isActive: 1
@@ -27155,7 +27173,7 @@ MonoBehaviour:
   id: 
   isRelative: 0
   isFrom: 0
-  isIndependentUpdate: 0
+  isIndependentUpdate: 1
   autoKill: 1
   autoGenerate: 1
   isActive: 1

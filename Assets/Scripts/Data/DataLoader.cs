@@ -1,12 +1,6 @@
-using UnityEngine;
+癤퓎sing UnityEngine;
 
 public class DataLoader : MonoBehaviour
 {
     public UserData MyUserData = null;
-
-    //// 유저의 기본 정보
-    //public UserData_Common UserCommonData  = null;
-
-    //// 유저의 히어로 정보
-    //public UserData_Hero UserHeroData = null;
 }

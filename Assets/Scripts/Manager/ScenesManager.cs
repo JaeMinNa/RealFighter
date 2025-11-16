@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+ï»¿using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -53,36 +53,35 @@ public class ScenesManager : Singleton<ScenesManager>
     #region Public Method
     public async UniTask LoadScene(string sceneName)
     {
-        // ÇöÀç±îÁö µ¥ÀÌÅÍ¸¦ ÀúÀå
+        // í˜„ì¬ ë°ì´í„°ë¥¼ ì €ì¥
         DataManager.Instance.SaveData();
 
-        // ¾ÀÀ» ºñµ¿±â·Î ·Îµå (½Ì±Û ¸ğµå)
+        // ì”¬ ë¹„ë™ê¸° ë¡œë“œ (ë¡œë”© í™”ë©´ ë„ìš°ëŠ” ë°©ì‹ ì‚¬ìš© ì‹œ ëŒ€ê¸°)
         await SceneManager.LoadSceneAsync(sceneName).ToUniTask();
 
-        // ¾À ·Îµå ¿Ï·á ÈÄ, DataLoader¸¦ ¼³Á¤
+        // ì”¬ ë¡œë“œ ì™„ë£Œ í›„ DataLoader ì´ˆê¸°í™”
         DataManager.Instance.SetDataLoader();
 
-        // ¾À ·Îµå ¿Ï·á ÈÄ, DataLoader¿¡ µ¥ÀÌÅÍ¸¦ ·Îµå
+        // DataLoaderì—ì„œ ë°ì´í„° ë¶ˆëŸ¬ì˜¤ê¸°
         DataManager.Instance.LoadData();
     }
 
     public async UniTask PhotonLoadScene(string sceneName)
     {
-        Debug.LogWarning($"=== PhotonLoadScene ½ÃÀÛ ===");
+        Debug.LogWarning($"=== PhotonLoadScene ì‹œì‘ ===");
         Debug.LogWarning($"[1] AutoSyncScene = {PhotonNetwork.AutomaticallySyncScene}, IsMessageQueueRunning = {PhotonNetwork.IsMessageQueueRunning}, InRoom = {PhotonNetwork.InRoom}, IsMasterClient = {PhotonNetwork.IsMasterClient}");
-        Debug.LogWarning($"[1] ÇöÀç ¹æ ÀÌ¸§: {(PhotonNetwork.CurrentRoom != null ? PhotonNetwork.CurrentRoom.Name : "¾øÀ½")}");
+        Debug.LogWarning($"[1] í˜„ì¬ ë°© ì´ë¦„: {(PhotonNetwork.CurrentRoom != null ? PhotonNetwork.CurrentRoom.Name : "ì—†ìŒ")}");
 
-
-        // µ¥ÀÌÅÍ ÀúÀå
+        // í˜„ì¬ ë°ì´í„°ë¥¼ ì €ì¥
         DataManager.Instance.SaveData();
 
-        // Photon µ¿±âÈ­ ÁØºñ
+        // Photon ì”¬ ë™ê¸°í™” ì¤€ë¹„
         PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.IsMessageQueueRunning = true;
 
         Debug.LogWarning($"[2] AutoSyncScene = {PhotonNetwork.AutomaticallySyncScene}, IsMessageQueueRunning = {PhotonNetwork.IsMessageQueueRunning}");
 
-        // ¾À ·Îµå ¿Ï·á °¨Áö¿ë ÇÃ·¡±×
+        // ì”¬ ë¡œë“œ ì™„ë£Œ ì—¬ë¶€ í”Œë˜ê·¸
         bool isLoaded = false;
         SceneManager.sceneLoaded += OnSceneLoaded;
 
@@ -92,36 +91,36 @@ public class ScenesManager : Singleton<ScenesManager>
             if (scene.name == sceneName)
             {
                 isLoaded = true;
-                Debug.LogWarning($"[3] Scene Loaded °¨Áö: {sceneName}");
+                Debug.LogWarning($"[3] Scene Loaded ì™„ë£Œ: {sceneName}");
             }
         }
 
-        // ¸¶½ºÅÍ¸¸ LoadLevel È£Ãâ
+        // ë§ˆìŠ¤í„° í´ë¼ì´ì–¸íŠ¸ë§Œ LoadLevel í˜¸ì¶œ
         if (PhotonNetwork.IsMasterClient)
         {
-            Debug.LogWarning($"[MASTER] PhotonNetwork.LoadLevel È£Ãâ: {sceneName}");
+            Debug.LogWarning($"[MASTER] PhotonNetwork.LoadLevel í˜¸ì¶œ: {sceneName}");
             PhotonNetwork.LoadLevel(sceneName);
         }
         else
         {
-            Debug.LogWarning($"[CLIENT] LoadLevel Á÷Á¢ È£Ãâ ¾È ÇÔ, Photon ÀÚµ¿ ·Îµå ´ë±â");
+            Debug.LogWarning($"[CLIENT] LoadLevel ì§ì ‘ í˜¸ì¶œ ë¶ˆê°€ â€” Photon ìë™ ë¡œë“œ ëŒ€ê¸°");
         }
 
-        // ¾À ·Îµå ¿Ï·áµÉ ¶§±îÁö ´ë±â
+        // ì”¬ ë¡œë“œ ì™„ë£Œë  ë•Œê¹Œì§€ ëŒ€ê¸°
         await UniTask.WaitUntil(() => isLoaded);
 
-        Debug.LogWarning($"[4] ¾À ·Îµå ¿Ï·á °¨ÁöµÊ, µ¥ÀÌÅÍ ÃÊ±âÈ­ ½ÇÇà");
+        Debug.LogWarning($"[4] ì”¬ ë¡œë“œ ì™„ë£Œ í™•ì¸, ë°ì´í„° ì´ˆê¸°í™” ì‹œì‘");
 
-        // ÀÌº¥Æ® ÇØÁ¦
+        // ì´ë²¤íŠ¸ í•´ì œ
         SceneManager.sceneLoaded -= OnSceneLoaded;
 
-        // ¾À ·Îµå ¿Ï·á ÈÄ, DataLoader¸¦ ¼³Á¤
+        // DataLoader ì´ˆê¸°í™”
         DataManager.Instance.SetDataLoader();
 
-        // ¾À ·Îµå ¿Ï·á ÈÄ, DataLoader¿¡ µ¥ÀÌÅÍ¸¦ ·Îµå
+        // DataLoaderì—ì„œ ë°ì´í„° ë¶ˆëŸ¬ì˜¤ê¸°
         DataManager.Instance.LoadData();
 
-        Debug.LogWarning($"{sceneName} Æ÷Åæ ¾À ·Îµå ¿Ï·á!");
+        Debug.LogWarning($"{sceneName} ì”¬ ë¡œë“œ ì™„ë£Œ!");
     }
     #endregion
 }

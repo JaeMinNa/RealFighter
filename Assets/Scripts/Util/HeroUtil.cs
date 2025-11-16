@@ -1,4 +1,4 @@
-using NUnit.Framework;
+ï»¿using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -55,7 +55,7 @@ public static class HeroUtil
         return heroData;
     }
 
-    // ÇöÀç ÀåÂøÇÑ È÷¾î·ÎÀÇ °æÇèÄ¡¸¦ ¿Ã¸²
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ã¸ï¿½
     public static void AddHeroExp(int value)
     {
         if (value <= 0)
@@ -79,7 +79,7 @@ public static class HeroUtil
         if (myHeroData == null)
             return;
 
-        // ÀåÂø, º¸À¯ È÷¾î·Î °¢°¢ ¸ðµÎ °æÇèÄ¡¸¦ Áõ°¡
+        // ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (curExp + value >= levelUpExp)
         {
             if(curLevel >= ClientDef.MaxHeroLevel)
@@ -114,7 +114,7 @@ public static class HeroUtil
         }
     }
 
-    // ÇØ´ç È÷¾î·ÎÀÇ µî±Þ °æÇèÄ¡¸¦ ¿Ã¸²
+    // ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ã¸ï¿½
     public static void AddHeroGradeExp(HeroData data)
     {
         if (data == null)
@@ -134,24 +134,24 @@ public static class HeroUtil
     #region Private Method
     private static void TryMergeHero(HeroData data)
     {
-        // ³» È÷¾î·Î ÀÎº¥Åä¸® °¡Á®¿À±â
+        // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         var heroList = DataManager.Instance.GetMyUserData().UserHeroData.MyHeroes;
 
-        // µ¿ÀÏ ÀÌ¸§, µ¿ÀÏ µî±Þ, ÀÚ±â ÀÚ½ÅÀÌ ¾Æ´Ñ ´ë»ó Ã£±â
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½, ï¿½Ú±ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½Æ´ï¿½ ï¿½ï¿½ï¿½ Ã£ï¿½ï¿½
         var target = heroList.Find(Data =>
             Data != data &&
             Data.HeroName == data.HeroName &&
             Data.Grade == data.Grade);
 
-        // µ¿ÀÏ È÷¾î·Î°¡ ÀÖ´Ù¸é º´ÇÕ
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Î°ï¿½ ï¿½Ö´Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (target != null)
         {
             target.GradeExp++;
 
-            // ÇöÀç data´Â Á¦°Å
+            // ï¿½ï¿½ï¿½ï¿½ dataï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             heroList.Remove(data);
 
-            // µî±Þ °æÇèÄ¡°¡ ´Ù½Ã MaxGradeExp¿¡ µµ´ÞÇÏ¸é Àç±Í Ã³¸®
+            // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ù½ï¿½ MaxGradeExpï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
             if (target.GradeExp >= ClientDef.MaxGradeExp)
             {
                 target.GradeExp = 0;

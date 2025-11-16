@@ -16,7 +16,7 @@ public class Popup_BattleLoading : UIElement
     #region Member Property
     private bool m_IsRoom = false;
     private bool m_IsGameStart = false;
-    private float m_WaitTime = ClientDef.RoomWaitTime;
+    private float m_WaitTime = 0;
     #endregion
 
     #region Unity Method
@@ -48,8 +48,9 @@ public class Popup_BattleLoading : UIElement
     #region Override Method
     public override void Init()
     {
-        PhotonNetwork.AutomaticallySyncScene = true;
+        m_WaitTime = DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 1 ? 1f : ClientDef.RoomWaitTime;
         Btn_Close.onClick.AddListener(OnClick_Close);
+        PhotonNetwork.AutomaticallySyncScene = true;
     }
 
     public override void OnClose()
@@ -61,7 +62,7 @@ public class Popup_BattleLoading : UIElement
     {
         Text_PlayerCount.gameObject.SetActive(false);
 
-        // ���� ���� �õ� -> ��� ã��
+        // 서버 접속 시도
         PhotonManager.Instance.Connect(SuccessConnect, FailConnect);
     }
 

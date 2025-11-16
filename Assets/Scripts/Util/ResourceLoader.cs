@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
@@ -138,7 +138,7 @@ class LocalResourceLoader : IResourceLoader
             return new Object() as T;
         }
 
-        // ¿Àµð¿À Å¬¸³ÀÎ °æ¿ì ·Îµå »óÅÂ È®ÀÎ
+        // ì˜¤ë””ì˜¤ í´ë¦½ì¼ ê²½ìš° ë¡œë“œ ìƒíƒœ í™•ì¸ (ë¹„ë™ê¸° ë¡œë”© ë³´ìž¥)
         if (obj is AudioClip audioClip)
         {
             await UniTask.WaitUntil(() => audioClip.loadState == AudioDataLoadState.Loaded);
@@ -358,7 +358,7 @@ class DownloadResourceLoader : IResourceLoader
             return new Object() as T;
         }
 
-        // ¿Àµð¿À Å¬¸³ÀÎ °æ¿ì ·Îµå »óÅÂ È®ÀÎ (WebGL ¿À·ù)
+        // ì˜¤ë””ì˜¤ í´ë¦½ì¼ ê²½ìš° ë¡œë“œ ìƒíƒœ í™•ì¸ (WebGL ì „ìš© ì²˜ë¦¬)
         if (obj is AudioClip audioClip)
         {
             await UniTask.WaitUntil(() => audioClip.loadState == AudioDataLoadState.Loaded);

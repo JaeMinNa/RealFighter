@@ -1,4 +1,4 @@
-using UnityEngine;
+锘縰sing UnityEngine;
 
 public class GameScene : MonoBehaviour
 {
@@ -12,14 +12,18 @@ public class GameScene : MonoBehaviour
         SoundManager.Instance.StartBGM("BGM_Battle");
         SoundManager.Instance.StartSFX("StartGame");
 
-        // Module 积己
+        // Module 靸濎劚
         BattleModule.CreateModule<PVPModule>();
         BattleModule.Instance.SetRootObject(Root_Camera, Root_Environment, Root_Character);
         await BattleModule.Instance.StartGame();
 
-        // IngameWindow 积己
+        // IngameWindow 靸濎劚
         UIManager.Instance.SetUIRoot(Root_UI);
         UIManager.Instance.SetActiveRoot(UI.BackGround, false);
         UIManager.Instance.Open<IngameWindow>(UI.Main, "Prefabs/UI/Window/IngameWindow");
+
+        // 韸滍啝毽柤 鞁滌瀾
+        if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 1)
+            await TutorialManager.Instance.StartTutorial(TutorialStep.IngameChat_0);
     }
 }

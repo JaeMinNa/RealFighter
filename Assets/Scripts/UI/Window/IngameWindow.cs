@@ -123,7 +123,7 @@ public class IngameWindow : UIElement
 
     public override void OnClose()
     {
-                
+
     }
 
     public override void OnOpen(List<object> Args)
@@ -155,8 +155,8 @@ public class IngameWindow : UIElement
         Obj_DefTurn.SetActive(false);
 
         Text_Round.text = $"Round {m_PVPModule.CurRound}";
-        
-        if(m_PVPModule.IsAttackTurn)
+
+        if (m_PVPModule.IsAttackTurn)
             Obj_AtkTurn.SetActive(true);
         else
             Obj_DefTurn.SetActive(true);
@@ -168,8 +168,6 @@ public class IngameWindow : UIElement
         {
             SetUI_Player_Left(DataManager.Instance.GetMyUserData());
             SetUI_Player_Right(m_PVPModule.EnemyUserData);
-
-
         }
         else
         {
@@ -187,8 +185,8 @@ public class IngameWindow : UIElement
         Obj_MyCritical.SetActive(false);
         Obj_EnemyCritical.SetActive(false);
 
-        // UI ��ġ ����
-        if(m_PVPModule.IsLeftPlayer)
+        // UI 위치 설정
+        if (m_PVPModule.IsLeftPlayer)
         {
             Obj_MySkillInfoPanel.GetComponent<RectTransform>().anchorMax = new Vector2(0f, 0.5f);
             Obj_MySkillInfoPanel.GetComponent<RectTransform>().anchorMin = new Vector2(0f, 0.5f);
@@ -211,7 +209,7 @@ public class IngameWindow : UIElement
             Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(-600f, 250f, 0f);
         }
 
-        // ��� ��밡���� ��ư Ȱ��ȭ
+        // 사용 가능한 내 공격 스킬 버튼만 활성화
         for (int Index = 0; Index < Btn_MyAttacks.Length; ++Index)
         {
             if (m_PVPModule.MyCanUseSkillCounts[Index] > 0)
@@ -227,7 +225,7 @@ public class IngameWindow : UIElement
 
         Btn_Ready.interactable = true;
 
-        // ��� ��ư �ʱ� �̹���
+        // 내 공격/방어 버튼들을 기본 이미지로 초기화
         foreach (var btn in Btn_MyAttacks)
             btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_n");
 
@@ -310,7 +308,7 @@ public class IngameWindow : UIElement
     {
         Text_NickName_Left.text = userData.UserCommonData.NickName;
         Text_Score_Left.text = userData.UserCommonData.RankPoint.ToString();
-        Text_Hp_Left.text = $"{(m_PVPModule.IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp)} <#afd9e9>/ {100}";
+        Text_Hp_Left.text = $"{(m_PVPModule.IsLeftPlayer ? (m_PVPModule.CurHp < 0 ? 0 : m_PVPModule.CurHp) : (m_PVPModule.EnemyCurHp < 0 ? 0 : m_PVPModule.EnemyCurHp))} <#afd9e9>/ {100}";
         Slider_Hp_Left.value = m_PVPModule.IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp;
         Img_Hero_Left.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Character/Character_{userData.UserCommonData.Image}");
         Text_Level_Left.text = userData.UserHeroData.EquipHero.Level.ToString();
@@ -321,7 +319,7 @@ public class IngameWindow : UIElement
     {
         Text_NickName_Right.text = userData.UserCommonData.NickName;
         Text_Score_Right.text = userData.UserCommonData.RankPoint.ToString();
-        Text_Hp_Right.text = $"{(!m_PVPModule.IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp)} <#ffc9d6>/ {100}";
+        Text_Hp_Right.text = $"{(!m_PVPModule.IsLeftPlayer ? (m_PVPModule.CurHp < 0 ? 0 : m_PVPModule.CurHp) : (m_PVPModule.EnemyCurHp < 0 ? 0 : m_PVPModule.EnemyCurHp))} <#ffc9d6>/ {100}";
         Slider_Hp_Right.value = !m_PVPModule.IsLeftPlayer ? m_PVPModule.CurHp : m_PVPModule.EnemyCurHp;
         Img_Hero_Right.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Character/Character_{userData.UserCommonData.Image}");
         Text_Level_Right.text = userData.UserHeroData.EquipHero.Level.ToString();
@@ -352,7 +350,7 @@ public class IngameWindow : UIElement
 
     private void SetUI_MyCombo()
     {
-        if(m_PVPModule.MyCombo != 0)
+        if (m_PVPModule.MyCombo != 0)
         {
             if (m_PVPModule.MyCombo == 3)
                 Obj_MyCritical.SetActive(true);
@@ -382,14 +380,14 @@ public class IngameWindow : UIElement
     #endregion
 
     #region Button
-    private void OnClick_MyAttacks(int num)
+    public void OnClick_MyAttacks(int num)
     {
         if (m_PVPModule.IsMyReady)
             return;
 
         SoundManager.Instance.StartSFX("ButtonClick");
 
-        // �⺻ Image�� �ʱ�ȭ
+        // 내 공격 버튼들을 기본 이미지로 초기화
         foreach (var btn in Btn_MyAttacks)
             btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_n");
 
@@ -399,14 +397,14 @@ public class IngameWindow : UIElement
         m_PVPModule.MySelectBtnNum = num;
     }
 
-    private void OnClick_MyDefences(int num)
+    public void OnClick_MyDefences(int num)
     {
         if (m_PVPModule.IsMyReady)
             return;
 
         SoundManager.Instance.StartSFX("ButtonClick");
 
-        // �⺻ Image�� �ʱ�ȭ
+        // 내 방어 버튼들을 기본 이미지로 초기화
         foreach (var btn in Btn_MyDefences)
             btn.image.sprite = ResourceLoader.LoadAssetResources<Sprite>($"Textures/Button/Btn_MenuButton_Square01_n");
 
@@ -424,7 +422,7 @@ public class IngameWindow : UIElement
         {
             Type = PopupType.OkCancel,
             Message = "패널티를 받고 정말 나가시겠습니까?",
-            OkAction = async () => 
+            OkAction = async () =>
             {
                 if (PhotonNetwork.IsConnected)
                     PhotonManager.Instance.Disconnect(null);
@@ -439,7 +437,7 @@ public class IngameWindow : UIElement
         });
     }
 
-    private void OnClick_Ready()
+    public void OnClick_Ready()
     {
         if (m_PVPModule.IsMyReady)
             return;
@@ -462,9 +460,9 @@ public class IngameWindow : UIElement
 
     private void OnClick_Emoticon(int num)
     {
-        if(!PhotonNetwork.IsConnected)
+        if (!PhotonNetwork.IsConnected)
         {
-            if(m_PVPModule.IsLeftPlayer)
+            if (m_PVPModule.IsLeftPlayer)
             {
                 if (Img_Emoticon_Left.gameObject.activeSelf)
                     return;

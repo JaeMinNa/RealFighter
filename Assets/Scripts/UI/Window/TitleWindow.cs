@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
@@ -32,7 +32,11 @@ public class TitleWindow : UIElement
     private async void OnClick_Start()
     {
         SoundManager.Instance.StartSFX("ButtonClick");
-        await ScenesManager.Instance.LoadScene("LobbyScene");
+
+        if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 1)
+            await ScenesManager.Instance.LoadScene("GameScene");
+        else
+            await ScenesManager.Instance.LoadScene("LobbyScene");
     }
     #endregion
 }

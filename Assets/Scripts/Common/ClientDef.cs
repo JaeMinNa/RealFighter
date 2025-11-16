@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
+using UnityEngine;
 
 public static class ClientDef
 {
@@ -8,7 +9,6 @@ public static class ClientDef
     public static readonly int SkillMaxCount = 3;
     public static readonly float TurnTime = 60f;
     public static readonly int MaxRound = 9;    // SkillMaxCount x 3 보다 무조건 같거나 커야 된다!!
-    public static readonly int MaxHeroLevel = 10;
     public static readonly int WinExp = 5;
     public static readonly int LoseExp = 2;
     public static readonly int DrawExp = 1;
@@ -21,6 +21,7 @@ public static class ClientDef
     {
         "REX", "BLAZE", "DRAKE", "DOMINICK", "MAVERICK", "STEELTON", "IRIS", "SERENA", "ORIANNA", "JIN"
     };
+    public static readonly int MaxHeroLevel = 10;
     public static readonly int MaxGradeExp = 3;
 
     // Shop
@@ -37,9 +38,13 @@ public static class ClientDef
 
     // Photon
     public static readonly float RoomWaitTime = 10f;
+    public static readonly int RankingCount = 20;
 
     // LocalPush
     public static readonly string LOCALKEY_Push_FreeGold = string.Empty;
+
+    // Tutorial
+    public static readonly int TutorialRewardGold = 3000;
 }
 
 #region UserData
@@ -72,6 +77,7 @@ public class UserData_Contents
     public DateTime LastLoginTime = DateTime.MinValue;
     public bool IsGotFreeGold = false;
     public int AdGoldBuyCount = 0;
+    public int TutorialIndex = 0;
 }
 #endregion
 
@@ -115,9 +121,65 @@ public enum LocalPushType
 {
     None,
 
+    Test,
     FreeGold,
 
     Max
+}
+
+public enum TutorialStep
+{
+    None,
+
+    LobbyChat_0,
+    LobbyChat_1,
+    ClickBattle,
+
+    IngameChat_0,
+    IngameChat_1,
+    ClickAttack,
+    ClickReady_0,
+    IngameChat_2,
+    IngameChat_3,
+    IngameChat_4,
+    IngameChat_5,
+    IngameChat_6,
+    IngameChat_7,
+    ClickDeffence,
+    ClickReady_1,
+    IngameChat_8,
+    IngameChat_9,
+    IngameChat_10,
+    IngameChat_11,
+    IngameChat_12,
+    IngameChat_13,
+    IngameChat_14,
+    ClickLobby,
+
+    LobbyChat_2,
+    LobbyChat_3,
+    LobbyChat_4,
+    ClickShop,
+
+    ShopChat_0,
+    ClickBuy,
+    ClickBuyOk,
+    ShopChat_1,
+    ShopChat_2,
+
+    Max
+}
+
+public class TutorialData
+{
+    public float TimeScale = -1;
+    public Vector2 MaskSize = new Vector2 (0, 0);
+    public Vector2 MaskPos = new Vector2(0, 0);
+    public Action Action_Mask = null;
+    public string ChatText = string.Empty;
+    public Action Action_Chat = null;
+    public bool IsUp = false;
+    public bool IsDown = false;
 }
 
 public class ItemData

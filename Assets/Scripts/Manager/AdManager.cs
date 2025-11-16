@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using GoogleMobileAds.Api;
+using Cysharp.Threading.Tasks;
 
 public class AdManager : Singleton<AdManager>
 {
@@ -187,29 +188,33 @@ public class AdManager : Singleton<AdManager>
             {
                 m_IsLoadingReward = false;
 
-                // 에러 처리
-                if (error != null || ad == null)
+                // 빌드에서 오류가 나기 때문에, 메인 스레드에서 실행해야 한다!
+                UniTask.Post(() =>
                 {
-                    Debug.LogError("Rewarded ad failed to load an ad " +
-                                   "with error : " + error);
-
-                    // 광고 불러오기 실패
-                    UIManager.Instance.OpenSystemPopup(new MessageData
+                    // 에러 처리
+                    if (error != null || ad == null)
                     {
-                        Type = PopupType.OkOnly,
-                        Title = "알림",
-                        Message = "광고 불러오기를 실패 했습니다."
-                    });
+                        Debug.LogError("Rewarded ad failed to load an ad " +
+                                       "with error : " + error);
 
-                    return;
-                }
+                        //광고 불러오기 실패
+                        UIManager.Instance.OpenSystemPopup(new MessageData
+                        {
+                            Type = PopupType.OkOnly,
+                            Title = "알림",
+                            Message = "광고 불러오기를 실패 했습니다."
+                        });
 
-                Debug.LogWarning("Rewarded ad loaded with response : "
+                        return;
+                    }
+
+                    Debug.LogWarning("Rewarded ad loaded with response : "
                           + ad.GetResponseInfo());
 
-                m_RewardedAd = ad;
-                RegisterEventHandlers(m_RewardedAd);
-                ShowRewardedAd();
+                    m_RewardedAd = ad;
+                    RegisterEventHandlers(m_RewardedAd);
+                    ShowRewardedAd();
+                });
             });
     }
 
@@ -221,8 +226,28 @@ public class AdManager : Singleton<AdManager>
             m_RewardedAd.Show((Reward reward) =>
             {
                 Debug.Log($"User earned reward: {reward.Amount} {reward.Type}");
-                m_Action?.Invoke();
-                m_Action = null;
+
+                UniTask.Post(() =>
+                {
+                    try
+                    {
+                        // 보상 처리 로직
+                        m_Action?.Invoke();
+                        m_Action = null;
+
+                        // 완료
+                        UIManager.Instance.OpenSystemPopup(new MessageData
+                        {
+                            Type = PopupType.OkOnly,
+                            Title = "알림",
+                            Message = "광고 골드를 획득 했습니다."
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"[AdManager] Exception during reward handling: {e}");
+                    }
+                });
             });
         }
         else

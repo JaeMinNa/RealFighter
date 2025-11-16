@@ -93,6 +93,7 @@ public class GameManager : Singleton<GameManager>
         _ = AdManager.Instance;
         _ = BackendManager.Instance;
         _ = LocalPushManager.Instance;
+        _ = TutorialManager.Instance;
     }
 
     public void ExitGame()

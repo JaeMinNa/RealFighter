@@ -1,25 +1,25 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class TitleScene : MonoBehaviour
 {
     [SerializeField] private GameObject Root_UI = null;
 
-    // TitleScene ÃÖÃÊ È£Ãâ ½ÃÁ¡
+    // TitleScene ìµœì´ˆ í˜¸ì¶œ ì‹œ ì‹¤í–‰
     private void Start()
     {
-        // GameManager ¼ÂÆÃ
+        // GameManager ì´ˆê¸° ì„¤ì •
         GameManager.Instance.InitDefaultManager();
 
-        // Ã¹ Scene¿¡¼­´Â ¼öµ¿À¸·Î DataLoader¸¦ ¼ÂÆÃ
+        // ì²« Sceneì—ì„œëŠ” ìˆ˜ë™ìœ¼ë¡œ DataLoaderë¥¼ ì„¤ì •
         DataManager.Instance.SetDataLoader();
 
-        // ÃÖÃÊÀÇ µ¥ÀÌÅÍ ·Îµå
+        // ìœ ì € ë°ì´í„° ë¡œë“œ
         DataManager.Instance.LoadData();
 
-        // µÚ³¡ ¼­¹ö ·Î±×ÀÎ
+        // ë’¤ë ì„œë²„ ë¡œê·¸ì¸
         BackendManager.Instance.Login();
 
-        // Title UI ¼ÂÆÃ
+        // Title UI ì„¤ì •
         UIManager.Instance.SetUIRoot(Root_UI);
         UIManager.Instance.SetActiveRoot(UI.BackGround, false);
         UIManager.Instance.Open<TitleWindow>(UI.Main, "Prefabs/UI/Window/TitleWindow");
