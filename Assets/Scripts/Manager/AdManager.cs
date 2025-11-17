@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 
 public class AdManager : Singleton<AdManager>
 {
-    private bool m_IsTestMode = false;
+    public bool IsTestMode { get; private set; } = false;
     private RewardedAd m_RewardedAd = null;
     private BannerView m_BannerView = null;
     private string m_AdRewardUnitId = string.Empty;
@@ -294,7 +294,7 @@ public class AdManager : Singleton<AdManager>
     #region Private Method
     private void Init()
     {
-        if (m_IsTestMode)
+        if (IsTestMode)
         {
             // 테스트용 광고 단위 ID
 #if UNITY_ANDROID

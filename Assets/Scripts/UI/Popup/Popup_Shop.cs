@@ -300,6 +300,9 @@ public class Popup_Shop : UIElement
 
     private void OnClick_Buy_Gold_Ad(int num)
     {
+        if (GameManager.Instance.IsEditor && !AdManager.Instance.IsTestMode)
+            return;
+
         if (m_IsAdCheck)
             return;
 
