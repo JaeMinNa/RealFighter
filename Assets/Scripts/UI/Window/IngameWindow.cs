@@ -4,9 +4,6 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEngine.Assertions.Must;
-using Cysharp.Threading.Tasks.Triggers;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
 
@@ -416,7 +413,10 @@ public class IngameWindow : UIElement
 
     private void OnClick_Exit()
     {
-        m_PVPModule.IsStartGame = false;
+        // 튜토리얼 중, 로비 이동 금지
+        if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 1)
+            return;
+
         SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.OpenSystemPopup(new MessageData
         {
@@ -424,6 +424,8 @@ public class IngameWindow : UIElement
             Message = "패널티를 받고 정말 나가시겠습니까?",
             OkAction = async () =>
             {
+                m_PVPModule.IsStartGame = false;
+
                 if (PhotonNetwork.IsConnected)
                     PhotonManager.Instance.Disconnect(null);
 
