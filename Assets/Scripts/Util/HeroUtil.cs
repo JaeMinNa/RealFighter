@@ -55,7 +55,7 @@ public static class HeroUtil
         return heroData;
     }
 
-    // ���� ������ ������� ����ġ�� �ø�
+    // 해당 영웅의 경험치를 증가시킴
     public static void AddHeroExp(int value)
     {
         if (value <= 0)
@@ -79,10 +79,10 @@ public static class HeroUtil
         if (myHeroData == null)
             return;
 
-        // ����, ���� ����� ���� ��� ����ġ�� ����
+        // 현재 경험치와 추가될 경험치 합이 레벨업 경험치를 넘는 경우 처리
         if (curExp + value >= levelUpExp)
         {
-            if(curLevel >= ClientDef.MaxHeroLevel)
+            if (curLevel >= ClientDef.MaxHeroLevel)
             {
                 DataManager.Instance.GetMyUserData().UserHeroData.EquipHero.Exp = curExp + value;
                 myHeroData.Exp = curExp + value;
@@ -114,7 +114,7 @@ public static class HeroUtil
         }
     }
 
-    // �ش� ������� ��� ����ġ�� �ø�
+    // 해당 영웅의 등급 경험치를 증가시킴
     public static void AddHeroGradeExp(HeroData data)
     {
         if (data == null)
@@ -134,24 +134,24 @@ public static class HeroUtil
     #region Private Method
     private static void TryMergeHero(HeroData data)
     {
-        // �� ����� �κ��丮 ��������
+        // 같은 이름, 같은 등급, 자기 자신이 아닌 영웅을 찾아 병합
         var heroList = DataManager.Instance.GetMyUserData().UserHeroData.MyHeroes;
 
-        // ���� �̸�, ���� ���, �ڱ� �ڽ��� �ƴ� ��� ã��
+        // 같은 이름, 같은 등급, 자기 자신이 아닌 대상 찾기
         var target = heroList.Find(Data =>
             Data != data &&
             Data.HeroName == data.HeroName &&
             Data.Grade == data.Grade);
 
-        // ���� ����ΰ� �ִٸ� ����
+        // 병합 대상이 있으면 병합
         if (target != null)
         {
             target.GradeExp++;
 
-            // ���� data�� ����
+            // 현재 data는 삭제
             heroList.Remove(data);
 
-            // ��� ����ġ�� �ٽ� MaxGradeExp�� �����ϸ� ��� ó��
+            // 병합 후 등급 경험치가 다시 MaxGradeExp를 넘으면 추가 처리
             if (target.GradeExp >= ClientDef.MaxGradeExp)
             {
                 target.GradeExp = 0;
