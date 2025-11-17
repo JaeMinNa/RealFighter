@@ -516,7 +516,7 @@ public class TutorialManager : Singleton<TutorialManager>
 
                 TutorialData data_30 = new TutorialData()
                 {
-                    ChatText = "이거 처음부터 좋은 선수가 나왔잖아?",
+                    ChatText = "이거 처음부터 좋은 히어로가 나왔잖아?",
                     Action_Chat = async () => await StartTutorial(TutorialStep.ShopChat_2)
                 };
                 await SetTutorial(data_30);

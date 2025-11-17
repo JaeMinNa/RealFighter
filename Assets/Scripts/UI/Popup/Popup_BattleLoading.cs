@@ -17,6 +17,7 @@ public class Popup_BattleLoading : UIElement
     private bool m_IsRoom = false;
     private bool m_IsGameStart = false;
     private float m_WaitTime = 0;
+    private bool m_IsTutorial = false;
     #endregion
 
     #region Unity Method
@@ -36,7 +37,7 @@ public class Popup_BattleLoading : UIElement
 
             // PVP 모드 시작
             if(PhotonNetwork.InRoom && PhotonNetwork.IsConnected 
-                && PhotonNetwork.CurrentRoom.PlayerCount == 2 && !m_IsGameStart)
+                && PhotonNetwork.CurrentRoom.PlayerCount == 2 && !m_IsGameStart && !m_IsTutorial)
             {
                 m_IsGameStart = true;
                 await ScenesManager.Instance.PhotonLoadScene("GameScene");
@@ -49,6 +50,7 @@ public class Popup_BattleLoading : UIElement
     public override void Init()
     {
         m_WaitTime = DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 1 ? 1f : ClientDef.RoomWaitTime;
+        m_IsTutorial = DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 1 ? true : false;
         Btn_Close.onClick.AddListener(OnClick_Close);
         PhotonNetwork.AutomaticallySyncScene = true;
     }

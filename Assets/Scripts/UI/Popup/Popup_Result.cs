@@ -84,7 +84,9 @@ public class Popup_Result : UIElement
 
         HeroUtil.AddHeroExp(ClientDef.LoseExp);
         DataManager.Instance.GetMyUserData().UserCommonData.Gold += ClientDef.LoseGold;
-        DataManager.Instance.GetMyUserData().UserCommonData.RankPoint--;
+
+        if (DataManager.Instance.GetMyUserData().UserCommonData.RankPoint > 0)
+            DataManager.Instance.GetMyUserData().UserCommonData.RankPoint--;
 
         // Lose 보상
         RewardItems.Add(new ItemData("Exp", ClientDef.LoseExp));

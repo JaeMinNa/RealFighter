@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 
 public class AdManager : Singleton<AdManager>
 {
-    private bool m_IsTestMode = true;
+    private bool m_IsTestMode = false;
     private RewardedAd m_RewardedAd = null;
     private BannerView m_BannerView = null;
     private string m_AdRewardUnitId = string.Empty;

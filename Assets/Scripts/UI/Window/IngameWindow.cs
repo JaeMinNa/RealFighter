@@ -195,7 +195,7 @@ public class IngameWindow : UIElement
             Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchorMax = new Vector2(1f, 0.5f);
             Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchorMin = new Vector2(1f, 0.5f);
             Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().pivot = new Vector2(1f, 0.5f);
-            Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(690f, 230f, 0f);
+            Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(600f, 170, 0f);
         }
         else
         {
@@ -206,7 +206,7 @@ public class IngameWindow : UIElement
             Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchorMax = new Vector2(0f, 0.5f);
             Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchorMin = new Vector2(0f, 0.5f);
             Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().pivot = new Vector2(0f, 0.5f);
-            Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(-600f, 250f, 0f);
+            Obj_EnemySkillInfoPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(-600f, 170f, 0f);
         }
 
         // 사용 가능한 내 공격 스킬 버튼만 활성화
