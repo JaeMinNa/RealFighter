@@ -133,7 +133,6 @@ public class LobbyWindow : UIElement
             // 하루 초기화
             userContentsData.IsGotFreeGold = false;
             userContentsData.AdGoldBuyCount = 0;
-            userContentsData.TutorialIndex = 0;
         }
 
         userContentsData.LastLoginTime = Util.DateTimeNow;

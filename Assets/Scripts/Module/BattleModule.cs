@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Unity.VisualScripting;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ public class BattleModule : MonoBehaviour
     #endregion
 
     #region Instance
-    // ÀÎ½ºÅÏ½º
+    // ì¸ìŠ¤í„´ìŠ¤
     private static BattleModule m_Instance;
 
     public static BattleModule Instance
@@ -63,14 +63,14 @@ public class BattleModule : MonoBehaviour
 
     #endregion
 
-    // BattleModuleÀ» »ó¼Ó¹Ş´Â Module¿¡¼­ ´ëºÎºĞ °øÅëÀ¸·Î »ç¿ëÇÏ´Â ±â´ÉÀ» ±¸Çö
-    // ÀÚ½Ä Module¿¡¼­ ±¸ÇöÇÏÁö ¾Ê¾Æµµ µÈ´Ù.
+    // BattleModuleì„ ìƒì†ë°›ëŠ” Moduleë“¤ì€ ì´ê³³ì— ê³µí†µì ì¸ ê¸°ëŠ¥ì„ ì‘ì„±í•˜ëŠ” ì˜ì—­  
+    // ìì‹ Moduleì—ì„œ ë°˜ë“œì‹œ ì¬ì •ì˜ í•˜ì§€ ì•Šì•„ë„ ëœë‹¤.
     #region Virtual Method
-    // °ÔÀÓ ½ÃÀÛ
-    // ·Îµå ÇÒ ³»¿ëÀÌ ¸¹ÀÌ ¶§¹®¿¡ Delay¸¦ ÁØ´Ù.
+    // ê²Œì„ ì‹œì‘  
+    // ë¡œë”© ë° ì—°ì¶œì´ í•„ìš”í•œ ê²½ìš° í•´ë‹¹ ë©”ì„œë“œì—ì„œ Delayë¥¼ ì¤€ë‹¤.
     public async virtual UniTask StartGame()
     {
-        // 1. ¸ğµç UI ´İ±â
+        // 1. ëª¨ë“  UI ë‹«ê¸°
         UIManager.Instance.CloseAll();
 
         //// 2.
@@ -78,22 +78,22 @@ public class BattleModule : MonoBehaviour
         //// ....
     }
 
-    // °ÔÀÓ ³¡
+    // ê²Œì„ ì¢…ë£Œ
     protected virtual void EndGame()
     {
-        
+
         Time.timeScale = 0f;
         IsStartGame = false;
 
         List<object> args = new List<object> { m_Result };
         UIManager.Instance.Open<Popup_Result>(UI.Popup, "Prefabs/UI/Popup/Popup_Result", args);
 
-        // Module Á¦°Å
+        // Module ì‚­ì œ
         DestroyModule();
     }
     #endregion
 
-    // BattleModuleÀ» »ó¼Ó¹Ş´Â module¿¡¼­ º°´Ù¸¥ ±¸Çö ¾øÀÌ °øÅëÀûÀ¸·Î »ç¿ëÇÏ´Â ±â´ÉÀ» ±¸Çö
+    // BattleModuleì„ ìƒì†í•˜ëŠ” moduleë“¤ì„ ì™¸ë¶€ì—ì„œ íŒë‹¨í•˜ê¸° ìœ„í•œ ë©”ì„œë“œ ì˜ì—­
     #region Public Method
     public bool IsModule<T>() where T : BattleModule
     {
@@ -133,23 +133,23 @@ public class BattleModule : MonoBehaviour
     }
     #endregion
 
-    // ³ªÁß¿¡ ±¸Çö
+    // ì•„ë˜ë¶€í„°ëŠ” í•„ìš” ì‹œ ì‚¬ìš© ì˜ˆì •
     #region ObjectPool
-    //// ÀÎ°ÔÀÓ ³» ¿ÀºêÁ§Æ®µéÀÇ Ç®À» »ı¼ºÇÏ´Â ¸Ş¼­µå
-    //// ex) »óÀÚ, °æÇèÄ¡¼®, Ã¼·ÂÈ¸º¹ÅÛ µî 
+    //// ì•ìœ¼ë¡œ ì‚¬ìš©í•  ì˜¤ë¸Œì íŠ¸ë“¤ì— ëŒ€í•œ í’€ë§ì„ ìƒì„±í•˜ëŠ” ë©”ì„œë“œ  
+    //// ex) ê²½í—˜ì¹˜, ê³¨ë“œ, ì²´ë ¥íšŒë³µ ë“± 
     //private void CreateObjectPool()
     //{
-    //    // ÀüÃ¼ ¿ÀºêÁ§Æ® ¸®½ºÆ®
+    //    // ì „ì²´ ì˜¤ë¸Œì íŠ¸ ë¦¬ìŠ¤íŠ¸
     //    var objInfoList = m_ObjectInfoTable.Values.Where(Data => Data.Key > 0).ToList();
-    //    // ¿ÀºêÁ§Æ® Å¸ÀÔ ¸®½ºÆ®
+    //    // ì˜¤ë¸Œì íŠ¸ íƒ€ì… ë¦¬ìŠ¤íŠ¸
     //    var objTypeList = DataManager.GetTable<ObjectType>(TableType.ObjectType).Values.Where(Data => Data.Key != "empty").Select(Data => Data.Key).ToList();
-    //    // ¿ÀºêÁ§Æ® Å¸ÀÔº° ·çÆ® ÇÁ¸®ÆÕ ÄÁÅ×ÀÌ³Ê
+    //    // ì˜¤ë¸Œì íŠ¸ íƒ€ì…ë³„ í”„ë¦¬íŒ¹ ë”•ì…”ë„ˆë¦¬
     //    var dicObjRoot = new Dictionary<string, GameObject>();
 
-    //    // ¿ÀºêÁ§Æ® Å¸ÀÔº° ·çÆ® ÇÁ¸®ÆÕÀ» ·ÎµåÇÑ µÚ µñ¼Å³Ê¸®¿¡ ³Ö¾îÁØ´Ù.
+    //    // ì˜¤ë¸Œì íŠ¸ íƒ€ì…ë³„ í”„ë¦¬íŒ¹ ë¡œë”© í›„ ì €ì¥
     //    for (int index = 0; index < objTypeList.Count; ++index)
     //    {
-    //        // ½½¶óÀÓ ÀÌº¥Æ®°¡ ÁøÇàÁßÀÌÁö ¾ÊÀ¸¸é Ç®À» ¸¸µéÁö ¾Ê´Â´Ù.
+    //        // ìœ ì € ì´ë²¤íŠ¸ì— í•´ë‹¹í•˜ëŠ” ê²½ìš°ì—ë§Œ í’€ ìƒì„±
     //        if (User.UserEventData.SlimeData == null && objTypeList[index] == $"{eObjectType.SlimeGold}")
     //            continue;
 
@@ -158,7 +158,7 @@ public class BattleModule : MonoBehaviour
     //        var root = ResourceLoader.LoadAsset<GameObject>($"Prefab/Object/Obj_{type}", $"Obj_{type}");
     //        if (root == null)
     //        {
-    //            Debug.LogError($"Obj_{type} ÇÁ¸®ÆÕÀÌ ¾ø½À´Ï´Ù.");
+    //            Debug.LogError($"Obj_{type} í”„ë¦¬íŒ¹ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
     //            continue;
     //        }
 
@@ -167,11 +167,9 @@ public class BattleModule : MonoBehaviour
     //        root = null;
     //    }
 
-    //    // ¸ğµç ¿ÀºêÁ§Æ® Å¸ÀÔº°·Î Ç®À» ¸¸µå´Â ´Ü°è
-    //    // ·çÆ® ÇÁ¸®ÆÕÀ» Ã£Àº µÚ ±× ÀÚ½ÄÀ¸·Î ¸ğµ¨ ÇÁ¸®ÆÕÀ» ·Îµå½ÃÄÑÁØ´Ù.
+    //    // ì‹¤ì œ ì˜¤ë¸Œì íŠ¸ë³„ í’€ ìƒì„±
     //    for (int index = 0; index < objInfoList.Count; ++index)
     //    {
-    //        // ½½¶óÀÓ ÀÌº¥Æ®°¡ ÁøÇàÁßÀÌÁö ¾ÊÀ¸¸é Ç®À» ¸¸µéÁö ¾Ê´Â´Ù.
     //        if (User.UserEventData.SlimeData == null && objInfoList[index].Type == $"{eObjectType.SlimeGold}")
     //            continue;
 
@@ -192,7 +190,7 @@ public class BattleModule : MonoBehaviour
 
     //        root.SetActive(false);
 
-    //        // TODO: ¿ÀºêÁ§Æ®º°·Î Ç® »çÀÌÁî¸¦ Á¶Á¤ÇØ¾ßÇÒµí => Å×ÀÌºí?
+    //        // TODO: ì˜¤ë¸Œì íŠ¸ë³„ í’€ ê°œìˆ˜ ì„¤ì • í•„ìš”
     //        var count = 5;
 
     //        if (info.Type == $"{eObjectType.Exp}")
@@ -200,7 +198,7 @@ public class BattleModule : MonoBehaviour
     //        if (info.Type == $"{eObjectType.SlimeGold}")
     //            count = 50;
 
-    //        // Ç® »ı¼º
+    //        // í’€ ìƒì„±
     //        PoolManager.Instance.CreatePooler($"Obj_{info.Type}_{info.Object_Index}", root, count, m_CharacterRoot.transform);
 
     //        info = null;
@@ -214,8 +212,8 @@ public class BattleModule : MonoBehaviour
     //    dicObjRoot = null;
     //}
 
-    //// ÀÎ°ÔÀÓ ³» ¿ÀºêÁ§Æ®µéÀ» °¡Á®¿À´Â ¸Ş¼­µå 
-    //// ex) »óÀÚ, °æÇèÄ¡¼®, Ã¼·ÂÈ¸º¹ÅÛ µî 
+    //// í’€ì—ì„œ ì˜¤ë¸Œì íŠ¸ë¥¼ ê°€ì ¸ì˜¤ëŠ” ë©”ì„œë“œ  
+    //// ex) ê²½í—˜ì¹˜, ê³¨ë“œ, ì²´ë ¥íšŒë³µ ë“± 
     //public GameObject GetObjectByPool(int key)
     //{
     //    GameObject obj = null;
@@ -224,7 +222,7 @@ public class BattleModule : MonoBehaviour
 
     //    obj = PoolManager.Instance.GetPooler($"Obj_{objInfo.Type}_{objInfo.Object_Index}").GetAvailable();
 
-    //    // »óÀÚÀÏ °æ¿ì
+    //    // ì˜¤ë¸Œì íŠ¸ íƒ€ì…ì´ ë°•ìŠ¤ì¸ ê²½ìš°
     //    if (objInfo.Type == $"{eObjectType.Box}")
     //    {
     //        var box = obj.GetComponent<ItemBox>();
@@ -243,7 +241,7 @@ public class BattleModule : MonoBehaviour
     //        return obj;
     //    }
 
-    //    // ¿ÜÀÇ ¿ÀºêÁ§Æ®µé
+    //    // ê¸°ë³¸ ì˜¤ë¸Œì íŠ¸ì¼ ê²½ìš°
     //    var objBase = obj.GetComponent<ObjectBase>();
     //    if (objBase == null)
     //        return null;
