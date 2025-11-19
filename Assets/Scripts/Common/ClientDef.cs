@@ -73,7 +73,6 @@ public class UserData_Hero
 
 public class UserData_Contents
 {
-    public bool IsFirstLogin = true;
     public DateTime LastLoginTime = DateTime.MinValue;
     public bool IsGotFreeGold = false;
     public int AdGoldBuyCount = 0;

@@ -58,13 +58,7 @@ public class LobbyWindow : UIElement
 
         // 튜토리얼 시작
         if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 0)
-        {
-            //첫 로그인이라면 닉네임 설정 팝업 오픈
-            if (DataManager.Instance.GetMyUserData().UserContentsData.IsFirstLogin)
-                UIManager.Instance.Open<Popup_NickName>(UI.Popup, "Prefabs/UI/Popup/Popup_NickName");
-            else
-                await TutorialManager.Instance.StartTutorial(TutorialStep.LobbyChat_0);
-        }
+            await TutorialManager.Instance.StartTutorial(TutorialStep.LobbyChat_0);
         else if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 2)
             await TutorialManager.Instance.StartTutorial(TutorialStep.LobbyChat_2);
         else if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 3)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,7 @@ public class Popup_NickName : UIElement
     [SerializeField] TMP_Text m_Text = null;
     [SerializeField] TMP_InputField m_InputField = null;
     [SerializeField] private Button Btn_Ok = null;
+    [SerializeField] private Button Btn_Close = null;
     #endregion
 
     #region Member Property
@@ -24,18 +26,20 @@ public class Popup_NickName : UIElement
     public override void Init()
     {
         Btn_Ok.onClick.AddListener(OnClick_Ok);
+        Btn_Close.onClick.AddListener(OnClick_Close);
 
         LoadBannedWords();
     }
 
-    public async override void OnClose()
+    public override void OnClose()
     {
-        await TutorialManager.Instance.StartTutorial(TutorialStep.LobbyChat_0);
+        
     }
 
     public override void OnOpen(List<object> Args)
     {
-
+        m_Text.text = DataManager.Instance.GetMyUserData().UserCommonData.NickName;
+        m_InputField.text = DataManager.Instance.GetMyUserData().UserCommonData.NickName;
     }
 
     public override void OnRefresh()
@@ -140,11 +144,16 @@ public class Popup_NickName : UIElement
         }
 
         DataManager.Instance.GetMyUserData().UserCommonData.NickName = m_Text.text;
-        DataManager.Instance.GetMyUserData().UserContentsData.IsFirstLogin = false;
         DataManager.Instance.SaveData();
         UIManager.Instance.Refresh();
         SoundManager.Instance.StartSFX("ButtonClick");
 
+        UIManager.Instance.Close<Popup_NickName>();
+    }
+
+    private void OnClick_Close()
+    {
+        SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Close<Popup_NickName>();
     }
     #endregion

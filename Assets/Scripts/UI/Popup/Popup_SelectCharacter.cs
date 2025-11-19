@@ -1,4 +1,4 @@
-using System;
+癤퓎sing System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -9,6 +9,7 @@ public class Popup_SelectCharacter : UIElement
     #region Cahsed Object
     [SerializeField] private Button[] Btn_Characters = null;
     [SerializeField] private Button Btn_Close = null;
+    [SerializeField] private Button Btn_NickName = null;
     #endregion
 
     #region Member Property
@@ -23,6 +24,7 @@ public class Popup_SelectCharacter : UIElement
             Btn_Characters[index].onClick.AddListener(() => OnClick_Character(capturedIndex));
         }
 
+        Btn_NickName.onClick.AddListener(OnClick_NickName);
         Btn_Close.onClick.AddListener(OnClick_Close);
     }
 
@@ -50,7 +52,6 @@ public class Popup_SelectCharacter : UIElement
     {
         SoundManager.Instance.StartSFX("ButtonClick");
 
-        // 모든 선택 비활성화
         for (int index = 0; index < Btn_Characters.Length; ++index)
         {
             Btn_Characters[index].transform.GetChild(0).gameObject.SetActive(false);
@@ -61,12 +62,14 @@ public class Popup_SelectCharacter : UIElement
         Btn_Characters[num].transform.GetChild(0).gameObject.SetActive(true);
 
         UIManager.Instance.Refresh();
-
-        // 데이터 저장
         DataManager.Instance.SaveData();
-
-        // 뒤끝 저장
         BackendManager.Instance.SaveData();
+    }
+
+    private void OnClick_NickName()
+    {
+        SoundManager.Instance.StartSFX("ButtonClick");
+        UIManager.Instance.Open<Popup_NickName>(UI.Popup, "Prefabs/UI/Popup/Popup_NickName");
     }
 
     private void OnClick_Close()

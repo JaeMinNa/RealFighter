@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2684872242881691071
 RectTransform:
   m_ObjectHideFlags: 0
@@ -463,6 +463,7 @@ MonoBehaviour:
   m_Text: {fileID: 8687737771795215910}
   m_InputField: {fileID: 2787326034888767338}
   Btn_Ok: {fileID: 3052225434907201095}
+  Btn_Close: {fileID: 5180306058612448678}
 --- !u!1 &3785522662402129830
 GameObject:
   m_ObjectHideFlags: 0
@@ -718,8 +719,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uD55C\uBC88 \uC124\uC815\uD55C \uB2C9\uB124\uC784\uC740 \uBCC0\uACBD\uD560
-    \uC218 \uC5C6\uC2B5\uB2C8\uB2E4."
+  m_text: "\uB2C9\uB124\uC784\uC740 \uC5B8\uC81C\uB4E0\uC9C0 \uBCC0\uACBD\uD560 \uC218
+    \uC788\uC2B5\uB2C8\uB2E4."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b47e6dda10077cd478e199b032893946, type: 2}
   m_sharedMaterial: {fileID: 8009923162452323068, guid: b47e6dda10077cd478e199b032893946, type: 2}
@@ -1532,7 +1533,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: NickName
+  m_text: "\uB2C9\uB124\uC784\uC744 \uC785\uB825\uD558\uC138\uC694."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b47e6dda10077cd478e199b032893946, type: 2}
   m_sharedMaterial: {fileID: 8009923162452323068, guid: b47e6dda10077cd478e199b032893946, type: 2}

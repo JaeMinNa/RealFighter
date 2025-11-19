@@ -175,7 +175,6 @@ public class DataManager : Singleton<DataManager>
         // Contents 기본값 설정
         UserData_Contents userData_Contents = new UserData_Contents()
         {
-            IsFirstLogin = true,
             LastLoginTime = Util.DateTimeNow,
             IsGotFreeGold = false,
             AdGoldBuyCount = 0,

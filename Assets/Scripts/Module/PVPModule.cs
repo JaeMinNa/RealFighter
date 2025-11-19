@@ -561,8 +561,6 @@ public class PVPModule : BattleModule
                     int damage = DamageUtil.GetSkillDamage(DataManager.Instance.GetMyUserData().UserHeroData.EquipHero, MySelectBtnNum);
                     if (MySelectBtnNum != EnemySelectBtnNum)
                         damage *= 2;
-                    else
-                        damage /= 2;
 
                     EnemyCurHp -= damage;
 
@@ -689,8 +687,6 @@ public class PVPModule : BattleModule
                     int damage = DamageUtil.GetSkillDamage(EnemyUserData.UserHeroData.EquipHero, EnemySelectBtnNum);
                     if (MySelectBtnNum != EnemySelectBtnNum)
                         damage *= 2;
-                    else
-                        damage /= 2;
 
                     CurHp -= damage;
                     ingameWindow.SetUI_Players();

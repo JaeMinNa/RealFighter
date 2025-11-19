@@ -63,6 +63,7 @@ public class BackendManager : Singleton<BackendManager>
             InsertData();
             SaveData();
             Login();
+            UpdateNickname(DataManager.Instance.GetMyUserData().UserCommonData.NickName);
         }
         else
         {
