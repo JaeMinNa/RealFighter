@@ -44,7 +44,7 @@ public static class ClientDef
     public static readonly string LOCALKEY_Push_FreeGold = string.Empty;
 
     // Tutorial
-    public static readonly int TutorialRewardGold = 3000;
+    public static readonly int TutorialRewardGold = 1000;
 }
 
 #region UserData
@@ -158,13 +158,7 @@ public enum TutorialStep
     LobbyChat_2,
     LobbyChat_3,
     LobbyChat_4,
-    ClickShop,
-
-    ShopChat_0,
-    ClickBuy,
-    ClickBuyOk,
-    ShopChat_1,
-    ShopChat_2,
+    LobbyChat_5,
 
     Max
 }
@@ -176,7 +170,6 @@ public class TutorialData
     public Vector2 MaskPos = new Vector2(0, 0);
     public Action Action_Mask = null;
     public string ChatText = string.Empty;
-    public Action Action_Chat = null;
     public bool IsUp = false;
     public bool IsDown = false;
 }

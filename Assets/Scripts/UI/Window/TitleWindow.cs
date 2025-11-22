@@ -8,6 +8,8 @@ public class TitleWindow : UIElement
     [SerializeField] private Button Btn_Start = null;
     #endregion
 
+    private bool m_IsClickStart = false;
+
     #region Override Method
     public override void Init()
     {     
@@ -31,6 +33,10 @@ public class TitleWindow : UIElement
     #region Button
     private async void OnClick_Start()
     {
+        if (m_IsClickStart)
+            return;
+
+        m_IsClickStart = true;
         SoundManager.Instance.StartSFX("ButtonClick");
 
         if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 1)

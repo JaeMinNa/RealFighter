@@ -8,17 +8,13 @@ using UnityEngine.UI;
 public class TutorialMask : UIElement
 {
     #region Cahsed Object
-    [SerializeField] private GameObject Obj_Mask = null;
     [SerializeField] private Button Btn_Mask = null;
+    [SerializeField] private GameObject Obj_Mask = null;
     [SerializeField] private GameObject Obj_ArrowUp = null;
     [SerializeField] private GameObject Obj_ArrowDown = null;
     [SerializeField] private GameObject Obj_Chat = null;
     [SerializeField] private Text Text_Chat = null;
-    [SerializeField] private Button Btn_Chat = null;
 
-    #endregion
-
-    #region Member Property
     #endregion
 
     #region Unity Method
@@ -81,11 +77,6 @@ public class TutorialMask : UIElement
     {
         Text_Chat.text = "";
         Text_Chat.DOText(text, 1f, true).SetUpdate(true);
-    }
-
-    public void SetButtonChat(Action action)
-    {
-        Btn_Chat.onClick.AddListener(() => action?.Invoke());
     }
     #endregion
 }

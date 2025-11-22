@@ -71,34 +71,4 @@ public class TutorialController : MonoBehaviour
         popup.OnClick_Home();
     }
     #endregion
-
-    #region Lobby_1
-    public async void OnClick_Shop()
-    {
-        if(m_LobbyWindow == null)
-        {
-            // IngameWindow 가져올 때 까지 대기
-            await UniTask.WaitUntil(() => UIManager.Instance.GetOpened<LobbyWindow>() != null);
-            m_LobbyWindow = UIManager.Instance.GetOpened<LobbyWindow>();
-        }
-
-        m_LobbyWindow.OnClick_Shop();
-    }
-
-    public async UniTask OnClick_Buy()
-    {
-        await UniTask.WaitUntil(() => UIManager.Instance.GetOpened<Popup_Shop>() != null);
-        var popup = UIManager.Instance.GetOpened<Popup_Shop>();
-
-        popup.OnClick_Buy_Hero(0);
-    }
-
-    public async UniTask OnClick_BuyOk()
-    {
-        await UniTask.WaitUntil(() => UIManager.Instance.GetOpened<Popup_System>() != null);
-        var popup = UIManager.Instance.GetOpened<Popup_System>();
-
-        popup.OnClick_OK();
-    }
-    #endregion
 }

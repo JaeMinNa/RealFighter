@@ -61,8 +61,8 @@ public class LobbyWindow : UIElement
             await TutorialManager.Instance.StartTutorial(TutorialStep.LobbyChat_0);
         else if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 2)
             await TutorialManager.Instance.StartTutorial(TutorialStep.LobbyChat_2);
-        else if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 3)
-            await TutorialManager.Instance.StartTutorial(TutorialStep.LobbyChat_4);
+        //else if (DataManager.Instance.GetMyUserData().UserContentsData.TutorialIndex == 3)
+        //    await TutorialManager.Instance.StartTutorial(TutorialStep.LobbyChat_4);
     }
 
     public override void OnRefresh()
