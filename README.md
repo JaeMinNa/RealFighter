@@ -940,7 +940,6 @@ public void SchedulePushNotification(LocalPushType pushType, string title, strin
 }
 ```
 <br/>
-<br/>
 ​
 - 로컬 푸시 취소 기능 구현
 ```C#
@@ -965,7 +964,6 @@ public void CancelPushNotification(LocalPushType pushType)
     Debug.LogWarning("Complete Cancel to Push Notification.");
 }
 ```
-<br/>
 <br/>
 
 ### 8. 튜토리얼 구현
