@@ -30,6 +30,8 @@ public class LobbyWindow : UIElement
     [SerializeField] private Button Btn_Hero = null;
     [SerializeField] private Button Btn_Shop = null;
     [SerializeField] private Button Btn_Ranking = null;
+    [SerializeField] private Button Btn_Mission = null;
+    [SerializeField] private Button Btn_Clan = null;
     #endregion
 
     #region Override Method
@@ -40,6 +42,8 @@ public class LobbyWindow : UIElement
         Btn_Character.onClick.AddListener(OnClick_Character);
         Btn_Hero.onClick.AddListener(OnClick_Hero);
         Btn_Shop.onClick.AddListener(OnClick_Shop);
+        Btn_Mission.onClick.AddListener(OnClick_Mission);
+        Btn_Clan.onClick.AddListener(OnClick_Clan);
         Btn_Ranking.onClick.AddListener(OnClick_Ranking);
         Btn_Setting.onClick.AddListener(OnClick_Setting);
         Btn_PVP.onClick.AddListener(OnClick_PVP);
@@ -162,6 +166,26 @@ public class LobbyWindow : UIElement
     {
         SoundManager.Instance.StartSFX("ButtonClick");
         UIManager.Instance.Open<Popup_Rank>(UI.Popup, "Prefabs/UI/Popup/Popup_Rank");
+    }
+
+    private void OnClick_Mission()
+    {
+        SoundManager.Instance.StartSFX("ButtonClick");
+        UIManager.Instance.OpenSystemPopup(new MessageData
+        {
+            Type = PopupType.OkOnly,
+            Message = "업데이트 예정입니다.",
+        });
+    }
+
+    private void OnClick_Clan()
+    {
+        SoundManager.Instance.StartSFX("ButtonClick");
+        UIManager.Instance.OpenSystemPopup(new MessageData
+        {
+            Type = PopupType.OkOnly,
+            Message = "업데이트 예정입니다.",
+        });
     }
 
     private void OnClick_Setting()

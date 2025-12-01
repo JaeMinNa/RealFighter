@@ -12,6 +12,10 @@ public class Popup_Setting : UIElement
     [SerializeField] private Button Btn_SFX = null;
     [SerializeField] private GameObject Obj_SFXOn = null;
     [SerializeField] private GameObject Obj_SFXOff = null;
+    [SerializeField] private Button Btn_Language = null;
+    [SerializeField] private Button Btn_LanguageChange = null;
+    [SerializeField] private Button Btn_About = null;
+    [SerializeField] private Button Btn_Support = null;
     [SerializeField] private Button Btn_Cancel = null;
     [SerializeField] private Button Btn_DeleteData = null;
     [SerializeField] private Button Btn_Exit = null;
@@ -23,6 +27,10 @@ public class Popup_Setting : UIElement
     {
         Btn_BGM.onClick.AddListener(OnClick_BGM);
         Btn_SFX.onClick.AddListener(OnClick_SFX);
+        Btn_Language.onClick.AddListener(OnClick_Language);
+        Btn_LanguageChange.onClick.AddListener(OnClick_Language);
+        Btn_About.onClick.AddListener(OnClick_About);
+        Btn_Support.onClick.AddListener(OnClick_Support);
         Btn_Cancel.onClick.AddListener(OnClick_Cancel);
         Btn_DeleteData.onClick.AddListener(OnClick_DeleteData);
         Btn_Exit.onClick.AddListener(OnClick_Exit);
@@ -123,6 +131,36 @@ public class Popup_Setting : UIElement
             SetSFX(false);
         else
             SetSFX(true);
+    }
+
+    private void OnClick_Language()
+    {
+        SoundManager.Instance.StartSFX("ButtonClick");
+        UIManager.Instance.OpenSystemPopup(new MessageData
+        {
+            Type = PopupType.OkOnly,
+            Message = "업데이트 예정입니다.",
+        });
+    }
+
+    private void OnClick_About()
+    {
+        SoundManager.Instance.StartSFX("ButtonClick");
+        UIManager.Instance.OpenSystemPopup(new MessageData
+        {
+            Type = PopupType.OkOnly,
+            Message = "업데이트 예정입니다.",
+        });
+    }
+
+    private void OnClick_Support()
+    {
+        SoundManager.Instance.StartSFX("ButtonClick");
+        UIManager.Instance.OpenSystemPopup(new MessageData
+        {
+            Type = PopupType.OkOnly,
+            Message = "업데이트 예정입니다.",
+        });
     }
 
     private void OnClick_Cancel()
