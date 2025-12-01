@@ -23,7 +23,7 @@
  - Mobile Notifications를 이용한 로컬 푸시 구현
  - TotorialManager를 사용한 깔끔한 튜토리얼 구현
  - 서버를 직접 구현하지 않고, 멀티 플레이 구현
- - 깔끔한 클라이언트 코드 구조
+ - 실무 코드 스타일을 적용한 구조적이고 일관된 코드 작성
 <br/>
 
 ## ⚙️ Environment
@@ -70,12 +70,13 @@
 
 ## ✏️ 구현 기능
 
-### 1. 멀티 대전 입장
-<img src="https://github.com/user-attachments/assets/ca915275-4091-425c-84de-1c4774e1dbed" width="50%"/>
+### 1. UIManager
+<img src="https://github.com/user-attachments/assets/e37abeea-9c4a-46a7-8b04-b6270da7d7cd" width="50%"/>
 
 #### 구현 이유
-- PUN2 멀티 서버 연결
-- PVP 시작 전, 대기방 구현
+- 프로젝트의 UI를 체계적으로 관리하기 위해
+- 유지보수성과 확장성을 극대화하기 위해
+- 게임의 규모가 커질수록 UI 요소를 개별적으로 제어하기 힘들기 때문에
 
 #### 구현 방법
 - NetworkManager 생성 : 서버 접속, Room 생성 및 참가 관리
@@ -137,43 +138,60 @@ public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
 - 입력한 string 데이터를 송수신
 
 #### 구현 방법
-- RPC 함수를 통해, 모든 Player가 동시에 함수 실행
+- UIElement
 ```C#
-private void SendChat()
+using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
+using UnityEngine;
+
+public abstract class UIElement : MonoBehaviour
 {
-    if (_photonView.IsMine)
+    public string UIName = string.Empty;
+    public RectTransform RectTransform;
+    public UI UIParent;
+
+    // 초기화
+    public abstract void Init();
+    // UI가 열릴 때 호출
+    public abstract void OnOpen(List<object> Args);
+    // UI가 닫힐 때 호출
+    public abstract void OnClose();
+    // UI 갱신
+    public abstract void OnRefresh();
+
+    #region Async
+    public virtual async UniTask InitAsync()
     {
-        string chat = PhotonNetwork.NickName + " : " + _networkManager.ChatInputText.text;
-        _photonView.RPC("ChatRPC", RpcTarget.All, chat);
-        _networkManager.ChatInputText.text = "";
+        await UniTask.Yield();
     }
+
+    public virtual async UniTask OnOpenAsync(List<object> Args)
+    {
+        await UniTask.Yield();
+    }
+
+    public virtual async UniTask OnCloseAsync()
+    {
+        await UniTask.Yield();
+    }
+
+    public virtual async UniTask OpenAction()
+    {
+        await UniTask.Yield();
+    }
+
+    public virtual async UniTask CloseAction()
+    {
+        await UniTask.Yield();
+    }
+    #endregion
 }
+```
+<br/>
 
-[PunRPC]
-public void ChatRPC(string str)
-{
-    bool isInput = false;
+- UIManager
+```C#
 
-    for (int i = 0; i < _chatTexts.Length; i++)
-    {
-        if (_chatTexts[i].text == "")
-        {
-            isInput = true;
-            _chatTexts[i].text = str;
-            break;
-        }
-    }
-
-    if (!isInput)
-    {
-        for (int i = 1; i < _chatTexts.Length; i++)
-        {
-            _chatTexts[i - 1].text = _chatTexts[i].text;
-        }
-
-        _chatTexts[_chatTexts.Length - 1].text = str;
-    }
-}
 ```
 <br/>
 
