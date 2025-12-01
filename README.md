@@ -353,7 +353,7 @@ public override void OnOpen(List<object> Args)
 
 ### 3. Photon을 이용한 멀티 플레이 구현
 <p align="center">
-  <img src="github.com/user-attachments/assets/acf17504-67c4-405c-9ca6-ee35ce4e7c47" width="49%"/>
+  <img src="https://github.com/user-attachments/assets/acf17504-67c4-405c-9ca6-ee35ce4e7c47" width="49%"/>
   <img src="https://github.com/user-attachments/assets/493a5f77-5be8-4938-ba49-e5765738ac92" width="49%"/>
 </p>
 
