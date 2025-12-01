@@ -69,7 +69,7 @@
 
 ## ✏️ 구현 기능
 
-### 1. UIManager
+### 1. UIManager 구현
 <img src="https://github.com/user-attachments/assets/e37abeea-9c4a-46a7-8b04-b6270da7d7cd" width="50%"/>
 
 #### 구현 이유
