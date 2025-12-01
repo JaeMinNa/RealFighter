@@ -898,9 +898,8 @@ public enum LocalPushType
 }
 ```
 <br/>
-​
-- 로컬 푸시 예약 기능 구현
 
+- 로컬 푸시 예약 기능 구현
 ```C#
 public void SchedulePushNotification(LocalPushType pushType, string title, string message, DateTime scheduleTime)
 {
@@ -941,9 +940,8 @@ public void SchedulePushNotification(LocalPushType pushType, string title, strin
 }
 ```
 <br/>
-​
+
 - 로컬 푸시 취소 기능 구현
-  
 ```C#
 public void CancelPushNotification(LocalPushType pushType)
 {
