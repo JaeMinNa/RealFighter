@@ -901,69 +901,69 @@ public enum LocalPushType
 ​
 - 로컬 푸시 예약 기능 구현
 ```C#
-    public void SchedulePushNotification(LocalPushType pushType, string title, string message, DateTime scheduleTime)
+public void SchedulePushNotification(LocalPushType pushType, string title, string message, DateTime scheduleTime)
+{
+    // 예약 시간이 현재보다 미래인지 확인
+    if (scheduleTime <= Util.DateTimeNow)
     {
-        // 예약 시간이 현재보다 미래인지 확인
-        if (scheduleTime <= Util.DateTimeNow)
-        {
-            Debug.LogWarning("The time is earlier or equal to the current time. Please enter a valid future time.");
-            return;
-        }
-
-        try
-        {
-            // Android: 알림 객체 생성 및 설정
-            var notification = new AndroidNotification();
-            notification.Title = title;
-            notification.Text = message;
-            notification.FireTime = scheduleTime;
-            notification.LargeIcon = "icon_0";
-            notification.SmallIcon = "icon_1";
-            notification.ShowInForeground = true;
-            string channelId = "my_channel_id";
-
-            int pushCode = AndroidNotificationCenter.SendNotification(notification, channelId);
-
-            switch (pushType)
-            {
-                case LocalPushType.FreeGold:
-                    PlayerPrefs.SetInt(ClientDef.LOCALKEY_Push_FreeGold, pushCode);
-                    break;
-
-                default:
-                    break;
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning("푸시알람 예약 중 오류 발생: " + e.ToString());
-        }
+        Debug.LogWarning("The time is earlier or equal to the current time. Please enter a valid future time.");
+        return;
     }
-```
-<br/>
-​
-- 로컬 푸시 취소 기능 구현
-```C#
-    public void CancelPushNotification(LocalPushType pushType)
+
+    try
     {
-        int pushCode = 0;
+        // Android: 알림 객체 생성 및 설정
+        var notification = new AndroidNotification();
+        notification.Title = title;
+        notification.Text = message;
+        notification.FireTime = scheduleTime;
+        notification.LargeIcon = "icon_0";
+        notification.SmallIcon = "icon_1";
+        notification.ShowInForeground = true;
+        string channelId = "my_channel_id";
+
+        int pushCode = AndroidNotificationCenter.SendNotification(notification, channelId);
+
         switch (pushType)
         {
             case LocalPushType.FreeGold:
-                pushCode = PlayerPrefs.GetInt(ClientDef.LOCALKEY_Push_FreeGold, 0);
+                PlayerPrefs.SetInt(ClientDef.LOCALKEY_Push_FreeGold, pushCode);
                 break;
 
             default:
                 break;
         }
-
-        if (pushCode == 0)
-            return;
-
-        AndroidNotificationCenter.CancelScheduledNotification(pushCode);
-
-        Debug.LogWarning("Complete Cancel to Push Notification.");
     }
+    catch (Exception e)
+    {
+        Debug.LogWarning("푸시알람 예약 중 오류 발생: " + e.ToString());
+    }
+}
+```
+<br/>
+​
+- 로컬 푸시 취소 기능 구현
+```C#
+public void CancelPushNotification(LocalPushType pushType)
+{
+    int pushCode = 0;
+    switch (pushType)
+    {
+        case LocalPushType.FreeGold:
+            pushCode = PlayerPrefs.GetInt(ClientDef.LOCALKEY_Push_FreeGold, 0);
+            break;
+
+        default:
+            break;
+    }
+
+    if (pushCode == 0)
+        return;
+
+    AndroidNotificationCenter.CancelScheduledNotification(pushCode);
+
+    Debug.LogWarning("Complete Cancel to Push Notification.");
+}
 ```
 <br/>
 
