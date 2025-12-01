@@ -22,6 +22,7 @@
  - CSV파일은 이용한 금칙어 적용
  - Mobile Notifications를 이용한 로컬 푸시 구현
  - TotorialManager를 사용한 깔끔한 튜토리얼 구현
+ - 서버를 직접 구현하지 않고, 멀티 플레이 구현
 <br/>
 
 ## ⚙️ Environment
