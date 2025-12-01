@@ -44,16 +44,16 @@
 <br/>
 
 ## 🔳 와이어 프레임
-![image](https://github.com/user-attachments/assets/0099b12e-d1b4-4eeb-bbde-5fdb65517eed)
+![image](https://github.com/user-attachments/assets/09923004-558f-4711-81ee-6829d915d297)
 
 
 ## 🧩 클라이언트 구조
 
-### GameManager
-![image](https://github.com/user-attachments/assets/38eb976c-8e82-4986-9e37-44602d08803a)
+### Managers
+![image](https://github.com/user-attachments/assets/580f4e1e-c8da-431b-afe0-315b241640d5)
 
-### Enemy
-![image](https://github.com/user-attachments/assets/5a388a6d-9ddf-48c5-be22-65edad0331ef)
+### 
+![image]()
 
 
 ## ✏️ 구현 기능
