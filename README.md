@@ -14,6 +14,16 @@
  - 개발 기간 : 25.08.12 ~ 25.11.12
 <br/>
 
+## 🎯 개발 목표
+ - Photon을 사용한 실시간 PVP 구현
+ - 뒤끝서버를 사용한 랭킹 구현
+ - 구글 애드몹 광고 구현
+ - UIManager를 사용한 깔끔한 UI 구현
+ - CSV파일은 이용한 금칙어 적용
+ - Mobile Notifications를 이용한 로컬 푸시 구현
+ - TotorialManager를 사용한 깔끔한 튜토리얼 구현
+<br/>
+
 ## ⚙️ Environment
 
 - `Unity 6000.0.40f1`
