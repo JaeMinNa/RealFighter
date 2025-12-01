@@ -23,6 +23,7 @@
  - Mobile Notifications를 이용한 로컬 푸시 구현
  - TotorialManager를 사용한 깔끔한 튜토리얼 구현
  - 서버를 직접 구현하지 않고, 멀티 플레이 구현
+ - 깔끔한 클라이언트 코드 구조
 <br/>
 
 ## ⚙️ Environment
