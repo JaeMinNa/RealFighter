@@ -692,7 +692,7 @@ public List<RankData> GetRankDataList()
 <br/>
 
 ### 6. Google Admob 광고 구현
-<img src="https://github.com/user-attachments/assets/d51a94bc-5be0-4812-b0ed-7c9dfd3ee361" width="50%"/> 
+<img src="https://github.com/user-attachments/assets/5351db87-58f9-4f79-999d-e2a5df0e39c7" width="50%"/> 
 
 #### 구현 이유
 - 유저들이 광고를 시청함으로써, 게임의 수익화를 실현하기 위해
