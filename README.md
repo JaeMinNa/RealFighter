@@ -55,7 +55,7 @@
 </p>
 <br/>
 
-## 🔳 와이어 프레임
+## 🔳 초기 와이어프레임
 ![image](https://github.com/user-attachments/assets/09923004-558f-4711-81ee-6829d915d297)
 
 
