@@ -19,9 +19,8 @@
  - 뒤끝서버를 사용한 랭킹 구현
  - 구글 애드몹 광고 구현
  - UIManager를 사용한 깔끔한 UI 구현
- - CSV파일은 이용한 금칙어 적용
+ - CSV파일을 이용한 금칙어 적용
  - Mobile Notifications를 이용한 로컬 푸시 구현
- - TotorialManager를 사용한 깔끔한 튜토리얼 구현
  - 서버를 직접 구현하지 않고, 멀티 플레이 구현
  - 실무 코드 스타일을 적용한 구조적이고 일관된 코드 작성
 <br/>
@@ -79,56 +78,192 @@
 - 게임의 규모가 커질수록 UI 요소를 개별적으로 제어하기 힘들기 때문에
 
 #### 구현 방법
-- NetworkManager 생성 : 서버 접속, Room 생성 및 참가 관리
+- 프로젝트 내 모든 UI 오브젝트가 공통적으로 가져야 할 동작을 추상화(Abstract)한 베이스 클래스
 ```C#
-public void Connect()
+public abstract class UIElement : MonoBehaviour
 {
-    PhotonNetwork.ConnectUsingSettings();
-}
+    public string UIName = string.Empty;
+    public RectTransform RectTransform;
+    public UI UIParent;
 
-public void JoinRandomOrCreateRoom()
-{
-    PhotonNetwork.JoinRandomOrCreateRoom(expectedMaxPlayers : 2, roomOptions : new RoomOptions() { MaxPlayers = 2 });
-}
+    // 초기화
+    public abstract void Init();
+    // UI가 열릴 때 호출
+    public abstract void OnOpen(List<object> Args);
+    // UI가 닫힐 때 호출
+    public abstract void OnClose();
+    // UI 갱신
+    public abstract void OnRefresh();
 
-public override void OnJoinedRoom()
-{
-    Debug.Log("방참가완료");
-    PhotonNetwork.Instantiate("PUN2/Room/RoomController", transform.position, Quaternion.identity);
-}
-``` 
-​<br/>
-
-- RoomController 생성 : OnPhotonSerializeView 함수를 통해, Room 데이터를 송수신
-<img src="https://github.com/user-attachments/assets/4188147c-cc8d-45b1-a50b-b33c786f97c0" width="50%"/>
-<br/>
-<br/>
-
-```C#
-public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-{
-    if (stream.IsWriting)
+    #region Async
+    public virtual async UniTask InitAsync()
     {
-        stream.SendNext(GameManager.I.DataManager.PlayerData.KoreaTag);
-        stream.SendNext(GameManager.I.DataManager.PlayerData.Level);
-        stream.SendNext(GameManager.I.DataManager.PlayerData.CharacterRank.ToString());
-        stream.SendNext(GameManager.I.DataManager.GameData.UserName);
-        stream.SendNext(GameManager.I.DataManager.GameData.RankPoint);
-        stream.SendNext(GameManager.I.DataManager.PlayerData.Star);
-        stream.SendNext(GameManager.I.DataManager.PlayerData.Tag);
+        await UniTask.Yield();
+    }
+
+    public virtual async UniTask OnOpenAsync(List<object> Args)
+    {
+        await UniTask.Yield();
+    }
+
+    public virtual async UniTask OnCloseAsync()
+    {
+        await UniTask.Yield();
+    }
+
+    public virtual async UniTask OpenAction()
+    {
+        await UniTask.Yield();
+    }
+
+    public virtual async UniTask CloseAction()
+    {
+        await UniTask.Yield();
+    }
+    #endregion
+}
+```
+<br/>
+
+- 캔버스들을 자동으로 찾아 Dictionary에 저장하여, UI 계층 구조를 명확하게 하고 정렬 순서 충돌 방지
+```C#
+public void SetUIRoot(GameObject Obj)
+{
+    m_UIRootObjects.Clear();
+
+    m_UIRootObjects.Add(UI.Root, Obj.GetComponent<Canvas>());
+
+    Transform Panel = null;
+    Panel = Obj.transform.Find("Background");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.BackGround, Panel.GetComponent<Canvas>());
+
+    Panel = Obj.transform.Find("Main");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.Main, Panel.GetComponent<Canvas>());
+
+    Panel = Obj.transform.Find("Top");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.Top, Panel.GetComponent<Canvas>());
+
+    Panel = Obj.transform.Find("Popup");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.Popup, Panel.GetComponent<Canvas>());
+
+    Panel = Obj.transform.Find("Mask");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.Mask, Panel.GetComponent<Canvas>());
+
+    Panel = Obj.transform.Find("Fade");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.Fade, Panel.GetComponent<Canvas>());
+
+    Panel = Obj.transform.Find("TouchBlock");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.TouchBlock, Panel.GetComponent<Canvas>());
+
+    m_EventSystem = Obj.transform.Find("EventSystem").GetComponent<EventSystem>();
+
+    SwitchRoot();
+}
+```
+<br/>
+
+- 제네릭 기반의 UI 동적 로딩
+```C#
+public T Open<T>(UI Depth, string PrefabPath, List<object> Args = null, bool SetFirst = false, bool IsBundle = false) where T : UIElement
+{
+    if (m_UIDictionary.ContainsKey(typeof(T)))
+    {
+        if (m_UIDictionary[typeof(T)] != null)
+        {
+            m_UIDictionary[typeof(T)].gameObject.SetActive(true);
+            m_UIDictionary[typeof(T)].OnOpen(Args);
+            OnOpen?.Invoke(Depth, m_UIDictionary[typeof(T)]);
+            return m_UIDictionary[typeof(T)] as T;
+        }
+        else
+        {
+            m_UIDictionary.TryRemove(typeof(T), out _);
+        }
+    }
+
+    GameObject prefab;
+
+    if (IsBundle)
+    {
+        PrefabPath = $"Prefab/{PrefabPath}";
+        string AssetName = PrefabPath.Split('/').Last();
+        prefab = ResourceLoader.LoadAsset<GameObject>(PrefabPath, AssetName);
     }
     else
     {
-        _roomEnemyCharacterName = (string)stream.ReceiveNext();
-        _roomEnemyCharacterLevel = (int)stream.ReceiveNext();
-        _roomEnemyCharacterRank = (string)stream.ReceiveNext();
-        _roomEnemyUserName = (string)stream.ReceiveNext();
-        _roomEnemyRankPoint = (int)stream.ReceiveNext();
-        _roomEnemyCharacterStar = (int)stream.ReceiveNext();
-        _roomEnemyCharacterKorTag = (string)stream.ReceiveNext();
+        prefab = ResourceLoader.LoadAssetResources<GameObject>(PrefabPath);
+    }
+
+    if (prefab == null)
+        return null;
+
+    GameObject obj = Instantiate(prefab, GetRootTransform(Depth));
+    T comp = obj.GetComponent<T>();
+
+    if (comp == null)
+        return null;
+
+    m_UIDictionary.TryAdd(typeof(T), comp);
+    m_UIDictionary[typeof(T)].UIParent = Depth;
+    m_UIDictionary[typeof(T)].UIName = PrefabPath;
+    m_UIDictionary[typeof(T)].RectTransform = obj.GetComponent<RectTransform>();
+
+    if (SetFirst)
+        m_UIDictionary[typeof(T)].RectTransform.SetAsFirstSibling();
+
+    m_UIDictionary[typeof(T)].Init();
+    m_UIDictionary[typeof(T)].OnOpen(Args);
+    OnOpen?.Invoke(Depth, m_UIDictionary[typeof(T)]);
+
+    return comp;
+}
+```
+<br/>
+
+- UI 닫기 기능 관리
+```C#
+public void Close<T>(bool IsDestroy = true) where T : UIElement
+{
+    if (m_UIDictionary.ContainsKey(typeof(T)) && m_UIDictionary[typeof(T)] != null)
+    {
+        UIElement temp = m_UIDictionary[typeof(T)];
+        temp.OnClose();
+
+        if (IsDestroy)
+        {
+            m_UIDictionary.TryRemove(typeof(T), out _);
+            Destroy(temp.gameObject);
+        }
+        else
+            temp.gameObject.SetActive(false);
     }
 }
 ```
+<br/>
+
+- UI Refresh 시스템
+```C#
+ public void Refresh()
+ {
+     foreach (var Elements in m_UIDictionary)
+     {
+         if (Elements.Value != null && Elements.Value.gameObject.activeInHierarchy)
+             Elements.Value.OnRefresh();
+     }
+ }
+```
+<br/>
+
+- UI를 레이어별로 구분하여 UIManager가 UI를 정확한 우선순위와 규칙에 따라 배치할 수 있도록 Root UI 구조를 설계
+<img src="https://github.com/user-attachments/assets/1cee13a4-3d1a-4adb-a381-8b8ee7ef2b05" width="50%"/>
+<br/>
 <br/>
 
 ### 2. PUN2 멀티 채팅 구현
