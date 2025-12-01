@@ -248,7 +248,7 @@ public void Close<T>(bool IsDestroy = true) where T : UIElement
 ```
 <br/>
 
-- UI Refresh 시스템
+- UI 전체 자동 업데이트를 위한 Refresh 기능
 ```C#
  public void Refresh()
  {
@@ -266,124 +266,202 @@ public void Close<T>(bool IsDestroy = true) where T : UIElement
 <br/>
 <br/>
 
-### 2. PUN2 멀티 채팅 구현
-<img src="https://github.com/user-attachments/assets/3c3123b6-2357-4c31-8c5c-70267dd60e79" width="50%"/>
+### 2. SystemPopup 구현
+<img src="https://github.com/user-attachments/assets/e890102f-a2c2-4371-9139-193bb282d0f6" width="50%"/>
 
 #### 구현 이유
-- 입력한 string 데이터를 송수신
+- 반복적으로 사용되는 공통 팝업 UI를 호출하기 위해
+- 일관된 팝업 생성 로직으로 UI 관리의 안정성을 높히기 위해
 
 #### 구현 방법
-- UIElement
+- SystemPopup 호출
 ```C#
-using Cysharp.Threading.Tasks;
-using System.Collections.Generic;
-using UnityEngine;
-
-public abstract class UIElement : MonoBehaviour
+public void OpenSystemPopup(MessageData Data)
 {
-    public string UIName = string.Empty;
-    public RectTransform RectTransform;
-    public UI UIParent;
-
-    // 초기화
-    public abstract void Init();
-    // UI가 열릴 때 호출
-    public abstract void OnOpen(List<object> Args);
-    // UI가 닫힐 때 호출
-    public abstract void OnClose();
-    // UI 갱신
-    public abstract void OnRefresh();
-
-    #region Async
-    public virtual async UniTask InitAsync()
-    {
-        await UniTask.Yield();
-    }
-
-    public virtual async UniTask OnOpenAsync(List<object> Args)
-    {
-        await UniTask.Yield();
-    }
-
-    public virtual async UniTask OnCloseAsync()
-    {
-        await UniTask.Yield();
-    }
-
-    public virtual async UniTask OpenAction()
-    {
-        await UniTask.Yield();
-    }
-
-    public virtual async UniTask CloseAction()
-    {
-        await UniTask.Yield();
-    }
-    #endregion
+    Open<Popup_System>(UI.Popup, "Prefabs/UI/Popup/Popup_System", new List<object> { Data });
 }
 ```
 <br/>
 
-- UIManager
+- Popup 유형을 enum으로 정의
 ```C#
+public enum PopupType
+{
+    None,
 
+    OkOnly,
+    OkCancel,
+
+    Max
+}
 ```
 <br/>
 
-### 3. PUN2 멀티 애니메이션 동기화
-<img src="https://github.com/user-attachments/assets/6baf68b3-0a0b-416c-924b-703abcb2b105" width="50%"/>
-
-#### 구현 이유
-- 멀티 PVP에서 애니메이션을 동기화
-
-#### 구현 방법
-- PhotonAnimatorView 컴포넌트 추가
-<img src="https://github.com/user-attachments/assets/05fb9546-1e0b-41c4-8435-0e27bb8e57a3" width="50%"/>
-<br/>
-<br/>
-
-- PhotonView 컴포넌트 추가 및 Observed Components에 PhotonAnimatorView 추가
-<img src="https://github.com/user-attachments/assets/caa1a31b-b577-4593-b510-28426f1ff30c" width="50%"/>
-<br/>
-<br/>
-
-- Synchronize Parameters에서 Bool Parameter를 Continuous 설정
-- Trigger Parameter의 경우, RPC 함수를 통해 동기화해야 하므로, Disabled로 설정
-<img src="https://github.com/user-attachments/assets/fe0ac5fd-96f7-44a6-8ec1-49d043f0c73a" width="50%"/>
-<br/>
-<br/>
-
-### 4. PUN2 멀티 전투 구현
-<img src="https://github.com/user-attachments/assets/eea1b5b6-0044-4df5-b82e-da66317591f7" width="50%"/>
-
-#### 구현 이유
-- 멀티 대전의 전투 시스템 구현을 위해
-
-#### 구현 방법
-- Weapon Collider를 활성화하는 함수 작성
-<img src="https://github.com/user-attachments/assets/30d10b39-db25-4103-8f9e-aacb0703196f" width="50%"/>
-<br/>
-<br/>
-
+- Popup 에 필요한 정보를 정의
 ```C#
-public void AttackColliderActive(float time)
+public class MessageData
 {
-	for (int i = 0; i < _weaponColliders.Length; i++)
-	{
-	    _weaponColliders[i].enabled = true;
-	}
-	
-	StartCoroutine(COAttackColliderInactive(time));
+    public PopupType Type;
+    public string Title;
+    public string Message;
+    public UnityAction OkAction;
 }
+```
+<br/>
 
-private IEnumerator COAttackColliderInactive(float time)
+- PopupType에 따른 UI 동적 구성 및 버튼 적용
+```C#
+public override void OnOpen(List<object> Args)
 {
-	yield return new WaitForSeconds(time);
-	
-	for (int i = 0; i < _weaponColliders.Length; i++)
-	{
-	    _weaponColliders[i].enabled = false;
-	}
+    if (Args.Count == 0)
+    {
+        Debug.LogWarning("MessageData is Null");
+        return;
+    }
+
+    MyData = Args[0] as MessageData;
+
+    if (!string.IsNullOrEmpty(MyData.Title))
+    {
+        Text_Title.text = MyData.Title;
+    }
+    else
+    {
+        Text_Title.text = "Notice";
+    }
+    
+    Text_Message.text = MyData.Message;
+
+    switch (MyData.Type)
+    {
+        case PopupType.OkOnly:
+            {
+                Btn_OK.gameObject.SetActive(true);
+                Btn_Cancel.gameObject.SetActive(false);
+            }
+            break;
+        case PopupType.OkCancel:
+            {
+                Btn_OK.gameObject.SetActive(true);
+                Btn_Cancel.gameObject.SetActive(true);
+            }
+            break;
+    }
+}
+```
+<br/>
+
+### 3. Photon을 이용한 멀티 플레이 구현
+<p align="center">
+  <img src="github.com/user-attachments/assets/acf17504-67c4-405c-9ca6-ee35ce4e7c47" width="49%"/>
+  <img src="https://github.com/user-attachments/assets/493a5f77-5be8-4938-ba49-e5765738ac92" width="49%"/>
+</p>
+
+#### 구현 이유
+- 서버를 직접 구축하지 않고도 실시간 멀티플레이 기능을 구현하기 위해
+- 서버리스(Serverless) 구조 기반의 게임을 개발하기 위해
+
+#### 구현 방법
+- OnPhotonSerializeView를 통한 프레임 단위 동기화로 마스터클라이언트에서 계산한 게임 상태값을 상대 플레이어에게 빠르게 전달
+- 실시간으로 데이터를 송수신해야하는 준비여부, 선택 스킬, 남은 턴 시간 데이터를 동기화 함
+```C#
+ public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+ {
+     if (m_pvpModule == null)
+     {
+         m_pvpModule = BattleModule.Instance as PVPModule;
+         if (m_pvpModule == null)
+             return;
+     }
+
+     // 데이터를 전송할 때
+     if (stream.IsWriting)
+     {
+         // Ingame Data
+         stream.SendNext(m_pvpModule.IsMyReady);
+         stream.SendNext(m_pvpModule.MySelectBtnNum);
+         stream.SendNext(PhotonNetwork.IsMasterClient? m_pvpModule.CurTime : 0);
+     }
+     // 데이터를 받을 때
+     else
+     {
+         // Ingame Data
+         m_pvpModule.IsEnemyReady = (bool)stream.ReceiveNext();
+         m_pvpModule.EnemySelectBtnNum = (int)stream.ReceiveNext();
+         float curTime = (float)stream.ReceiveNext();
+
+         if (!PhotonNetwork.IsMasterClient)
+             m_pvpModule.CurTime = curTime;
+     }
+ }
+```
+<br/>
+
+- 다른 클라이언트의 함수를 직접 호출하기 위해 RPC 함수 사용
+- RPC 함수로 실시간 이모티콘 전송 기능을 구현
+```C#
+[PunRPC]
+public void RPCPlayEmoticon(bool isLeft, int num)
+{
+    if (m_IngameWindow == null)
+        m_IngameWindow = UIManager.Instance.GetOpened<IngameWindow>();
+
+    if (m_IngameWindow != null)
+        m_IngameWindow.SetEmoticon(isLeft, num);
+}
+```
+<br/>
+
+### 4. 금칙어 적용
+<img src="https://github.com/user-attachments/assets/8650e8bd-839c-4ff8-9b9a-ee5ee70f5c0b" width="50%"/>
+
+#### 구현 이유
+- 부적절한 닉네임 사용을 제한하기 위해
+- 유지보수와 업데이트가 쉽기 때문에 CSV 파일 기반 금칙어 구현
+
+#### 구현 방법
+- CSV 파일로 관리되는 금칙어 목록을 읽어와 메모리에 로드
+```C#
+private void LoadBannedWords()
+{
+    if (m_BannedWords.Count > 0) return;
+
+    TextAsset csvFile = ResourceLoader.LoadAssetResources<TextAsset>("CSV/BannedWord/BannedWord");
+    if (csvFile == null)
+    {
+        Debug.LogError("금칙어 CSV 파일을 찾을 수 없습니다.");
+        return;
+    }
+
+    // 줄 단위로 분리
+    string[] lines = csvFile.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+    foreach (var line in lines)
+    {
+        string word = line.Trim();
+        if (!string.IsNullOrEmpty(word))
+        {
+            // 중복 방지
+            if (!m_BannedWords.Contains(word))
+                m_BannedWords.Add(word);
+        }
+    }
+
+    Debug.Log($"금칙어 {m_BannedWords.Count}개 로드 완료");
+}
+```
+<br/>
+
+- 금칙어가 포함되어 있는지 체크
+```C#
+private bool IsBannedNickName(string nickname)
+{
+    foreach (var banned in m_BannedWords)
+    {
+        if (nickname.Contains(banned, StringComparison.OrdinalIgnoreCase))
+            return true;
+    }
+    return false;
 }
 ```
 <br/>
