@@ -466,84 +466,11 @@ private bool IsBannedNickName(string nickname)
 ```
 <br/>
 
-- Animation Events 등록
-<img src="https://github.com/user-attachments/assets/04cffd69-7ba3-4f76-85e7-ee4d40f5b176" width="50%"/>
-<br/>
-<br/>
-
-- OnPhotonSerializeView 함수를 통해, 능력치 데이터 송수신
-```C#
-public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-{
-    // 데이터 보내기 (isMine == true)
-    if (stream.IsWriting)
-    {
-        stream.SendNext(GameManager.I.DataManager.PlayerData.Atk);
-        stream.SendNext(GameManager.I.DataManager.PlayerData.SkillAtk);
-        stream.SendNext(GameManager.I.DataManager.PlayerData.Def);
-    }
-    // 데이터 받기 (isMine == false)
-    else
-    {
-        Atk = (float)stream.ReceiveNext();
-        SkillAtk = (float)stream.ReceiveNext();
-        Def = (float)stream.ReceiveNext();
-    }
-}
-``` 
-​<br/>
-
-- RPC를 통해, 공격 애니메이션 실행
-```C#
-if (PhotonView.IsMine) PhotonView.RPC("PlayerAttackRPC", RpcTarget.AllViaServer);
-
-[PunRPC]
-public void PlayerAttackRPC()
-{
-    _anim.SetTrigger("Attack");
-}
-```
-<br/>
-
-- RPC를 통해, 넉백 구현
-```C#
-private void OnTriggerEnter(Collider other)
-{
-    if (other.gameObject.CompareTag("Player")
-    {
-	if (!_photonView.IsMine)
-	{
-	    _atk = _playerCharacter.Atk;
-	    other.GetComponent<PlayerCharacter>().PhotonView.RPC("RPCPlayerNuckback", RpcTarget.AllViaServer, _playerCharacter.transform.position, _atk);
-	}
-    }
-}
-
-[PunRPC]
-public void RPCPlayerNuckback(Vector3 attackPosition, float power)
-{
-    if (PhotonView.IsMine) PhotonView.RPC("PlayerHitRPC", RpcTarget.AllViaServer);
-    Vector3 dir = (transform.position - attackPosition).normalized;
-
-    if (PhotonView.IsMine) _rigidbody.velocity = new Vector3(dir.x, 0, dir.z) * (power - _playerData.Def);
-    else _rigidbody.velocity = new Vector3(dir.x, 0, dir.z) * (power - Def);
-
-    transform.LookAt(attackPosition);
-}
-
-[PunRPC]
-public void PlayerHitRPC()
-{
-    _anim.SetTrigger("Hit");
-}
-```
-<br/>
-
-### 5. 랭킹 구현
-<img src="https://github.com/user-attachments/assets/cfbc5009-0507-46f7-a827-3ff786e20206" width="50%"/>
+### 5. 뒤끝 서버를 이용한 랭킹 구현
+<img src="https://github.com/user-attachments/assets/ca5b51b5-cf98-40a8-a349-d212802c868f" width="50%"/>
 
 #### 구현 이유
-- 경쟁 심리를 이용해서 유저들이 더 게임을 플레이 하도록 하기 위해
+- 서버를 직접 구축하지 않고도 안정적이고 관리 가능한 랭킹 구현을 위해
 
 #### 구현 방법
 - 뒤끝 서버 설치 및 서버 접속
@@ -574,15 +501,15 @@ else
 public void InsertData()
 {
     Param param = GetUserDataParam();
-    BackendReturnObject bro = Backend.GameData.Insert("USER_DATA", param);
+    BackendReturnObject bro = Backend.GameData.Insert("USER_DATA", param); // USER_DATA 테이블 이름
 
     if (bro.IsSuccess())
     {
-        Debug.Log("데이터 추가를 성공했습니다");
+        Debug.LogWarning("뒤끝 서버 데이터 추가 성공!");
     }
     else
     {
-        Debug.Log("데이터 추가를 실패했습니다");
+        Debug.LogWarning("뒤끝 서버 데이터 추가 실패");
     }
 }
 
@@ -590,7 +517,9 @@ public void InsertData()
 private Param GetUserDataParam()
 {
     Param param = new Param();
-    param.Add("RankPoint", GameManager.I.DataManager.GameData.RankPoint);
+    param.Add("RankPoint", DataManager.Instance.GetMyUserData().UserCommonData.RankPoint);
+    param.Add("CharacterImg", DataManager.Instance.GetMyUserData().UserCommonData.Image);
+
     return param;
 }
 ```
@@ -603,59 +532,58 @@ private Param GetUserDataParam()
 
 - 랭킹 데이터 갱신
 ```C#
-// 데이터 테이블에 추가하는 함수
-private void UpdateMyRankData(int value)
+public void SaveMyRank()
 {
-	string rowInDate = string.Empty;
+    string rowInDate = string.Empty;
 
-	// 랭킹 데이터를 업데이트하려면 게임 데이터에서 사용하는 데이터의 inDate 값 필요
-	BackendReturnObject bro = Backend.GameData.GetMyData("USER_DATA", new Where());
-	
-	if (!bro.IsSuccess())
-	{
-	    Debug.LogError("랭킹 업데이트를 위한 데이터 조회 중 문제가 발생했습니다.");
-	    return;
-	}
-	
-	Debug.Log("랭킹 업데이트를 위한 데이터 조회에 성공했습니다.");
-	
-	if(bro.FlattenRows().Count > 0)
-	{
-	    rowInDate = bro.FlattenRows()[0]["inDate"].ToString();
-	}
-	else
-	{
-	    Debug.LogError("데이터가 존재하지 않습니다.");
-	}
-	
-	Param param = new Param()
-	{
-	    {"RankPoint",  value}
-	};
-	
-	// 해당 데이터테이블의 데이터를 갱신하고, 랭킹 데이터 정보 갱신
-	bro = Backend.URank.User.UpdateUserScore(RANK_UUID, "USER_DATA", rowInDate, param);
-	
-	if(bro.IsSuccess())
-	{
-	    Debug.Log("랭킹 등록에 성공했습니다.");
-	}
-	else
-	{
-	    Debug.LogError("랭킹 등록에 실패했습니다.");
-	}
+    // 랭킹 데이터를 업데이트하려면 게임 데이터에서 사용하는 데이터의 inDate 값 필요
+    BackendReturnObject bro = Backend.GameData.GetMyData("USER_DATA", new Where());
+
+    if (!bro.IsSuccess())
+    {
+        Debug.LogWarning("뒤끝 서버 랭킹 업데이트를 위한 데이터 조회 중 문제 발생");
+        return;
+    }
+
+    Debug.LogWarning("뒤끝 서버 랭킹 업데이트를 위한 데이터 조회 성공!");
+
+    if (bro.FlattenRows().Count > 0)
+    {
+        rowInDate = bro.FlattenRows()[0]["inDate"].ToString();
+    }
+    else
+    {
+        Debug.LogWarning("뒤끝 서버 랭킹 업데이트를 위한 데이터가 존재하지 않음");
+    }
+
+    Param param = new Param()
+    {
+        {"RankPoint",  DataManager.Instance.GetMyUserData().UserCommonData.RankPoint}
+    };
+
+    // 해당 데이터테이블의 데이터를 갱신하고, 랭킹 데이터 정보 갱신
+    bro = Backend.URank.User.UpdateUserScore(RANK_UUID, "USER_DATA", rowInDate, param);
+
+    if (bro.IsSuccess())
+    {
+        Debug.LogWarning("뒤끝 서버 랭킹 등록 성공!");
+    }
+    else
+    {
+        Debug.LogWarning("뒤끝 서버 랭킹 등록 실패");
+    }
 }
 ```
 <br/>
 
 - 뒤끝 서버 Json 데이터를 파싱해서 나의 랭킹 불러오기
 ```C#
-public void GetMyRank()
+public RankData GetMyRankData()
 {
-    // 내 랭킹 정보 불러오기
+    // 내 랭킹 정보 불러오기 
     BackendReturnObject bro = Backend.URank.User.GetMyRank(RANK_UUID);
 
-    if(bro.IsSuccess())
+    if (bro.IsSuccess())
     {
         try
         {
@@ -664,24 +592,38 @@ public void GetMyRank()
             // 받아온 데이터의 개수가 0 -> 데이터가 없음
             if (rankDataJson.Count <= 0)
             {
-                Debug.Log("나의 랭킹 데이터가 존재하지 않습니다.");
+                Debug.LogWarning("뒤끝 서버 나의 랭킹 데이터가 존재하지 않음");
+                return null;
+
             }
             else
             {
-                _rankPoint = int.Parse(rankDataJson[0]["score"].ToString());
-                _rank = int.Parse(rankDataJson[0]["rank"].ToString());
-                _userName = rankDataJson[0]["nickname"].ToString();
+                Debug.LogWarning("뒤끝 서버 나의 랭킹 조회 성공!");
+
+                RankData data = new RankData()
+                {
+                    NickName = rankDataJson[0]["nickname"].ToString(),
+                    Rank = int.Parse(rankDataJson[0]["rank"].ToString()),
+                    RankPoint = int.Parse(rankDataJson[0]["score"].ToString()),
+
+                    // 추가 항목 데이터
+                    Image = rankDataJson[0]["CharacterImg"].ToString()
+                };
+
+                return data;
             }
         }
         // 나의 랭킹 정보 JSON 데이터 파싱에 실패했을 때
         catch (System.Exception e)
         {
-            Debug.LogError(e);
+            Debug.LogWarning($"뒤끝 서버 나의 랭킹 데이터 파싱 실패 : {e}");
+            return null;
         }
     }
     else
     {
-        // 나의 랭킹 정보를 불러오는데 실패했을 때
+        Debug.LogWarning("뒤끝 서버 나의 랭킹 데이터 불러오기 실패");
+        return null;
     }
 }
 ```
@@ -689,328 +631,484 @@ public void GetMyRank()
 
 - 뒤끝 서버 Json 데이터를 파싱해서 유저 랭킹 불러오기
 ```C#
-private const int MAX_RANK_LIST = 10;
-
-public void GetRankList()
+public List<RankData> GetRankDataList()
 {
-    // 랭킹 테이블에 있는 유저의 offset ~ offset + limit 순위 랭킹 정보를 불러옴
-    BackendReturnObject bro = Backend.URank.User.GetRankList(RANK_UUID, MAX_RANK_LIST, 0);
+    int maxRankList = ClientDef.RankingCount;
 
-    if(bro.IsSuccess())
+    // 랭킹 테이블에 있는 유저의 offset ~ offset + limit 순위 랭킹 정보를 불러옴
+    BackendReturnObject bro = Backend.URank.User.GetRankList(RANK_UUID, maxRankList, 0);
+
+    if (bro.IsSuccess())
     {
-        // JSON 데이터 파싱 성공
         try
         {
-            Debug.Log("랭킹 조회에 성공했습니다.");
             JsonData rankDataJson = bro.FlattenRows();
 
             // 받아온 데이터의 개수가 0 -> 데이터가 없음
-            if(rankDataJson.Count <= 0)
+            if (rankDataJson.Count <= 0)
             {
-                Debug.Log("랭킹 데이터가 존재하지 않습니다.");
+                Debug.LogWarning("뒤끝 서버 랭킹 데이터가 존재하지 않음");
+
+                return null;
             }
             else
             {
+                Debug.LogWarning("뒤끝 서버 랭킹 조회 성공!");
+
+                List<RankData> rankData = new List<RankData>();
                 int rankCount = rankDataJson.Count;
 
-                // 받아온 rank 데이터의 숫자만큼 데이터 출력
-                for (int i = 0; i < rankCount; i++)
+                for (int index = 0; index < rankCount; ++index)
                 {
-                    _rankPoint = int.Parse(rankDataJson[i]["score"].ToString());
-                    _rank = int.Parse(rankDataJson[i]["rank"].ToString());
-                    _userName = rankDataJson[i]["nickname"].ToString();
+                    RankData data = new RankData()
+                    {
+                        NickName = rankDataJson[index]["nickname"].ToString(),
+                        Rank = int.Parse(rankDataJson[index]["rank"].ToString()),
+                        RankPoint = int.Parse(rankDataJson[index]["score"].ToString()),
+
+                        // 추가 항목 데이터
+                        Image = rankDataJson[index]["CharacterImg"].ToString()
+                    };
+
+                    rankData.Add(data);
                 }
-                // rankCount가 Max값만큼 존재하지 않을 때, 나머지 랭킹
-                for (int i = rankCount; i < MAX_RANK_LIST; i++)
-                {
-                    // 랭킹 데이터 비활성화
-                }
+
+                return rankData;
             }
         }
-        // JSON 데이터 파싱 실패
         catch (System.Exception e)
         {
-            Debug.LogError(e);
+            Debug.LogWarning($"뒤끝 서버 랭킹 데이터 파싱 실패 : {e}");
+            return null;
         }
     }
     else
     {
-        Debug.LogError("랭킹 조회에 실패했습니다.");
+        Debug.LogWarning("뒤끝 서버 랭킹 데이터 불러오기 실패");
+        return null;
     }
 }
 ```
 <br/>
 
-### 6. Admob 광고 구현
-<img src="https://github.com/user-attachments/assets/cee62c9f-3df8-4753-bbd6-969521b3afab" width="50%"/> 
+### 6. Google Admob 광고 구현
+<img src="https://github.com/user-attachments/assets/d51a94bc-5be0-4812-b0ed-7c9dfd3ee361" width="50%"/> 
 
 #### 구현 이유
-- 유저들이 광고를 시청하면 Coin을 얻게하기 위해
 - 유저들이 광고를 시청함으로써, 게임의 수익화를 실현하기 위해
 
 #### 구현 방법
-- Google Admob에서 보상형 광고와 배너 광고 생성
-<img src="https://github.com/user-attachments/assets/b98f1d69-bf1b-4164-8eab-1878be77beb0" width="50%"/>
-<br/>
-<br/>
-
-- Unity plugin을 설치 후, 프로젝트에 Import
-- 테스트 ID와 광고 ID를 적용해서 스크립트 작성
-
+- Google Admob에서 보상형 광고 구현
+- SDK 초기화, 광고 로딩, 실패 처리, 보상 지급까지 모든 과정을 AdManager에서 통제
+- 로딩 → 표시 → 보상 지급 → 재로딩 까지 한 사이클을 자동 처리하도록 설계
 ```C#
-public void Init()
-{
-	if (IsTestMode)
-	{
-	    // 테스트용 ID
-	    _adRewardUnitId = "ca-app-pub-3940256099942544/5224354917";
-	    _adBannerUnitId = "ca-app-pub-3940256099942544/6300978111";
-	}
-	else
-	{
-	    #if UNITY_ANDROID
-	    // 광고 ID
-	    _adRewardUnitId = "";
-	    _adBannerUnitId = "";
-	    #elif UNITY_IPHONE
-	    // 테스트용 ID
-	    _adRewardUnitId = "ca-app-pub-3940256099942544/1712485313";
-	    _adBannerUnitId = "ca-app-pub-3940256099942544/2934735716";
-	    #else
-	    _adRewardUnitId = "unused";
-	    _adBannerUnitId = "unused";
-	    #endif
-	}
-
-	MobileAds.Initialize((InitializationStatus initStatus) => { });
-}
-
-//보상형 광고 로드, 사용 시 호출
-public void LoadRewardedAd()
-{
-	if (_rewardedAd != null)
-	{
-	    _rewardedAd.Destroy();
-	    _rewardedAd = null;
-	}
-
-	var adRequest = new AdRequest();
-
-	RewardedAd.Load(_adUnitId, adRequest, (RewardedAd ad, LoadAdError error) =>
-	{
-		if (error != null || ad == null)
-		{
-		    Debug.LogError("Rewarded ad failed to load an ad " +
-				   "with error : " + error);
-		    return;
-		}
-
-		Debug.Log("Rewarded ad loaded with response : " + ad.GetResponseInfo());
-
-		_rewardedAd = ad;
-		RegisterEventHandlers(_rewardedAd);
-		ShowRewardedAd();
-	});
-}
-
-public void ShowRewardedAd()
-{
-	if (_rewardedAd != null && _rewardedAd.CanShowAd())
-	{
-	    _rewardedAd.Show((Reward reward) =>
-	    {
-		// 광고 보상 입력
-	    });
-	}
-}
-
-private void RegisterEventHandlers(RewardedAd ad)
-{
-	ad.OnAdPaid += (AdValue adValue) => { };
-	ad.OnAdImpressionRecorded += () => { };
-	ad.OnAdClicked += () => { };
-	ad.OnAdFullScreenContentOpened += () => { };
-	ad.OnAdFullScreenContentClosed += () => { }; // 광고 창을 닫을 때, 실행할 내용
-	// 광고 불러오기를 실패했을 때
-	ad.OnAdFullScreenContentFailed += (AdError error) =>
-	{
-	    LoadRewardedAd();
-	};
-}
-
-//배너 광고 로드, 사용 시 호출
-public void LoadBannerAd()
-{
-	if (_bannerView == null)
-	{
-	    CreateBannerView();
-	}
-	
-	var adRequest = new AdRequest();
-	_bannerView.LoadAd(adRequest);
-}
-
-//배너 광고 보여주기
-private void CreateBannerView()
-{
-	if (_bannerView != null)
-	{
-	    DestroyAd();
-	}
-	
-	_bannerView = new BannerView(_adBannerUnitId, AdSize.Banner, AdPosition.Top);
-}
-
-//배너 광고 제거
-public void DestroyAd()
-{
-	if (_bannerView != null)
-	{
-	    _bannerView.Destroy();
-	    _bannerView = null;
-	}
-}
-```
-<br/>
-
-### 7. Enemy 상태 패턴 구현
-<img src="https://github.com/user-attachments/assets/3b2e2a93-5a9b-42e1-9e36-638c8fd8ec4c" width="50%"/>
-
-#### 구현 이유
-- 다양한 상태를 가진 Enemy 움직임 구현
-- 끊임없이 독립적으로 행동해야 함
-- 유연한 상태 관리로 필요에 따라 상태를 추가하거나 수정이 가능해야 함
-
-#### 구현 방법
-- IState 인터페이스 : 구체적인 상태 클래스로 연결할 수 있도록 설정
-```C#
-public interface IEnemyState
-{
-    void Handle(EnemyController controller);
-}
-``` 
-​
-- Context 스크립트 : 클라이언트가 객체의 내부 상태를 변경할 수 있도록 요청하는 인터페이스를 정의
-```C#
-public void Transition()
-{
-    CurrentState.Handle(_enemyController);
-}
-
-public void Transition(IEnemyState state)
-{
-    CurrentState = state;
-    CurrentState.Handle(_enemyController);
-}
-```
-​
-- EnemyController 스크립트 : 각 State 컴포넌트 연결, State 실행
-```C#
-
-// Start문과 동일하게 사용
-private void Start()
-{
-	_enemyStateContext = new EnemyStateContext(this);
-	_walkState = gameObject.AddComponent<EnemyWalkState>();
-}
-
-public void WalkStart()
-{
-	_enemyStateContext.Transition(_walkState);
-}
-```
-<br/>
-<br/>
-
-- State 스크립트 : 각 State를 정의, State 변경 조건 설정
-<img src="https://github.com/user-attachments/assets/b85edb66-b5ad-4c2b-b50e-de1237b26c55" width="50%"/>
-<br/>
-<br/>
-
-```C#
-// Start문과 동일하게 사용
-public void Handle(EnemyController enemyController)
-{
-	if (!_enemyController)
-	    _enemyController = enemyController;
-	
-	Debug.Log("Walk 상태 시작");
-	StartCoroutine(COUpdate());
-}
-
-// Update문과 동일하게 사용
-private IEnumerator COUpdate()
-{
-	while (true)
-	{
-	    _dir = (_enemyController.Target.transform.position - transform.position).normalized;
-	    transform.position += _dir * _enemyController.Speed * Time.deltaTime;
-	
-	    if (_enemyController.CheckPlayer())
-	    {
-		_enemyController.AttackStart();
-		_enemyController.EnemyAnimator.SetBool("Attack", true);
-		break;
-	    }
-	
-	    if (_enemyController.IsHit_attack || _enemyController.IsHit_skill)
-	    {
-		_enemyController.HitStart();
-		_enemyController.EnemyAnimator.SetTrigger("Hit");
-		break;
-	    }
-		
-	    yield return null;
-	}
-}
-```
-<br/>
-
-### 8. 비동기 방식 로딩 씬 구현
-<img src="https://github.com/user-attachments/assets/a26ffcc9-fdc0-4628-ba8f-952d1d6d90ba" width="50%"/>  
-
-#### 구현 이유
-- 씬이 전환 될 때, 다음 씬에서 사용될 리소스들을 읽어와서 게임을 위한 준비 작업 필요
-- 로딩 화면이 없다면 가만히 멈춘 화면이나 까만 화면만 보일 수 있음
-- 씬이 전환 될 때, 지루한 대기 시간을 지루하지 않게 하기 위해
-
-#### 구현 방법
-- 씬을 불러오는 도중에 다른 작업이 가능 비동기 방식 씬 전환 구현
-```C#
-IEnumerator LoadScene()
-{
-    yield return null;
-    AsyncOperation op = SceneManager.LoadSceneAsync(NextScene);
-    op.allowSceneActivation = false;
-    float timer = 0.0f;
-    while (!op.isDone)
+    private void Init()
     {
-        yield return null;
-        timer += Time.deltaTime;
-        if (op.progress < 0.9f)
+        if (IsTestMode)
         {
-            _loadingBar.value = Mathf.Lerp(_loadingBar.value, op.progress, timer);
-            if (_loadingBar.value >= op.progress)
-            {
-                timer = 0f;
-            }
+            // 테스트용 광고 단위 ID
+#if UNITY_ANDROID
+            m_AdRewardUnitId = "ca-app-pub-3940256099942544/5224354917";
+#elif UNITY_IPHONE
+            m_AdRewardUnitId = "ca-app-pub-3940256099942544/1712485313";
+#else
+            m_AdRewardUnitId = "unused";
+#endif
         }
         else
         {
-            _loadingBar.value = Mathf.Lerp(_loadingBar.value, 1f, timer);
-            if (_loadingBar.value == 1.0f)
+            // 실제 배포용 광고 단위 ID (수정 필요)
+#if UNITY_ANDROID
+            m_AdRewardUnitId = "ca-app-pub-5906820670754550/8653741011";
+#elif UNITY_IPHONE
+            m_AdRewardUnitId = "ca-app-pub-3940256099942544/1712485313";
+#else
+            m_AdRewardUnitId = "unused";
+#endif
+        }
+
+        // Google Mobile Ads SDK 초기화
+        MobileAds.Initialize((InitializationStatus initStatus) => { });
+    }
+
+// 리워드 광고 로드 및 표시
+public void LoadRewardedAd(Action action)
+{
+    if (m_IsLoadingReward) return;
+    m_IsLoadingReward = true;
+
+    m_Action = action;
+
+    // 이전 광고 객체가 남아 있다면 정리
+    if (m_RewardedAd != null)
+    {
+        m_RewardedAd.Destroy();
+        m_RewardedAd = null;
+    }
+
+    // 광고 요청 생성
+    var adRequest = new AdRequest();
+
+    // 광고 요청 전송
+    RewardedAd.Load(m_AdRewardUnitId, adRequest,
+        (RewardedAd ad, LoadAdError error) =>
+        {
+            m_IsLoadingReward = false;
+
+            // 빌드에서 오류가 나기 때문에, 메인 스레드에서 실행해야 한다!
+            UniTask.Post(() =>
             {
-                op.allowSceneActivation = true;
-                yield break;
+                // 에러 처리
+                if (error != null || ad == null)
+                {
+                    Debug.LogError("Rewarded ad failed to load an ad " +
+                                   "with error : " + error);
+
+                    //광고 불러오기 실패
+                    UIManager.Instance.OpenSystemPopup(new MessageData
+                    {
+                        Type = PopupType.OkOnly,
+                        Title = "알림",
+                        Message = "광고 불러오기를 실패 했습니다."
+                    });
+
+                    return;
+                }
+
+                Debug.LogWarning("Rewarded ad loaded with response : "
+                      + ad.GetResponseInfo());
+
+                m_RewardedAd = ad;
+                RegisterEventHandlers(m_RewardedAd);
+                ShowRewardedAd();
+            });
+        });
+}
+
+// 리워드 광고 표시
+private void ShowRewardedAd()
+{
+    if (m_RewardedAd != null && m_RewardedAd.CanShowAd())
+    {
+        m_RewardedAd.Show((Reward reward) =>
+        {
+            Debug.Log($"User earned reward: {reward.Amount} {reward.Type}");
+
+            UniTask.Post(() =>
+            {
+                try
+                {
+                    // 보상 처리 로직
+                    m_Action?.Invoke();
+                    m_Action = null;
+
+                    // 완료
+                    UIManager.Instance.OpenSystemPopup(new MessageData
+                    {
+                        Type = PopupType.OkOnly,
+                        Title = "알림",
+                        Message = "광고 골드를 획득 했습니다."
+                    });
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[AdManager] Exception during reward handling: {e}");
+                }
+            });
+        });
+    }
+    else
+    {
+        Debug.LogWarning("Rewarded ad is not ready yet.");
+        LoadRewardedAd(m_Action);
+    }
+}
+
+// 리워드 광고 이벤트 등록
+private void RegisterEventHandlers(RewardedAd ad)
+{
+    ad.OnAdPaid += (AdValue adValue) =>
+    {
+        Debug.LogWarning(String.Format("Rewarded ad paid {0} {1}.",
+            adValue.Value,
+            adValue.CurrencyCode));
+    };
+    ad.OnAdImpressionRecorded += () =>
+    {
+        Debug.LogWarning("Rewarded ad recorded an impression.");
+    };
+    ad.OnAdClicked += () =>
+    {
+        Debug.LogWarning("Rewarded ad was clicked.");
+    };
+    ad.OnAdFullScreenContentOpened += () =>
+    {
+        Debug.LogWarning("Rewarded ad full screen content opened.");
+    };
+    ad.OnAdFullScreenContentClosed += () =>
+    {
+        Debug.LogWarning("Rewarded ad full screen content closed.");
+    };
+    ad.OnAdFullScreenContentFailed += (AdError error) =>
+    {
+        Debug.LogError("Rewarded ad failed to open full screen content " +
+                       "with error : " + error);
+        LoadRewardedAd(m_Action);
+    };
+}
+```
+<br/>
+
+### 7. Mobile Notifications를 사용한 로컬 푸시 기능
+<img src="https://github.com/user-attachments/assets/3f398d92-d012-4917-9791-0496ea45824e" width="50%"/>
+
+#### 구현 이유
+- 게임의 재접속 유도 및 플레이 지속률(리텐션)을 높이기 위해
+- 서버 없이도 알림 기능 구현
+
+#### 구현 방법
+- 앱 시작 시 Notification 환경 초기화
+```C#
+private void RegisterAndroidChannel()
+{
+    var channel = new AndroidNotificationChannel()
+    {
+        Id = "my_channel_id",
+        Name = "Real Fighter",
+        Importance = Importance.High,
+        Description = "Generic notifications",
+    };
+    AndroidNotificationCenter.RegisterNotificationChannel(channel);
+
+    Debug.LogWarning("Register Android Channel");
+}
+```
+<br/>
+
+- 로컬 푸시의 종류 정의
+```C#
+public enum LocalPushType
+{
+    None,
+
+    Test,
+    FreeGold,
+
+    Max
+}
+```
+<br/>
+​
+- 로컬 푸시 예약 기능 구현
+```C#
+    public void SchedulePushNotification(LocalPushType pushType, string title, string message, DateTime scheduleTime)
+    {
+        // 예약 시간이 현재보다 미래인지 확인
+        if (scheduleTime <= Util.DateTimeNow)
+        {
+            Debug.LogWarning("The time is earlier or equal to the current time. Please enter a valid future time.");
+            return;
+        }
+
+        try
+        {
+            // Android: 알림 객체 생성 및 설정
+            var notification = new AndroidNotification();
+            notification.Title = title;
+            notification.Text = message;
+            notification.FireTime = scheduleTime;
+            notification.LargeIcon = "icon_0";
+            notification.SmallIcon = "icon_1";
+            notification.ShowInForeground = true;
+            string channelId = "my_channel_id";
+
+            int pushCode = AndroidNotificationCenter.SendNotification(notification, channelId);
+
+            switch (pushType)
+            {
+                case LocalPushType.FreeGold:
+                    PlayerPrefs.SetInt(ClientDef.LOCALKEY_Push_FreeGold, pushCode);
+                    break;
+
+                default:
+                    break;
             }
         }
+        catch (Exception e)
+        {
+            Debug.LogWarning("푸시알람 예약 중 오류 발생: " + e.ToString());
+        }
+    }
+```
+<br/>
+​
+- 로컬 푸시 취소 기능 구현
+```C#
+    public void CancelPushNotification(LocalPushType pushType)
+    {
+        int pushCode = 0;
+        switch (pushType)
+        {
+            case LocalPushType.FreeGold:
+                pushCode = PlayerPrefs.GetInt(ClientDef.LOCALKEY_Push_FreeGold, 0);
+                break;
+
+            default:
+                break;
+        }
+
+        if (pushCode == 0)
+            return;
+
+        AndroidNotificationCenter.CancelScheduledNotification(pushCode);
+
+        Debug.LogWarning("Complete Cancel to Push Notification.");
+    }
+```
+<br/>
+
+### 8. 튜토리얼 구현
+<img src="https://github.com/user-attachments/assets/462ee72c-3eae-4e0c-8efa-6e53d270ce69" width="50%"/>  
+
+#### 구현 이유
+- 캐주얼 게임 수준의 직관적인 UI 안내 시스템 구현을 위해
+- 사용자가 처음 접하면 이해하기 어려운 규칙들을 설명하기 위해
+- 유저가 쉽게 게임 플레이를 학습할 수 있도록 하기 위해
+- 초반 이탈률을 줄이기 위해
+- 대사 기반 튜토리얼, 클릭 기반 튜토리얼을 공용으로 사용할 수 있도록 설계
+- 보상을 지급하여 게임의 성장 구조를 자연스럽게 맛보게하고, 초기 플레이 동기부여 강화를 위해
+
+#### 구현 방법
+- 튜토리얼 각 단계를 enum으로 정의
+```C#
+public enum TutorialStep
+{
+    None,
+
+    LobbyChat_0,
+    LobbyChat_1,
+    ClickBattle,
+
+    IngameChat_0,
+    IngameChat_1,
+    ClickAttack,
+    ClickReady_0,
+    IngameChat_2,
+    IngameChat_3,
+    IngameChat_4,
+    IngameChat_5,
+    IngameChat_6,
+    IngameChat_7,
+    ClickDeffence,
+    ClickReady_1,
+    IngameChat_8,
+    IngameChat_9,
+    IngameChat_10,
+    IngameChat_11,
+    IngameChat_12,
+    IngameChat_13,
+    IngameChat_14,
+    ClickLobby,
+
+    LobbyChat_2,
+    LobbyChat_3,
+    LobbyChat_4,
+    LobbyChat_5,
+
+    Max
+}
+```
+<br/>
+
+- 각각 튜토리얼 단계에 대한 정보를 class로 정의
+```C#
+public class TutorialData
+{
+    public float TimeScale = -1;
+    public Vector2 MaskSize = new Vector2 (0, 0);
+    public Vector2 MaskPos = new Vector2(0, 0);
+    public Action Action_Mask = null;
+    public string ChatText = string.Empty;
+    public bool IsUp = false;
+    public bool IsDown = false;
+}
+```
+<br/>
+
+- 공용으로 사용할 수 있는 TutorialMask 프리팹 생성
+<img src="https://github.com/user-attachments/assets/6ef6e171-ad95-44d8-99e9-f2c664b77a34" width="50%"/>
+<br/>
+
+- 클릭 했을 때, 실행할 함수들을 TutorialController에 정리
+```C#
+public void OnClick_Ready()
+{
+    m_IngameWindow.OnClick_Ready();
+}
+
+public void OnClick_Deffence()
+{
+    m_IngameWindow.OnClick_MyDefences(0);
+}
+```
+<br/>
+
+- 각각 튜토리얼 스텝을 구현
+```C#
+public async UniTask StartTutorial(TutorialStep step)
+{
+    m_IsClickButton = false;
+
+    switch (step)
+    {
+
+        case TutorialStep.LobbyChat_0:
+
+            // TutorialController 가져올 때 까지 대기
+            await UniTask.WaitUntil(() => UIManager.Instance.GetOpened<LobbyWindow>().GetComponent<TutorialController>() != null);
+            m_TutorialController = UIManager.Instance.GetOpened<LobbyWindow>().GetComponent<TutorialController>();
+
+            TutorialData data_0 = new TutorialData()
+            {
+
+                ChatText = "어서와라. 여긴 네가 실력을 증명해야 하는 결투장이다!",
+                Action_Mask = async () =>
+                {
+                    if (m_IsClickButton)
+                        return;
+
+                    m_IsClickButton = true;
+
+                    await StartTutorial(TutorialStep.LobbyChat_1);
+                }
+            };
+            await SetTutorial(data_0);
+
+            break;
+
+        case TutorialStep.LobbyChat_1:
+
+            TutorialData data_1 = new TutorialData()
+            {
+                ChatText = "긴 말 필요 없이 바로 실전으로 가보자고! BATTLE을 클릭해봐!",
+                Action_Mask = async () =>
+                {
+                    if (m_IsClickButton)
+                        return;
+
+                    m_IsClickButton = true;
+
+                    await StartTutorial(TutorialStep.ClickBattle);
+                }
+            };
+            await SetTutorial(data_1);
+
+            break;
     }
 }
 ```
-
-- 리소스 로딩이 끝나기 전에 씬 로딩 되는 것을 막기 위해 allowSceneActivation을 false로 설정
-- allowSceneActivation을 false로 90% 로드 한 상태로 대기하고, true 변경 시, 남은 부분을 로드하고 씬 이동
 <br/>
+
 
 ## 💥 트러블 슈팅
 
