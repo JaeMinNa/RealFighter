@@ -1299,6 +1299,9 @@ public void RPCSetMyData(string nick, int score, string image, string heroName,
 - 구글 플레이 업로드 aab 파일은 최대 200MB까지만 업로드 가능
 
 #### 원인 분석 및 해결
+<img src="https://github.com/user-attachments/assets/b7b98e9a-7d09-47fc-a630-48973cf34ca0" width="50%"/>
+<br/>
+
 ##### Resources 폴더에 포함된 불필요한 파일
 - Resources 폴더 안의 파일들은 전부 빌드 용량에 포함
 - 사용하지 않는 파일들은 Resources에 절대 넣어선 안됨
