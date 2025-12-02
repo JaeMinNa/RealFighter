@@ -1243,6 +1243,7 @@ public void RPCSetMyData(string nick, int score, string image, string heroName,
 #### 의견 결정
 <img src="https://github.com/user-attachments/assets/e9b31750-7089-4fb3-af81-f48a41644507" width="50%"/>
 <br/>
+
 ##### UV Rect로 화면을 분리하는 방식 사용
 - Hero 프리팹을 일정 간격으로 배치
 - 카메라 1개를 이동시켜 모든 Hero가 한 화면에 들어오도록 구성
