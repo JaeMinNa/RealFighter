@@ -1111,175 +1111,155 @@ public async UniTask StartTutorial(TutorialStep step)
 
 ## 💥 트러블 슈팅
 
-### 1. Photon PUN2를 이용한 PVP 구현
+### 1. 서버를 직접 구축하지 않은 이유
 #### 문제 상황
-- 다른 클라이언트와 연동 가능한 서버가 필요
+- 1:1 실시간 PVP를 구현을 위해 플레이어 간 프레임 단위 실시간 동기화 요구
+- 랭킹 시스템을 구현해야 함
 
 #### 해결 방안
-##### Photon PUN2 사용
-- 참고할 자료 및 내용이 많이 공유되어 있음
-- 많은 개발자들이 대표적으로 가장 많이 사용
-- 무료 버전으로도 비교적 많은 인원을 수용할 수 있음
-- Shared 네트워크 구조 방식만 제공
-##### Photon Fusion2 사용
-- 많은 인원을 수용할 수 있음
-- 직관적이고 간단하게 변수 동기화 가능
-- 여러가지 네트워크 구조 방식 제공하고 네트워크 지연 보간 기능 제공
-- 기능과 성능이 우수함
-- 비교적 어려운 사용 방법
-##### 서버 직접 개발
-- 직접 게임 특성에 맞게 서버를 개발 가능
-- 서버를 직접 개발하기에는 많은 시간과 노력이 필요
+##### HTTP 통신 구현
+- 실제로 서버를 구축하여, 원하는대로 커스텀하여 사용 가능
+- 많은 유저들을 수용할 수 있음
+- 서버 컴퓨터, AWS, DB 등 사용이 필요
+- 1인 개발 규모에서는 부담이 크고 유지보수 난이도 높음
+##### 뒤끝 서버 사용
+- 이미 구현되어 있는 랭킹 시스템을 그대로 사용할 수 있음
+- 유지보수 부담이 거의 없음
+- 빠른 개발, 빠른 출시 가능
+- 그 외, 간단한 유저 데이터 저장 가능
+- 하지만, 일정 사용량 이상은 유료로 전환
+##### 포톤 사용
+- 실시간 동기화 영역을 안정적으로 해결
+- Room 생성/입장, 이벤트 브로드캐스팅 자동화
+- 하지만, 일정 인원 이상을 유저를 수용할 수 없음
+##### Easy Save 에셋 사용
+- 로컬에 AES 암호화된 데이터 저장 가능
+- 서버 부하 없이 저장/로드 가능
+- 데이터 조작과 같은 상황에는 대부분 방어할 수 있지만, 데이터의 삭제는 막을 수 없음
  
 #### 의견 결정
-##### Photon PUN2 사용
-- 1:1 PVP 게임이므로, 많은 인원을 수용할 필요 없음
-- 멀티 게임 개발 경험이 없기 때문에 많은 참고할 자료 및 내용이 필요
-- 무료 버전으로도 충분히 기획한 게임 구현 가능
-- 클라이언트 개발자로서 서버를 직접 개발할 필요성을 느끼지 못함
+##### 직접 서버 구축 없이, 뒤끝 서버 + 포톤 + Easy Save 조합 사용
+- 서버 구축·운영에 드는 리소스를 절약
+- 게임 개발 속도 향상
+- 1:1 PVP이기 때문에 인프라 요구량 낮음
+- 써드파티의 거부감만 없다면, 비교적 쉽게 구현할 수 있음
+- 세 솔루션을 조합함으로써 서버 없이도 “서버가 있는 게임”처럼 완전한 기능 제공 가능
 <br/>
 
-### 2. OnPhotonSerializeView 동기화를 이용한 끊김 현상 개선
-<img src="https://github.com/user-attachments/assets/f8dedc98-a67c-41a0-892b-8849f21cc587" width="50%"/>
-<br/>
-<br/>
-
-#### PhotonTransformView 컴포넌트로 동기화
-<img src="https://github.com/user-attachments/assets/ec1c8a19-9eda-4746-bbc6-4e96269e4043" width="50%"/>
+### 2. OnPhotonSerializeView 동기화
+<img src="https://github.com/user-attachments/assets/51f6349a-f468-4524-a1f6-8ad7160f9853" width="50%"/>
 <br/>
 <br/>
 
-- 간단하고 직관적으로 Position, Rotation 동기화 가능
-- 끊김 현상, 딜레이가 심하게 발생
-- 점프 시, Position Y 값을 제대로 동기화하지 못함
-- 유니티 3D의 빠른 움직임을 동기화 할때는 적합하지 않음
+#### 문제 상황
+- OnPhotonSerializeView은 Photon에서 실시간 동기화가 필요한 값(위치, 회전, 이동 상태 등)을 지속적으로 송수신하는 기능
+- 플레이어 정보 같은 정적 데이터까지 전송하는 것은 비효율적
+- 프레임 단위로 반복 호출로 성능 저하 및 지연(Latency) 증가 가능성
+- 상대 유저의 기초 데이터는 초기 1회만 전달하면 충분
 
-#### OnPhotonSerializeView 함수를 통해 Transform 데이터 실시간 송수신으로 개선
-- 실시간으로 전달된 데이터를 통해 각각 클라이언트에서 직접 움직임을 실행
-```C#
-public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+#### 해결 방안
+##### RPC 사용
+- 필요한 시점에 필요한 데이터만 직접 호출해서 상대방에게 전송
+- 초기 매칭 후 상대 데이터 전달에 적합
+##### Room / Player Properties 사용
+- Photon의 Key-Value 값을 이용하는 방법
+ 
+#### 의견 결정
+##### RPC 사용
+- Room / Player Properties 사용 방법은 전투 씬, 이동 전에 적용해야 함
+- 이미 구성해놓은 데이터 로드 구조와 충돌
+- 전투 씬 입장 후, 상대 데이터는 단 1회 전달하면 충분
+- RPC 방식이 가장 간단하고 정확한 시점에 데이터를 보낼 수 있음
+- ```C#
+[PunRPC]
+public void RPCSetMyData(string nick, int score, string image, string heroName,
+                      int skill0, int skill1, int skill2, int level, int exp, int grade, int gradeExp)
 {
-    // 데이터 보내기 (isMine == true)
-    if (stream.IsWriting)
-    {
-        stream.SendNext(transform.position);
-        stream.SendNext(transform.rotation);
-    }
-    // 데이터 받기 (isMine == false)
-    else
-    {
-        _playerPosition = (Vector3)stream.ReceiveNext();
-        _playerRotation = (Quaternion)stream.ReceiveNext();
-    }
+    MyNickName = nick;
+    MyScore = score;
+    MyImage = image;
+    MyHeroName = heroName;
+    MyHeroSkillproficiencies[0] = skill0;
+    MyHeroSkillproficiencies[1] = skill1;
+    MyHeroSkillproficiencies[2] = skill2;
+    MyHeroLevel = level;
+    MyHeroExp = exp;
+    MyHeroGrade = grade;
+    MyHeroGradeExp = gradeExp;
 }
 ```
 <br/>
 
-- OnPhotonSerializeView 호출 빈도를 직접 설정
-```C#
-private void Awake()
-{
-    PhotonNetwork.SendRate = 60;
-}
-```
+### 3. BattleModule의 상속 구조
+<img src="https://github.com/user-attachments/assets/235adc0a-b97e-48d6-919a-af0580af8a6b" width="50%"/>
 <br/>
+<br/>
+
+#### 문제 상황
+- 성격이 비슷한 스크립트의 공통 코드가 모든 스크립트에 중복
+- 한 로직을 수정할 때 모든 전투 컨텐츠마다 수정을 반복해야 했음
+- 신규 전투 컨텐츠를 추가할 때 진입 장벽이 높고, 수정 시 오류가 잦음
+
+#### 해결 방안
+##### 전투 컨텐츠 간 공통 로직을 BattleModule에 통합
+- Initialize, StartGame, EndGame 등 전투 컨텐츠는 흐름이 동일하기 때문에 반복되는 코드를 BattleModule
+- 모든 전투 컨텐츠가 공유하도록 설계
+##### 컨텐츠마다 다르게 동작해야 하는 구간은 virtual 메서드로 분리
+- 컨텐츠별로 동작을 변경해야 하면 override로 오버라이딩할 수 있도록 설계
+##### 모든 컨텐츠에서 동일하게 사용하는 기능은 public 메서드로 제공
+- 일시정지, 모듈 타입 체크, SetRootObject 등 완전히 동일한 기능은 BattleModule에 정의
+
+#### 설계 구조
+##### 부모 클래스: BattleModule
+- 공통 전투 로직 제공
+- virtual 메서드로 확장 포인트 열어둠
+- 싱글톤 + 모듈 생성/삭제 기능 포함
+##### 자식 클래스: PVPModule / ChapterModule 등 
+- 필요한 부분만 override
+- 나머지는 BattleModule의 공통 구현 재사용
+<br/>
+
+### 4. RenderTexture 최적화 적용
+<img src="https://github.com/user-attachments/assets/f07042c2-256d-4ef7-9f07-8a46ed06dce0" width="50%"/>
+<br/>
+<br/>
+
+#### 문제 상황
+- 프리팹 갯수만큼 RenderTexture과 전용 카메라를 생성하게 되면 높은 DrawCall, 높은 메모리 사용
+- 특히 모바일 환경에서는 성능 저하가 심각
+- 예전 프로젝트에서 사용했던 방법이지만, 위 문제를 개선하고 싶었음
+
+#### 해결 방안
+##### 월드 공간에 Hero 프리팹을 실제로 배치하고 UI에 그대로 보여주기
+- 구현이 가장 간단
+- 카메라 1개만 사용 가능
+- 프로젝트의 UI 구조와 충돌로 인해 추가 설정 필요
+##### 하나의 카메라만 사용하고 UV Rect로 화면을 분리하는 방식
+- 카메라는 정적 위치에서 다수의 Hero 프리팹을 한 번에 촬영
+- 각 Hero는 미리 일정한 간격으로 배치
+- UV Rect를 조절하여 RenderTexture의 특정 영역만 잘라서 표시
+- 화면상에서는 마치, 각 Hero를 따로 찍은 것처럼 보임
+ 
+#### 의견 결정
+<img src="https://github.com/user-attachments/assets/e9b31750-7089-4fb3-af81-f48a41644507" width="50%"/>
+<br/>
+##### UV Rect로 화면을 분리하는 방식 사용
+- Hero 프리팹을 일정 간격으로 배치
+- 카메라 1개를 이동시켜 모든 Hero가 한 화면에 들어오도록 구성
+- UV Rect를 이용해 화면 분할 표시
 
 #### 결과
-<img src="https://github.com/user-attachments/assets/c0625e71-1016-48cc-8893-512b0c9db764" width="50%"/>
-<br/>
-<br/>
-
-- 끊김 현상, 딜레이 개선
-- 점프 시, Position Y 값을 제대로 동기화하지 못하는 현상 해결
-<br/>
-
-### 3. 뒤끝 서버를 이용한 랭킹 구현
-<img src="https://github.com/user-attachments/assets/cd2b2bc5-b430-4ebd-8731-a8660d90513c" width="50%"/>
-<br/>
-<br/>
-
-#### 문제 상황
-- 랭킹 시스템에 사용할 서버 필요
-
-#### 해결 방안
-##### 뒤끝 서버 사용
-- 이미 랭킹 시스템이 구현되어 있음
-- 참고 가능한 자료, 정보가 비교적 많음
-- 일정 사용량 초과 시, 발생하는 사용료가 타 서버에 비해서 비쌈
-##### Firebase 서버 사용
-- 매우 저렴한 비용
-- 빠른 속도
-- 직관적인 코드로 쉽게 사용 가능
-##### 서버 직접 개발
-- 직접 게임 특성에 맞게 서버를 개발 가능
-- 서버를 직접 개발하기에는 많은 시간과 노력이 필요
- 
-#### 의견 결정
-##### 뒤끝 서버 사용
-- 이미 데이터를 비교해서 순위를 결정하는 랭킹 시스템이 구현되어 있기 때문에 사용 방법만 익히면 됨
-- 멀티 구현이 미숙하기 때문에 참고 가능한 자료, 정보가 많은 뒤끝 서버로 구현하는 것이 좋다고 판단
-- 랭킹 시스템만 구현하고 사용하는 유저가 적기 때문에 무료 버전의 사용량으로도 충분하다고 판단
-<br/>
-
-### 4. List 데이터 수정 시, 원본 데이터도 수정
-#### 문제 상황
-```C#
-public class CharacterData
-{
-    public string Tag;
-    public bool IsEquip;
-    public int Level;
-    public float Speed;
-    public float Atk;
-    public float Def;
-}
-
-public List<CharacterData> CharacterInventory;
-public CharacterData[] CharacterDatas;
-
-if (!CharacterIsGet(_data)) 
-{
-	GameManager.I.DataManager.DataWrapper.CharacterInventory.Add(_data);
-}
-```
-<br/>
-
-- CharacterData의 초기 데이터를 CharacterDatas 배열에서 관리
-- 캐릭터를 얻게 되면 해당 CharacterData를 CharacterInventory List에 추가
-- CharacterInventory List의 데이터가 수정되면, CharacterDatas 배열의 데이터도 함께 변경됨
-- CharacterData가 class이기 때문에 Heap 영역에 할당되고, 참조 형식이기 때문에 원본 데이터도 함께 변경
-
-#### 해결 방안
-##### struct 사용
-- struct는 stack 영역에 할당되고, 값 형식이기 때문에 근본적인 해결 가능
-- 현재 구현한 데이터 저장 방식이 class 형식만 저장 가능하기 때문에 데이터 저장 방식 변경 필요
-##### 별도의 인벤토리 List를 사용하지 않기
-- List를 사용하지 않고 각각 데이터마다 IsGet이라는 bool 값을 설정
-- 매번 CharacterDatas 배열 전체를 순회하여 캐릭터를 가지고 있는지 판단하기 때문에 비효율적이라고 판단
-##### class를 참조하지 않고 값 형식 복사
-- class를 값 형식으로 복사하는 깊은 복사 구현
-- 객체의 내부까지 모두 복사하는 복잡한 깊은 복사를 굳이 구현하는 것은 비효율적이라고 판단
-##### class에 수정하지 않을 원본 값을 추가
-- class에 별도의 원본 데이터를 추가
- 
-#### 의견 결정
-##### class에 수정하지 않을 원본 값을 추가
-- 변경하지 않을 별도의 원본 데이터를 추가
-- 근본적인 해결 방법은 아니지만, 가장 합리적인 해결 방법이라고 판단
-```C#
-public class CharacterData
-{
-    public string Tag;
-    public bool IsEquip;
-    public int Level;
-    public float Speed;
-    public float Atk;
-    public float Def;
-    public float OriginSpeed;
-    public float OriginAtk;
-    public float OriginDef;
-}
-```
+##### 성능 개선
+- 카메라 갯수: N개 → 1개 감소
+- RenderTexture: N개 → 1개 감소
+- DrawCall 감소 및 CPU/GPU 부하 저감
+##### 시각 품질 개선
+- 로비 전용 애니메이션 적용
+- 캐릭터마다 다른 포즈 연출 가능
+- 기존 UI 구조를 그대로 유지할 수 있었음
+#### 유지보수성 증가
+- UV Rect 방식은 캐릭터가 추가되어도 UI만 조정하면 되므로 구조가 단순
+- 여러 개의 카메라 세팅 및 관리 과정이 필요 없어졌음
 <br/>
 
 ### 5. 상태 패턴을 사용한 Enemy 구현
