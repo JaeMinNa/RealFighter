@@ -297,7 +297,7 @@ public enum PopupType
 ```
 <br/>
 
-- Popup 에 필요한 정보를 정의
+- Popup 에 필요한 정보를 class로 정의
 ```C#
 public class MessageData
 {
