@@ -1170,7 +1170,7 @@ public async UniTask StartTutorial(TutorialStep step)
 - 이미 구성해놓은 데이터 로드 구조와 충돌
 - 전투 씬 입장 후, 상대 데이터는 단 1회 전달하면 충분
 - RPC 방식이 가장 간단하고 정확한 시점에 데이터를 보낼 수 있음
-- ```C#
+```C#
 [PunRPC]
 public void RPCSetMyData(string nick, int score, string image, string heroName,
                       int skill0, int skill1, int skill2, int level, int exp, int grade, int gradeExp)
