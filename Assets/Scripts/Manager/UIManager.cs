@@ -70,8 +70,6 @@ public class UIManager : Singleton<UIManager>
     {
         m_UIRootObjects = new Dictionary<UI, Canvas>();
         m_UIDictionary = new ConcurrentDictionary<Type, UIElement>();
-
-        //SpriteAtlasManager.atlasRequested += RequestAtlas;
     }
 
     public override void DestroyInstance()
@@ -80,10 +78,6 @@ public class UIManager : Singleton<UIManager>
     }
     #endregion
 
-    private void RequestAtlas(string Tag, Action<SpriteAtlas> Callback)
-    {
-        Callback(ResourceLoader.LoadAsset<SpriteAtlas>($"Atlas/{Tag}", Tag));
-    }
 
     public void SetUIRoot(GameObject Obj)
     {
@@ -157,12 +151,6 @@ public class UIManager : Singleton<UIManager>
         // UI
         foreach (var pair in m_UIDictionary)
         {
-            //if (pair.Key != typeof(FadeWindow))
-            //{
-            //    pair.Value?.OnClose();
-            //    continue;
-            //}
-
             if (pair.Value == null)
                 continue;
 
@@ -178,47 +166,6 @@ public class UIManager : Singleton<UIManager>
             return m_UIRootObjects[Type].transform;
         else
             return null;
-    }
-
-    public void PreLoad<T>(UI Depth, string PrefabPath, bool SetFirst = false, bool IsBundle = false) where T : UIElement
-    {
-        if (m_UIDictionary.ContainsKey(typeof(T)))
-            return;
-
-        GameObject prefab;
-        if (IsBundle)
-        {
-            PrefabPath = $"Prefab/{PrefabPath}";
-            string AssetName = PrefabPath.Split('/').Last();
-            prefab = ResourceLoader.LoadAsset<GameObject>(PrefabPath, AssetName);
-        }
-        else
-        {
-            prefab = ResourceLoader.LoadAssetResources<GameObject>(PrefabPath);
-        }
-
-        if (prefab == null)
-            return;
-
-        GameObject obj = Instantiate(prefab, GetRootTransform(Depth));
-        obj.SetActive(false);
-
-        T comp = obj.GetComponent<T>();
-
-        if (comp == null)
-            return;
-
-        m_UIDictionary.TryAdd(typeof(T), comp);
-        m_UIDictionary[typeof(T)].UIParent = Depth;
-        m_UIDictionary[typeof(T)].UIName = PrefabPath;
-        m_UIDictionary[typeof(T)].RectTransform = obj.GetComponent<RectTransform>();
-
-        if (SetFirst)
-            m_UIDictionary[typeof(T)].RectTransform.SetAsFirstSibling();
-
-        m_UIDictionary[typeof(T)].Init();
-
-        return;
     }
 
     public T Open<T>(UI Depth, string PrefabPath, List<object> Args = null, bool SetFirst = false, bool IsBundle = false) where T : UIElement
@@ -277,7 +224,6 @@ public class UIManager : Singleton<UIManager>
 
     public T GetOpened<T>() where T : UIElement
     {
-        // async opening ���� ���
         if (m_AsyncOpeningStatus.ContainsKey(typeof(T)) && m_AsyncOpeningStatus[typeof(T)])
             return null;
 
@@ -286,11 +232,6 @@ public class UIManager : Singleton<UIManager>
 
         return null;
     }
-
-    public bool IsAnyOpened(UI Depth) => m_UIDictionary.Any(Pair => m_UIRootObjects.ContainsKey(Depth)
-                                                                    && Pair.Value != null
-                                                                    && Pair.Value.gameObject.activeInHierarchy
-                                                                    && Pair.Value.UIParent == Depth);
 
     public void Close<T>(bool IsDestroy = true) where T : UIElement
     {
@@ -336,8 +277,6 @@ public class UIManager : Singleton<UIManager>
 
         foreach (var UI in notRemove)
             m_UIDictionary.TryAdd(UI.Key, UI.Value);
-
-        //RedPointManager.Instance.RemoveAllAction();
     }
 
     public void Refresh()
@@ -353,63 +292,6 @@ public class UIManager : Singleton<UIManager>
     {
         Open<Popup_System>(UI.Popup, "Prefabs/UI/Popup/Popup_System", new List<object> { Data });
     }
-
-    #region Async
-    public async UniTask<T> OpenAsync<T>(UI Depth, string PrefabPath, List<object> Args = null, bool SetFirst = false, bool IsBundle = true) where T : UIElement
-    {
-        m_AsyncOpeningStatus[typeof(T)] = true;
-
-        if (m_UIDictionary.ContainsKey(typeof(T)))
-        {
-            if (m_UIDictionary[typeof(T)] != null)
-            {
-                m_UIDictionary[typeof(T)].gameObject.SetActive(true);
-                await m_UIDictionary[typeof(T)].OnOpenAsync(Args);
-                return m_UIDictionary[typeof(T)] as T;
-            }
-            else
-            {
-                m_UIDictionary.TryRemove(typeof(T), out _);
-            }
-        }
-
-        GameObject prefab;
-        if (IsBundle)
-        {
-            PrefabPath = $"Prefab/{PrefabPath}";
-            string AssetName = PrefabPath.Split('/').Last();
-            prefab = await ResourceLoader.LoadAssetAsync<GameObject>(PrefabPath, AssetName);
-        }
-        else
-        {
-            prefab = await ResourceLoader.LoadResourcesAsync<GameObject>(PrefabPath);
-        }
-
-        if (prefab == null)
-            return null;
-
-        var Objs = Instantiate(prefab, GetRootTransform(Depth));
-        T comp = Objs.GetComponent<T>();
-
-        if (comp == null)
-            return null;
-
-        m_UIDictionary.TryAdd(typeof(T), comp);
-        m_UIDictionary[typeof(T)].UIParent = Depth;
-        m_UIDictionary[typeof(T)].UIName = PrefabPath;
-        m_UIDictionary[typeof(T)].RectTransform = comp.GetComponent<RectTransform>();
-
-        if (SetFirst)
-            m_UIDictionary[typeof(T)].RectTransform.SetAsFirstSibling();
-
-        await m_UIDictionary[typeof(T)].InitAsync();
-        await m_UIDictionary[typeof(T)].OnOpenAsync(Args);
-
-        m_AsyncOpeningStatus[typeof(T)] = false;
-        return comp;
-    }
-    #endregion
-
 }
 
 

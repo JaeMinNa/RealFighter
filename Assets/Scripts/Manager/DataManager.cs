@@ -150,7 +150,8 @@ public class DataManager : Singleton<DataManager>
             NickName = UID,
             RankPoint = 0,
             Image = "0",
-            Gold = 0
+            //Gold = 0
+            Gold = 1000
         };
 
         m_DataLoader.MyUserData.UserCommonData = userData_Common;
@@ -161,7 +162,8 @@ public class DataManager : Singleton<DataManager>
         heroData.Skillproficiencies[0] = 0;
         heroData.Skillproficiencies[1] = 0;
         heroData.Skillproficiencies[2] = 0;
-        heroData.Level = 6;
+        //heroData.Level = 6;
+        heroData.Level = 1;
         heroData.Exp = 0;
         heroData.Grade = 0;
         heroData.GradeExp = 0;
@@ -178,7 +180,8 @@ public class DataManager : Singleton<DataManager>
             LastLoginTime = Util.DateTimeNow,
             IsGotFreeGold = false,
             AdGoldBuyCount = 0,
-            TutorialIndex = 0
+            //TutorialIndex = 0
+            TutorialIndex = 10
         };
 
         m_DataLoader.MyUserData.UserContentsData = userData_Contents;

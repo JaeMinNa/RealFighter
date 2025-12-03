@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Drawing;
 
 
 public class Popup_System : UIElement
