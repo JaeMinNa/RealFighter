@@ -14,6 +14,17 @@
  - 개발 기간 : 25.08.12 ~ 25.11.12
 <br/>
 
+## 🎯 개발 목표
+ - Photon을 사용한 실시간 PVP 구현
+ - 뒤끝서버를 사용한 랭킹 구현
+ - 구글 애드몹 광고 구현
+ - UIManager를 사용한 깔끔한 UI 구현
+ - CSV파일을 이용한 금칙어 적용
+ - Mobile Notifications를 이용한 로컬 푸시 구현
+ - 서버를 직접 구현하지 않고, 멀티 플레이 구현
+ - 실무 코드 스타일을 적용한 구조적이고 일관된 코드 작성
+<br/>
+
 ## ⚙️ Environment
 
 - `Unity 6000.0.40f1`
@@ -26,277 +37,440 @@
 ## ▶️ 게임 스크린샷
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/cf305438-8d78-436d-8180-afc30f376845" width="49%"/>
-  <img src="https://github.com/user-attachments/assets/eb6542da-a840-4594-988c-dd1792e684da" width="49%"/>
+  <img src="https://github.com/user-attachments/assets/462ee72c-3eae-4e0c-8efa-6e53d270ce69" width="49%"/>
+  <img src="https://github.com/user-attachments/assets/e37abeea-9c4a-46a7-8b04-b6270da7d7cd" width="49%"/>
 </p>
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/d3eeb740-4e88-46ba-a48f-c600d23cc59f" width="49%"/>
-  <img src="https://github.com/user-attachments/assets/8d75448f-daf8-45fc-9500-5963af37a0d3" width="49%"/>
+  <img src="https://github.com/user-attachments/assets/2145dd92-5e80-4e16-81e5-bb4830ac3fc9" width="49%"/>
+  <img src="https://github.com/user-attachments/assets/80d81112-3fbe-4bb6-9a1c-e2adaac49bf8" width="49%"/>
 </p>
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/a1cc2044-bc13-458e-adb6-9c3f677f8416" width="49%"/>
-  <img src="https://github.com/user-attachments/assets/5aa4bb15-8753-419a-9858-bb4f1f961f55" width="49%"/>
+  <img src="https://github.com/user-attachments/assets/eeab084b-888b-4943-96ef-6878ae9fc768" width="49%"/>
+  <img src="https://github.com/user-attachments/assets/5c055e61-ca2c-44f2-8c19-e9504c606d9d" width="49%"/>
+</p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a6eac821-f6c9-4b02-951e-a5e4fc5278f6" width="49%"/>
+  <img src="https://github.com/user-attachments/assets/a37cfeda-a959-4555-ae2b-74bbd18976a4" width="49%"/>
 </p>
 <br/>
 
-## 🔳 와이어 프레임
-![image](https://github.com/user-attachments/assets/0099b12e-d1b4-4eeb-bbde-5fdb65517eed)
+## 🔳 초기 와이어프레임
+![image](https://github.com/user-attachments/assets/09923004-558f-4711-81ee-6829d915d297)
 
 
 ## 🧩 클라이언트 구조
 
-### GameManager
-![image](https://github.com/user-attachments/assets/38eb976c-8e82-4986-9e37-44602d08803a)
+### Managers
+![image](https://github.com/user-attachments/assets/580f4e1e-c8da-431b-afe0-315b241640d5)
 
-### Enemy
-![image](https://github.com/user-attachments/assets/5a388a6d-9ddf-48c5-be22-65edad0331ef)
+### 데이터 전달 방식
+![image](https://github.com/user-attachments/assets/b9296579-8850-48c3-8f3c-b2830247693a)
 
 
 ## ✏️ 구현 기능
 
-### 1. 멀티 대전 입장
-<img src="https://github.com/user-attachments/assets/ca915275-4091-425c-84de-1c4774e1dbed" width="50%"/>
+### 1. UIManager 구현
+<img src="https://github.com/user-attachments/assets/e37abeea-9c4a-46a7-8b04-b6270da7d7cd" width="50%"/>
 
 #### 구현 이유
-- PUN2 멀티 서버 연결
-- PVP 시작 전, 대기방 구현
+- 프로젝트의 UI를 체계적으로 관리하기 위해
+- 유지보수성과 확장성을 극대화하기 위해
+- 게임의 규모가 커질수록 UI 요소를 개별적으로 제어하기 힘들기 때문에
 
 #### 구현 방법
-- NetworkManager 생성 : 서버 접속, Room 생성 및 참가 관리
+- 프로젝트 내 모든 UI 오브젝트가 공통적으로 가져야 할 동작을 추상화(Abstract)한 베이스 클래스
 ```C#
-public void Connect()
+public abstract class UIElement : MonoBehaviour
 {
-    PhotonNetwork.ConnectUsingSettings();
-}
+    public string UIName = string.Empty;
+    public RectTransform RectTransform;
+    public UI UIParent;
 
-public void JoinRandomOrCreateRoom()
-{
-    PhotonNetwork.JoinRandomOrCreateRoom(expectedMaxPlayers : 2, roomOptions : new RoomOptions() { MaxPlayers = 2 });
-}
+    // 초기화
+    public abstract void Init();
+    // UI가 열릴 때 호출
+    public abstract void OnOpen(List<object> Args);
+    // UI가 닫힐 때 호출
+    public abstract void OnClose();
+    // UI 갱신
+    public abstract void OnRefresh();
 
-public override void OnJoinedRoom()
-{
-    Debug.Log("방참가완료");
-    PhotonNetwork.Instantiate("PUN2/Room/RoomController", transform.position, Quaternion.identity);
-}
-``` 
-​<br/>
-
-- RoomController 생성 : OnPhotonSerializeView 함수를 통해, Room 데이터를 송수신
-<img src="https://github.com/user-attachments/assets/4188147c-cc8d-45b1-a50b-b33c786f97c0" width="50%"/>
-<br/>
-<br/>
-
-```C#
-public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-{
-    if (stream.IsWriting)
+    #region Async
+    public virtual async UniTask InitAsync()
     {
-        stream.SendNext(GameManager.I.DataManager.PlayerData.KoreaTag);
-        stream.SendNext(GameManager.I.DataManager.PlayerData.Level);
-        stream.SendNext(GameManager.I.DataManager.PlayerData.CharacterRank.ToString());
-        stream.SendNext(GameManager.I.DataManager.GameData.UserName);
-        stream.SendNext(GameManager.I.DataManager.GameData.RankPoint);
-        stream.SendNext(GameManager.I.DataManager.PlayerData.Star);
-        stream.SendNext(GameManager.I.DataManager.PlayerData.Tag);
+        await UniTask.Yield();
+    }
+
+    public virtual async UniTask OnOpenAsync(List<object> Args)
+    {
+        await UniTask.Yield();
+    }
+
+    public virtual async UniTask OnCloseAsync()
+    {
+        await UniTask.Yield();
+    }
+
+    public virtual async UniTask OpenAction()
+    {
+        await UniTask.Yield();
+    }
+
+    public virtual async UniTask CloseAction()
+    {
+        await UniTask.Yield();
+    }
+    #endregion
+}
+```
+<br/>
+
+- 캔버스들을 자동으로 찾아 Dictionary에 저장하여, UI 계층 구조를 명확하게 하고 정렬 순서 충돌 방지
+```C#
+public void SetUIRoot(GameObject Obj)
+{
+    m_UIRootObjects.Clear();
+
+    m_UIRootObjects.Add(UI.Root, Obj.GetComponent<Canvas>());
+
+    Transform Panel = null;
+    Panel = Obj.transform.Find("Background");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.BackGround, Panel.GetComponent<Canvas>());
+
+    Panel = Obj.transform.Find("Main");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.Main, Panel.GetComponent<Canvas>());
+
+    Panel = Obj.transform.Find("Top");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.Top, Panel.GetComponent<Canvas>());
+
+    Panel = Obj.transform.Find("Popup");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.Popup, Panel.GetComponent<Canvas>());
+
+    Panel = Obj.transform.Find("Mask");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.Mask, Panel.GetComponent<Canvas>());
+
+    Panel = Obj.transform.Find("Fade");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.Fade, Panel.GetComponent<Canvas>());
+
+    Panel = Obj.transform.Find("TouchBlock");
+    if (Panel != null)
+        m_UIRootObjects.Add(UI.TouchBlock, Panel.GetComponent<Canvas>());
+
+    m_EventSystem = Obj.transform.Find("EventSystem").GetComponent<EventSystem>();
+
+    SwitchRoot();
+}
+```
+<br/>
+
+- 제네릭 기반의 UI 동적 로딩
+```C#
+public T Open<T>(UI Depth, string PrefabPath, List<object> Args = null, bool SetFirst = false, bool IsBundle = false) where T : UIElement
+{
+    if (m_UIDictionary.ContainsKey(typeof(T)))
+    {
+        if (m_UIDictionary[typeof(T)] != null)
+        {
+            m_UIDictionary[typeof(T)].gameObject.SetActive(true);
+            m_UIDictionary[typeof(T)].OnOpen(Args);
+            OnOpen?.Invoke(Depth, m_UIDictionary[typeof(T)]);
+            return m_UIDictionary[typeof(T)] as T;
+        }
+        else
+        {
+            m_UIDictionary.TryRemove(typeof(T), out _);
+        }
+    }
+
+    GameObject prefab;
+
+    if (IsBundle)
+    {
+        PrefabPath = $"Prefab/{PrefabPath}";
+        string AssetName = PrefabPath.Split('/').Last();
+        prefab = ResourceLoader.LoadAsset<GameObject>(PrefabPath, AssetName);
     }
     else
     {
-        _roomEnemyCharacterName = (string)stream.ReceiveNext();
-        _roomEnemyCharacterLevel = (int)stream.ReceiveNext();
-        _roomEnemyCharacterRank = (string)stream.ReceiveNext();
-        _roomEnemyUserName = (string)stream.ReceiveNext();
-        _roomEnemyRankPoint = (int)stream.ReceiveNext();
-        _roomEnemyCharacterStar = (int)stream.ReceiveNext();
-        _roomEnemyCharacterKorTag = (string)stream.ReceiveNext();
+        prefab = ResourceLoader.LoadAssetResources<GameObject>(PrefabPath);
+    }
+
+    if (prefab == null)
+        return null;
+
+    GameObject obj = Instantiate(prefab, GetRootTransform(Depth));
+    T comp = obj.GetComponent<T>();
+
+    if (comp == null)
+        return null;
+
+    m_UIDictionary.TryAdd(typeof(T), comp);
+    m_UIDictionary[typeof(T)].UIParent = Depth;
+    m_UIDictionary[typeof(T)].UIName = PrefabPath;
+    m_UIDictionary[typeof(T)].RectTransform = obj.GetComponent<RectTransform>();
+
+    if (SetFirst)
+        m_UIDictionary[typeof(T)].RectTransform.SetAsFirstSibling();
+
+    m_UIDictionary[typeof(T)].Init();
+    m_UIDictionary[typeof(T)].OnOpen(Args);
+    OnOpen?.Invoke(Depth, m_UIDictionary[typeof(T)]);
+
+    return comp;
+}
+```
+<br/>
+
+- UI 닫기 기능 관리
+```C#
+public void Close<T>(bool IsDestroy = true) where T : UIElement
+{
+    if (m_UIDictionary.ContainsKey(typeof(T)) && m_UIDictionary[typeof(T)] != null)
+    {
+        UIElement temp = m_UIDictionary[typeof(T)];
+        temp.OnClose();
+
+        if (IsDestroy)
+        {
+            m_UIDictionary.TryRemove(typeof(T), out _);
+            Destroy(temp.gameObject);
+        }
+        else
+            temp.gameObject.SetActive(false);
     }
 }
 ```
 <br/>
 
-### 2. PUN2 멀티 채팅 구현
-<img src="https://github.com/user-attachments/assets/3c3123b6-2357-4c31-8c5c-70267dd60e79" width="50%"/>
+- UI 전체 자동 업데이트를 위한 Refresh 기능
+```C#
+ public void Refresh()
+ {
+     foreach (var Elements in m_UIDictionary)
+     {
+         if (Elements.Value != null && Elements.Value.gameObject.activeInHierarchy)
+             Elements.Value.OnRefresh();
+     }
+ }
+```
+<br/>
+
+- UI를 레이어별로 구분하여 UIManager가 UI를 정확한 우선순위와 규칙에 따라 배치할 수 있도록 Root UI 구조를 설계
+<img src="https://github.com/user-attachments/assets/1cee13a4-3d1a-4adb-a381-8b8ee7ef2b05" width="50%"/>
+<br/>
+<br/>
+
+### 2. SystemPopup 구현
+<img src="https://github.com/user-attachments/assets/e890102f-a2c2-4371-9139-193bb282d0f6" width="50%"/>
 
 #### 구현 이유
-- 입력한 string 데이터를 송수신
+- 반복적으로 사용되는 공통 팝업 UI를 호출하기 위해
+- 일관된 팝업 생성 로직으로 UI 관리의 안정성을 높히기 위해
 
 #### 구현 방법
-- RPC 함수를 통해, 모든 Player가 동시에 함수 실행
+- SystemPopup 호출
 ```C#
-private void SendChat()
+public void OpenSystemPopup(MessageData Data)
 {
-    if (_photonView.IsMine)
-    {
-        string chat = PhotonNetwork.NickName + " : " + _networkManager.ChatInputText.text;
-        _photonView.RPC("ChatRPC", RpcTarget.All, chat);
-        _networkManager.ChatInputText.text = "";
-    }
+    Open<Popup_System>(UI.Popup, "Prefabs/UI/Popup/Popup_System", new List<object> { Data });
 }
+```
+<br/>
 
-[PunRPC]
-public void ChatRPC(string str)
+- Popup 유형을 enum으로 정의
+```C#
+public enum PopupType
 {
-    bool isInput = false;
+    None,
 
-    for (int i = 0; i < _chatTexts.Length; i++)
+    OkOnly,
+    OkCancel,
+
+    Max
+}
+```
+<br/>
+
+- Popup 에 필요한 정보를 class로 정의
+```C#
+public class MessageData
+{
+    public PopupType Type;
+    public string Title;
+    public string Message;
+    public UnityAction OkAction;
+}
+```
+<br/>
+
+- PopupType에 따른 UI 동적 구성 및 버튼 적용
+```C#
+public override void OnOpen(List<object> Args)
+{
+    if (Args.Count == 0)
     {
-        if (_chatTexts[i].text == "")
-        {
-            isInput = true;
-            _chatTexts[i].text = str;
+        Debug.LogWarning("MessageData is Null");
+        return;
+    }
+
+    MyData = Args[0] as MessageData;
+
+    if (!string.IsNullOrEmpty(MyData.Title))
+    {
+        Text_Title.text = MyData.Title;
+    }
+    else
+    {
+        Text_Title.text = "Notice";
+    }
+    
+    Text_Message.text = MyData.Message;
+
+    switch (MyData.Type)
+    {
+        case PopupType.OkOnly:
+            {
+                Btn_OK.gameObject.SetActive(true);
+                Btn_Cancel.gameObject.SetActive(false);
+            }
             break;
-        }
+        case PopupType.OkCancel:
+            {
+                Btn_OK.gameObject.SetActive(true);
+                Btn_Cancel.gameObject.SetActive(true);
+            }
+            break;
+    }
+}
+```
+<br/>
+
+### 3. Photon을 이용한 멀티 플레이 구현
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/acf17504-67c4-405c-9ca6-ee35ce4e7c47" width="49%"/>
+  <img src="https://github.com/user-attachments/assets/493a5f77-5be8-4938-ba49-e5765738ac92" width="49%"/>
+</p>
+
+#### 구현 이유
+- 서버를 직접 구축하지 않고도 실시간 멀티플레이 기능을 구현하기 위해
+- 서버리스(Serverless) 구조 기반의 게임을 개발하기 위해
+
+#### 구현 방법
+- OnPhotonSerializeView를 통한 프레임 단위 동기화로 마스터클라이언트에서 계산한 게임 상태값을 상대 플레이어에게 빠르게 전달
+- 실시간으로 데이터를 송수신해야하는 준비여부, 선택 스킬, 남은 턴 시간 데이터를 동기화 함
+```C#
+ public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+ {
+     if (m_pvpModule == null)
+     {
+         m_pvpModule = BattleModule.Instance as PVPModule;
+         if (m_pvpModule == null)
+             return;
+     }
+
+     // 데이터를 전송할 때
+     if (stream.IsWriting)
+     {
+         // Ingame Data
+         stream.SendNext(m_pvpModule.IsMyReady);
+         stream.SendNext(m_pvpModule.MySelectBtnNum);
+         stream.SendNext(PhotonNetwork.IsMasterClient? m_pvpModule.CurTime : 0);
+     }
+     // 데이터를 받을 때
+     else
+     {
+         // Ingame Data
+         m_pvpModule.IsEnemyReady = (bool)stream.ReceiveNext();
+         m_pvpModule.EnemySelectBtnNum = (int)stream.ReceiveNext();
+         float curTime = (float)stream.ReceiveNext();
+
+         if (!PhotonNetwork.IsMasterClient)
+             m_pvpModule.CurTime = curTime;
+     }
+ }
+```
+<br/>
+
+- 다른 클라이언트의 함수를 직접 호출하기 위해 RPC 함수 사용
+- RPC 함수로 실시간 이모티콘 전송 기능을 구현
+```C#
+[PunRPC]
+public void RPCPlayEmoticon(bool isLeft, int num)
+{
+    if (m_IngameWindow == null)
+        m_IngameWindow = UIManager.Instance.GetOpened<IngameWindow>();
+
+    if (m_IngameWindow != null)
+        m_IngameWindow.SetEmoticon(isLeft, num);
+}
+```
+<br/>
+
+### 4. 금칙어 적용
+<img src="https://github.com/user-attachments/assets/8650e8bd-839c-4ff8-9b9a-ee5ee70f5c0b" width="50%"/>
+
+#### 구현 이유
+- 부적절한 닉네임 사용을 제한하기 위해
+- 유지보수와 업데이트가 쉽기 때문에 CSV 파일 기반 금칙어 구현
+
+#### 구현 방법
+- CSV 파일로 관리되는 금칙어 목록을 읽어와 메모리에 로드
+```C#
+private void LoadBannedWords()
+{
+    if (m_BannedWords.Count > 0) return;
+
+    TextAsset csvFile = ResourceLoader.LoadAssetResources<TextAsset>("CSV/BannedWord/BannedWord");
+    if (csvFile == null)
+    {
+        Debug.LogError("금칙어 CSV 파일을 찾을 수 없습니다.");
+        return;
     }
 
-    if (!isInput)
+    // 줄 단위로 분리
+    string[] lines = csvFile.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+    foreach (var line in lines)
     {
-        for (int i = 1; i < _chatTexts.Length; i++)
+        string word = line.Trim();
+        if (!string.IsNullOrEmpty(word))
         {
-            _chatTexts[i - 1].text = _chatTexts[i].text;
+            // 중복 방지
+            if (!m_BannedWords.Contains(word))
+                m_BannedWords.Add(word);
         }
-
-        _chatTexts[_chatTexts.Length - 1].text = str;
     }
+
+    Debug.Log($"금칙어 {m_BannedWords.Count}개 로드 완료");
 }
 ```
 <br/>
 
-### 3. PUN2 멀티 애니메이션 동기화
-<img src="https://github.com/user-attachments/assets/6baf68b3-0a0b-416c-924b-703abcb2b105" width="50%"/>
+- 금칙어가 포함되어 있는지 체크
+```C#
+private bool IsBannedNickName(string nickname)
+{
+    foreach (var banned in m_BannedWords)
+    {
+        if (nickname.Contains(banned, StringComparison.OrdinalIgnoreCase))
+            return true;
+    }
+    return false;
+}
+```
+<br/>
+
+### 5. 뒤끝 서버를 이용한 랭킹 구현
+<img src="https://github.com/user-attachments/assets/ca5b51b5-cf98-40a8-a349-d212802c868f" width="50%"/>
 
 #### 구현 이유
-- 멀티 PVP에서 애니메이션을 동기화
-
-#### 구현 방법
-- PhotonAnimatorView 컴포넌트 추가
-<img src="https://github.com/user-attachments/assets/05fb9546-1e0b-41c4-8435-0e27bb8e57a3" width="50%"/>
-<br/>
-<br/>
-
-- PhotonView 컴포넌트 추가 및 Observed Components에 PhotonAnimatorView 추가
-<img src="https://github.com/user-attachments/assets/caa1a31b-b577-4593-b510-28426f1ff30c" width="50%"/>
-<br/>
-<br/>
-
-- Synchronize Parameters에서 Bool Parameter를 Continuous 설정
-- Trigger Parameter의 경우, RPC 함수를 통해 동기화해야 하므로, Disabled로 설정
-<img src="https://github.com/user-attachments/assets/fe0ac5fd-96f7-44a6-8ec1-49d043f0c73a" width="50%"/>
-<br/>
-<br/>
-
-### 4. PUN2 멀티 전투 구현
-<img src="https://github.com/user-attachments/assets/eea1b5b6-0044-4df5-b82e-da66317591f7" width="50%"/>
-
-#### 구현 이유
-- 멀티 대전의 전투 시스템 구현을 위해
-
-#### 구현 방법
-- Weapon Collider를 활성화하는 함수 작성
-<img src="https://github.com/user-attachments/assets/30d10b39-db25-4103-8f9e-aacb0703196f" width="50%"/>
-<br/>
-<br/>
-
-```C#
-public void AttackColliderActive(float time)
-{
-	for (int i = 0; i < _weaponColliders.Length; i++)
-	{
-	    _weaponColliders[i].enabled = true;
-	}
-	
-	StartCoroutine(COAttackColliderInactive(time));
-}
-
-private IEnumerator COAttackColliderInactive(float time)
-{
-	yield return new WaitForSeconds(time);
-	
-	for (int i = 0; i < _weaponColliders.Length; i++)
-	{
-	    _weaponColliders[i].enabled = false;
-	}
-}
-```
-<br/>
-
-- Animation Events 등록
-<img src="https://github.com/user-attachments/assets/04cffd69-7ba3-4f76-85e7-ee4d40f5b176" width="50%"/>
-<br/>
-<br/>
-
-- OnPhotonSerializeView 함수를 통해, 능력치 데이터 송수신
-```C#
-public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-{
-    // 데이터 보내기 (isMine == true)
-    if (stream.IsWriting)
-    {
-        stream.SendNext(GameManager.I.DataManager.PlayerData.Atk);
-        stream.SendNext(GameManager.I.DataManager.PlayerData.SkillAtk);
-        stream.SendNext(GameManager.I.DataManager.PlayerData.Def);
-    }
-    // 데이터 받기 (isMine == false)
-    else
-    {
-        Atk = (float)stream.ReceiveNext();
-        SkillAtk = (float)stream.ReceiveNext();
-        Def = (float)stream.ReceiveNext();
-    }
-}
-``` 
-​<br/>
-
-- RPC를 통해, 공격 애니메이션 실행
-```C#
-if (PhotonView.IsMine) PhotonView.RPC("PlayerAttackRPC", RpcTarget.AllViaServer);
-
-[PunRPC]
-public void PlayerAttackRPC()
-{
-    _anim.SetTrigger("Attack");
-}
-```
-<br/>
-
-- RPC를 통해, 넉백 구현
-```C#
-private void OnTriggerEnter(Collider other)
-{
-    if (other.gameObject.CompareTag("Player")
-    {
-	if (!_photonView.IsMine)
-	{
-	    _atk = _playerCharacter.Atk;
-	    other.GetComponent<PlayerCharacter>().PhotonView.RPC("RPCPlayerNuckback", RpcTarget.AllViaServer, _playerCharacter.transform.position, _atk);
-	}
-    }
-}
-
-[PunRPC]
-public void RPCPlayerNuckback(Vector3 attackPosition, float power)
-{
-    if (PhotonView.IsMine) PhotonView.RPC("PlayerHitRPC", RpcTarget.AllViaServer);
-    Vector3 dir = (transform.position - attackPosition).normalized;
-
-    if (PhotonView.IsMine) _rigidbody.velocity = new Vector3(dir.x, 0, dir.z) * (power - _playerData.Def);
-    else _rigidbody.velocity = new Vector3(dir.x, 0, dir.z) * (power - Def);
-
-    transform.LookAt(attackPosition);
-}
-
-[PunRPC]
-public void PlayerHitRPC()
-{
-    _anim.SetTrigger("Hit");
-}
-```
-<br/>
-
-### 5. 랭킹 구현
-<img src="https://github.com/user-attachments/assets/cfbc5009-0507-46f7-a827-3ff786e20206" width="50%"/>
-
-#### 구현 이유
-- 경쟁 심리를 이용해서 유저들이 더 게임을 플레이 하도록 하기 위해
+- 서버를 직접 구축하지 않고도 안정적이고 관리 가능한 랭킹 구현을 위해
 
 #### 구현 방법
 - 뒤끝 서버 설치 및 서버 접속
@@ -327,15 +501,15 @@ else
 public void InsertData()
 {
     Param param = GetUserDataParam();
-    BackendReturnObject bro = Backend.GameData.Insert("USER_DATA", param);
+    BackendReturnObject bro = Backend.GameData.Insert("USER_DATA", param); // USER_DATA 테이블 이름
 
     if (bro.IsSuccess())
     {
-        Debug.Log("데이터 추가를 성공했습니다");
+        Debug.LogWarning("뒤끝 서버 데이터 추가 성공!");
     }
     else
     {
-        Debug.Log("데이터 추가를 실패했습니다");
+        Debug.LogWarning("뒤끝 서버 데이터 추가 실패");
     }
 }
 
@@ -343,7 +517,9 @@ public void InsertData()
 private Param GetUserDataParam()
 {
     Param param = new Param();
-    param.Add("RankPoint", GameManager.I.DataManager.GameData.RankPoint);
+    param.Add("RankPoint", DataManager.Instance.GetMyUserData().UserCommonData.RankPoint);
+    param.Add("CharacterImg", DataManager.Instance.GetMyUserData().UserCommonData.Image);
+
     return param;
 }
 ```
@@ -356,59 +532,58 @@ private Param GetUserDataParam()
 
 - 랭킹 데이터 갱신
 ```C#
-// 데이터 테이블에 추가하는 함수
-private void UpdateMyRankData(int value)
+public void SaveMyRank()
 {
-	string rowInDate = string.Empty;
+    string rowInDate = string.Empty;
 
-	// 랭킹 데이터를 업데이트하려면 게임 데이터에서 사용하는 데이터의 inDate 값 필요
-	BackendReturnObject bro = Backend.GameData.GetMyData("USER_DATA", new Where());
-	
-	if (!bro.IsSuccess())
-	{
-	    Debug.LogError("랭킹 업데이트를 위한 데이터 조회 중 문제가 발생했습니다.");
-	    return;
-	}
-	
-	Debug.Log("랭킹 업데이트를 위한 데이터 조회에 성공했습니다.");
-	
-	if(bro.FlattenRows().Count > 0)
-	{
-	    rowInDate = bro.FlattenRows()[0]["inDate"].ToString();
-	}
-	else
-	{
-	    Debug.LogError("데이터가 존재하지 않습니다.");
-	}
-	
-	Param param = new Param()
-	{
-	    {"RankPoint",  value}
-	};
-	
-	// 해당 데이터테이블의 데이터를 갱신하고, 랭킹 데이터 정보 갱신
-	bro = Backend.URank.User.UpdateUserScore(RANK_UUID, "USER_DATA", rowInDate, param);
-	
-	if(bro.IsSuccess())
-	{
-	    Debug.Log("랭킹 등록에 성공했습니다.");
-	}
-	else
-	{
-	    Debug.LogError("랭킹 등록에 실패했습니다.");
-	}
+    // 랭킹 데이터를 업데이트하려면 게임 데이터에서 사용하는 데이터의 inDate 값 필요
+    BackendReturnObject bro = Backend.GameData.GetMyData("USER_DATA", new Where());
+
+    if (!bro.IsSuccess())
+    {
+        Debug.LogWarning("뒤끝 서버 랭킹 업데이트를 위한 데이터 조회 중 문제 발생");
+        return;
+    }
+
+    Debug.LogWarning("뒤끝 서버 랭킹 업데이트를 위한 데이터 조회 성공!");
+
+    if (bro.FlattenRows().Count > 0)
+    {
+        rowInDate = bro.FlattenRows()[0]["inDate"].ToString();
+    }
+    else
+    {
+        Debug.LogWarning("뒤끝 서버 랭킹 업데이트를 위한 데이터가 존재하지 않음");
+    }
+
+    Param param = new Param()
+    {
+        {"RankPoint",  DataManager.Instance.GetMyUserData().UserCommonData.RankPoint}
+    };
+
+    // 해당 데이터테이블의 데이터를 갱신하고, 랭킹 데이터 정보 갱신
+    bro = Backend.URank.User.UpdateUserScore(RANK_UUID, "USER_DATA", rowInDate, param);
+
+    if (bro.IsSuccess())
+    {
+        Debug.LogWarning("뒤끝 서버 랭킹 등록 성공!");
+    }
+    else
+    {
+        Debug.LogWarning("뒤끝 서버 랭킹 등록 실패");
+    }
 }
 ```
 <br/>
 
 - 뒤끝 서버 Json 데이터를 파싱해서 나의 랭킹 불러오기
 ```C#
-public void GetMyRank()
+public RankData GetMyRankData()
 {
-    // 내 랭킹 정보 불러오기
+    // 내 랭킹 정보 불러오기 
     BackendReturnObject bro = Backend.URank.User.GetMyRank(RANK_UUID);
 
-    if(bro.IsSuccess())
+    if (bro.IsSuccess())
     {
         try
         {
@@ -417,24 +592,38 @@ public void GetMyRank()
             // 받아온 데이터의 개수가 0 -> 데이터가 없음
             if (rankDataJson.Count <= 0)
             {
-                Debug.Log("나의 랭킹 데이터가 존재하지 않습니다.");
+                Debug.LogWarning("뒤끝 서버 나의 랭킹 데이터가 존재하지 않음");
+                return null;
+
             }
             else
             {
-                _rankPoint = int.Parse(rankDataJson[0]["score"].ToString());
-                _rank = int.Parse(rankDataJson[0]["rank"].ToString());
-                _userName = rankDataJson[0]["nickname"].ToString();
+                Debug.LogWarning("뒤끝 서버 나의 랭킹 조회 성공!");
+
+                RankData data = new RankData()
+                {
+                    NickName = rankDataJson[0]["nickname"].ToString(),
+                    Rank = int.Parse(rankDataJson[0]["rank"].ToString()),
+                    RankPoint = int.Parse(rankDataJson[0]["score"].ToString()),
+
+                    // 추가 항목 데이터
+                    Image = rankDataJson[0]["CharacterImg"].ToString()
+                };
+
+                return data;
             }
         }
         // 나의 랭킹 정보 JSON 데이터 파싱에 실패했을 때
         catch (System.Exception e)
         {
-            Debug.LogError(e);
+            Debug.LogWarning($"뒤끝 서버 나의 랭킹 데이터 파싱 실패 : {e}");
+            return null;
         }
     }
     else
     {
-        // 나의 랭킹 정보를 불러오는데 실패했을 때
+        Debug.LogWarning("뒤끝 서버 나의 랭킹 데이터 불러오기 실패");
+        return null;
     }
 }
 ```
@@ -442,594 +631,756 @@ public void GetMyRank()
 
 - 뒤끝 서버 Json 데이터를 파싱해서 유저 랭킹 불러오기
 ```C#
-private const int MAX_RANK_LIST = 10;
-
-public void GetRankList()
+public List<RankData> GetRankDataList()
 {
-    // 랭킹 테이블에 있는 유저의 offset ~ offset + limit 순위 랭킹 정보를 불러옴
-    BackendReturnObject bro = Backend.URank.User.GetRankList(RANK_UUID, MAX_RANK_LIST, 0);
+    int maxRankList = ClientDef.RankingCount;
 
-    if(bro.IsSuccess())
+    // 랭킹 테이블에 있는 유저의 offset ~ offset + limit 순위 랭킹 정보를 불러옴
+    BackendReturnObject bro = Backend.URank.User.GetRankList(RANK_UUID, maxRankList, 0);
+
+    if (bro.IsSuccess())
     {
-        // JSON 데이터 파싱 성공
         try
         {
-            Debug.Log("랭킹 조회에 성공했습니다.");
             JsonData rankDataJson = bro.FlattenRows();
 
             // 받아온 데이터의 개수가 0 -> 데이터가 없음
-            if(rankDataJson.Count <= 0)
+            if (rankDataJson.Count <= 0)
             {
-                Debug.Log("랭킹 데이터가 존재하지 않습니다.");
+                Debug.LogWarning("뒤끝 서버 랭킹 데이터가 존재하지 않음");
+
+                return null;
             }
             else
             {
+                Debug.LogWarning("뒤끝 서버 랭킹 조회 성공!");
+
+                List<RankData> rankData = new List<RankData>();
                 int rankCount = rankDataJson.Count;
 
-                // 받아온 rank 데이터의 숫자만큼 데이터 출력
-                for (int i = 0; i < rankCount; i++)
+                for (int index = 0; index < rankCount; ++index)
                 {
-                    _rankPoint = int.Parse(rankDataJson[i]["score"].ToString());
-                    _rank = int.Parse(rankDataJson[i]["rank"].ToString());
-                    _userName = rankDataJson[i]["nickname"].ToString();
+                    RankData data = new RankData()
+                    {
+                        NickName = rankDataJson[index]["nickname"].ToString(),
+                        Rank = int.Parse(rankDataJson[index]["rank"].ToString()),
+                        RankPoint = int.Parse(rankDataJson[index]["score"].ToString()),
+
+                        // 추가 항목 데이터
+                        Image = rankDataJson[index]["CharacterImg"].ToString()
+                    };
+
+                    rankData.Add(data);
                 }
-                // rankCount가 Max값만큼 존재하지 않을 때, 나머지 랭킹
-                for (int i = rankCount; i < MAX_RANK_LIST; i++)
-                {
-                    // 랭킹 데이터 비활성화
-                }
+
+                return rankData;
             }
         }
-        // JSON 데이터 파싱 실패
         catch (System.Exception e)
         {
-            Debug.LogError(e);
+            Debug.LogWarning($"뒤끝 서버 랭킹 데이터 파싱 실패 : {e}");
+            return null;
         }
     }
     else
     {
-        Debug.LogError("랭킹 조회에 실패했습니다.");
+        Debug.LogWarning("뒤끝 서버 랭킹 데이터 불러오기 실패");
+        return null;
     }
 }
 ```
 <br/>
 
-### 6. Admob 광고 구현
-<img src="https://github.com/user-attachments/assets/cee62c9f-3df8-4753-bbd6-969521b3afab" width="50%"/> 
+### 6. Google Admob 광고 구현
+<img src="https://github.com/user-attachments/assets/5351db87-58f9-4f79-999d-e2a5df0e39c7" width="50%"/> 
 
 #### 구현 이유
-- 유저들이 광고를 시청하면 Coin을 얻게하기 위해
 - 유저들이 광고를 시청함으로써, 게임의 수익화를 실현하기 위해
 
 #### 구현 방법
-- Google Admob에서 보상형 광고와 배너 광고 생성
-<img src="https://github.com/user-attachments/assets/b98f1d69-bf1b-4164-8eab-1878be77beb0" width="50%"/>
-<br/>
-<br/>
-
-- Unity plugin을 설치 후, 프로젝트에 Import
-- 테스트 ID와 광고 ID를 적용해서 스크립트 작성
-
+- Google Admob에서 보상형 광고 구현
+- SDK 초기화, 광고 로딩, 실패 처리, 보상 지급까지 모든 과정을 AdManager에서 통제
+- 로딩 → 표시 → 보상 지급 → 재로딩 까지 한 사이클을 자동 처리하도록 설계
 ```C#
-public void Init()
-{
-	if (IsTestMode)
-	{
-	    // 테스트용 ID
-	    _adRewardUnitId = "ca-app-pub-3940256099942544/5224354917";
-	    _adBannerUnitId = "ca-app-pub-3940256099942544/6300978111";
-	}
-	else
-	{
-	    #if UNITY_ANDROID
-	    // 광고 ID
-	    _adRewardUnitId = "";
-	    _adBannerUnitId = "";
-	    #elif UNITY_IPHONE
-	    // 테스트용 ID
-	    _adRewardUnitId = "ca-app-pub-3940256099942544/1712485313";
-	    _adBannerUnitId = "ca-app-pub-3940256099942544/2934735716";
-	    #else
-	    _adRewardUnitId = "unused";
-	    _adBannerUnitId = "unused";
-	    #endif
-	}
-
-	MobileAds.Initialize((InitializationStatus initStatus) => { });
-}
-
-//보상형 광고 로드, 사용 시 호출
-public void LoadRewardedAd()
-{
-	if (_rewardedAd != null)
-	{
-	    _rewardedAd.Destroy();
-	    _rewardedAd = null;
-	}
-
-	var adRequest = new AdRequest();
-
-	RewardedAd.Load(_adUnitId, adRequest, (RewardedAd ad, LoadAdError error) =>
-	{
-		if (error != null || ad == null)
-		{
-		    Debug.LogError("Rewarded ad failed to load an ad " +
-				   "with error : " + error);
-		    return;
-		}
-
-		Debug.Log("Rewarded ad loaded with response : " + ad.GetResponseInfo());
-
-		_rewardedAd = ad;
-		RegisterEventHandlers(_rewardedAd);
-		ShowRewardedAd();
-	});
-}
-
-public void ShowRewardedAd()
-{
-	if (_rewardedAd != null && _rewardedAd.CanShowAd())
-	{
-	    _rewardedAd.Show((Reward reward) =>
-	    {
-		// 광고 보상 입력
-	    });
-	}
-}
-
-private void RegisterEventHandlers(RewardedAd ad)
-{
-	ad.OnAdPaid += (AdValue adValue) => { };
-	ad.OnAdImpressionRecorded += () => { };
-	ad.OnAdClicked += () => { };
-	ad.OnAdFullScreenContentOpened += () => { };
-	ad.OnAdFullScreenContentClosed += () => { }; // 광고 창을 닫을 때, 실행할 내용
-	// 광고 불러오기를 실패했을 때
-	ad.OnAdFullScreenContentFailed += (AdError error) =>
-	{
-	    LoadRewardedAd();
-	};
-}
-
-//배너 광고 로드, 사용 시 호출
-public void LoadBannerAd()
-{
-	if (_bannerView == null)
-	{
-	    CreateBannerView();
-	}
-	
-	var adRequest = new AdRequest();
-	_bannerView.LoadAd(adRequest);
-}
-
-//배너 광고 보여주기
-private void CreateBannerView()
-{
-	if (_bannerView != null)
-	{
-	    DestroyAd();
-	}
-	
-	_bannerView = new BannerView(_adBannerUnitId, AdSize.Banner, AdPosition.Top);
-}
-
-//배너 광고 제거
-public void DestroyAd()
-{
-	if (_bannerView != null)
-	{
-	    _bannerView.Destroy();
-	    _bannerView = null;
-	}
-}
-```
-<br/>
-
-### 7. Enemy 상태 패턴 구현
-<img src="https://github.com/user-attachments/assets/3b2e2a93-5a9b-42e1-9e36-638c8fd8ec4c" width="50%"/>
-
-#### 구현 이유
-- 다양한 상태를 가진 Enemy 움직임 구현
-- 끊임없이 독립적으로 행동해야 함
-- 유연한 상태 관리로 필요에 따라 상태를 추가하거나 수정이 가능해야 함
-
-#### 구현 방법
-- IState 인터페이스 : 구체적인 상태 클래스로 연결할 수 있도록 설정
-```C#
-public interface IEnemyState
-{
-    void Handle(EnemyController controller);
-}
-``` 
-​
-- Context 스크립트 : 클라이언트가 객체의 내부 상태를 변경할 수 있도록 요청하는 인터페이스를 정의
-```C#
-public void Transition()
-{
-    CurrentState.Handle(_enemyController);
-}
-
-public void Transition(IEnemyState state)
-{
-    CurrentState = state;
-    CurrentState.Handle(_enemyController);
-}
-```
-​
-- EnemyController 스크립트 : 각 State 컴포넌트 연결, State 실행
-```C#
-
-// Start문과 동일하게 사용
-private void Start()
-{
-	_enemyStateContext = new EnemyStateContext(this);
-	_walkState = gameObject.AddComponent<EnemyWalkState>();
-}
-
-public void WalkStart()
-{
-	_enemyStateContext.Transition(_walkState);
-}
-```
-<br/>
-<br/>
-
-- State 스크립트 : 각 State를 정의, State 변경 조건 설정
-<img src="https://github.com/user-attachments/assets/b85edb66-b5ad-4c2b-b50e-de1237b26c55" width="50%"/>
-<br/>
-<br/>
-
-```C#
-// Start문과 동일하게 사용
-public void Handle(EnemyController enemyController)
-{
-	if (!_enemyController)
-	    _enemyController = enemyController;
-	
-	Debug.Log("Walk 상태 시작");
-	StartCoroutine(COUpdate());
-}
-
-// Update문과 동일하게 사용
-private IEnumerator COUpdate()
-{
-	while (true)
-	{
-	    _dir = (_enemyController.Target.transform.position - transform.position).normalized;
-	    transform.position += _dir * _enemyController.Speed * Time.deltaTime;
-	
-	    if (_enemyController.CheckPlayer())
-	    {
-		_enemyController.AttackStart();
-		_enemyController.EnemyAnimator.SetBool("Attack", true);
-		break;
-	    }
-	
-	    if (_enemyController.IsHit_attack || _enemyController.IsHit_skill)
-	    {
-		_enemyController.HitStart();
-		_enemyController.EnemyAnimator.SetTrigger("Hit");
-		break;
-	    }
-		
-	    yield return null;
-	}
-}
-```
-<br/>
-
-### 8. 비동기 방식 로딩 씬 구현
-<img src="https://github.com/user-attachments/assets/a26ffcc9-fdc0-4628-ba8f-952d1d6d90ba" width="50%"/>  
-
-#### 구현 이유
-- 씬이 전환 될 때, 다음 씬에서 사용될 리소스들을 읽어와서 게임을 위한 준비 작업 필요
-- 로딩 화면이 없다면 가만히 멈춘 화면이나 까만 화면만 보일 수 있음
-- 씬이 전환 될 때, 지루한 대기 시간을 지루하지 않게 하기 위해
-
-#### 구현 방법
-- 씬을 불러오는 도중에 다른 작업이 가능 비동기 방식 씬 전환 구현
-```C#
-IEnumerator LoadScene()
-{
-    yield return null;
-    AsyncOperation op = SceneManager.LoadSceneAsync(NextScene);
-    op.allowSceneActivation = false;
-    float timer = 0.0f;
-    while (!op.isDone)
+    private void Init()
     {
-        yield return null;
-        timer += Time.deltaTime;
-        if (op.progress < 0.9f)
+        if (IsTestMode)
         {
-            _loadingBar.value = Mathf.Lerp(_loadingBar.value, op.progress, timer);
-            if (_loadingBar.value >= op.progress)
-            {
-                timer = 0f;
-            }
+            // 테스트용 광고 단위 ID
+#if UNITY_ANDROID
+            m_AdRewardUnitId = "ca-app-pub-3940256099942544/5224354917";
+#elif UNITY_IPHONE
+            m_AdRewardUnitId = "ca-app-pub-3940256099942544/1712485313";
+#else
+            m_AdRewardUnitId = "unused";
+#endif
         }
         else
         {
-            _loadingBar.value = Mathf.Lerp(_loadingBar.value, 1f, timer);
-            if (_loadingBar.value == 1.0f)
-            {
-                op.allowSceneActivation = true;
-                yield break;
-            }
+            // 실제 배포용 광고 단위 ID (수정 필요)
+#if UNITY_ANDROID
+            m_AdRewardUnitId = "ca-app-pub-5906820670754550/8653741011";
+#elif UNITY_IPHONE
+            m_AdRewardUnitId = "ca-app-pub-3940256099942544/1712485313";
+#else
+            m_AdRewardUnitId = "unused";
+#endif
         }
+
+        // Google Mobile Ads SDK 초기화
+        MobileAds.Initialize((InitializationStatus initStatus) => { });
+    }
+
+// 리워드 광고 로드 및 표시
+public void LoadRewardedAd(Action action)
+{
+    if (m_IsLoadingReward) return;
+    m_IsLoadingReward = true;
+
+    m_Action = action;
+
+    // 이전 광고 객체가 남아 있다면 정리
+    if (m_RewardedAd != null)
+    {
+        m_RewardedAd.Destroy();
+        m_RewardedAd = null;
+    }
+
+    // 광고 요청 생성
+    var adRequest = new AdRequest();
+
+    // 광고 요청 전송
+    RewardedAd.Load(m_AdRewardUnitId, adRequest,
+        (RewardedAd ad, LoadAdError error) =>
+        {
+            m_IsLoadingReward = false;
+
+            // 빌드에서 오류가 나기 때문에, 메인 스레드에서 실행해야 한다!
+            UniTask.Post(() =>
+            {
+                // 에러 처리
+                if (error != null || ad == null)
+                {
+                    Debug.LogError("Rewarded ad failed to load an ad " +
+                                   "with error : " + error);
+
+                    //광고 불러오기 실패
+                    UIManager.Instance.OpenSystemPopup(new MessageData
+                    {
+                        Type = PopupType.OkOnly,
+                        Title = "알림",
+                        Message = "광고 불러오기를 실패 했습니다."
+                    });
+
+                    return;
+                }
+
+                Debug.LogWarning("Rewarded ad loaded with response : "
+                      + ad.GetResponseInfo());
+
+                m_RewardedAd = ad;
+                RegisterEventHandlers(m_RewardedAd);
+                ShowRewardedAd();
+            });
+        });
+}
+
+// 리워드 광고 표시
+private void ShowRewardedAd()
+{
+    if (m_RewardedAd != null && m_RewardedAd.CanShowAd())
+    {
+        m_RewardedAd.Show((Reward reward) =>
+        {
+            Debug.Log($"User earned reward: {reward.Amount} {reward.Type}");
+
+            UniTask.Post(() =>
+            {
+                try
+                {
+                    // 보상 처리 로직
+                    m_Action?.Invoke();
+                    m_Action = null;
+
+                    // 완료
+                    UIManager.Instance.OpenSystemPopup(new MessageData
+                    {
+                        Type = PopupType.OkOnly,
+                        Title = "알림",
+                        Message = "광고 골드를 획득 했습니다."
+                    });
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[AdManager] Exception during reward handling: {e}");
+                }
+            });
+        });
+    }
+    else
+    {
+        Debug.LogWarning("Rewarded ad is not ready yet.");
+        LoadRewardedAd(m_Action);
+    }
+}
+
+// 리워드 광고 이벤트 등록
+private void RegisterEventHandlers(RewardedAd ad)
+{
+    ad.OnAdPaid += (AdValue adValue) =>
+    {
+        Debug.LogWarning(String.Format("Rewarded ad paid {0} {1}.",
+            adValue.Value,
+            adValue.CurrencyCode));
+    };
+    ad.OnAdImpressionRecorded += () =>
+    {
+        Debug.LogWarning("Rewarded ad recorded an impression.");
+    };
+    ad.OnAdClicked += () =>
+    {
+        Debug.LogWarning("Rewarded ad was clicked.");
+    };
+    ad.OnAdFullScreenContentOpened += () =>
+    {
+        Debug.LogWarning("Rewarded ad full screen content opened.");
+    };
+    ad.OnAdFullScreenContentClosed += () =>
+    {
+        Debug.LogWarning("Rewarded ad full screen content closed.");
+    };
+    ad.OnAdFullScreenContentFailed += (AdError error) =>
+    {
+        Debug.LogError("Rewarded ad failed to open full screen content " +
+                       "with error : " + error);
+        LoadRewardedAd(m_Action);
+    };
+}
+```
+<br/>
+
+### 7. Mobile Notifications를 사용한 로컬 푸시 기능
+<img src="https://github.com/user-attachments/assets/3f398d92-d012-4917-9791-0496ea45824e" width="50%"/>
+
+#### 구현 이유
+- 게임의 재접속 유도 및 플레이 지속률(리텐션)을 높이기 위해
+- 서버 없이도 알림 기능 구현
+
+#### 구현 방법
+- 앱 시작 시 Notification 환경 초기화
+```C#
+private void RegisterAndroidChannel()
+{
+    var channel = new AndroidNotificationChannel()
+    {
+        Id = "my_channel_id",
+        Name = "Real Fighter",
+        Importance = Importance.High,
+        Description = "Generic notifications",
+    };
+    AndroidNotificationCenter.RegisterNotificationChannel(channel);
+
+    Debug.LogWarning("Register Android Channel");
+}
+```
+<br/>
+
+- 로컬 푸시의 종류 정의
+```C#
+public enum LocalPushType
+{
+    None,
+
+    Test,
+    FreeGold,
+
+    Max
+}
+```
+<br/>
+
+- 로컬 푸시 예약 기능 구현
+```C#
+public void SchedulePushNotification(LocalPushType pushType, string title, string message, DateTime scheduleTime)
+{
+    // 예약 시간이 현재보다 미래인지 확인
+    if (scheduleTime <= Util.DateTimeNow)
+    {
+        Debug.LogWarning("The time is earlier or equal to the current time. Please enter a valid future time.");
+        return;
+    }
+
+    try
+    {
+        // Android: 알림 객체 생성 및 설정
+        var notification = new AndroidNotification();
+        notification.Title = title;
+        notification.Text = message;
+        notification.FireTime = scheduleTime;
+        notification.LargeIcon = "icon_0";
+        notification.SmallIcon = "icon_1";
+        notification.ShowInForeground = true;
+        string channelId = "my_channel_id";
+
+        int pushCode = AndroidNotificationCenter.SendNotification(notification, channelId);
+        switch (pushType)
+        {
+            case LocalPushType.FreeGold:
+                PlayerPrefs.SetInt(ClientDef.LOCALKEY_Push_FreeGold, pushCode);
+                break;
+
+            default:
+                break;
+        }
+    }
+    catch (Exception e)
+    {
+        Debug.LogWarning("푸시알람 예약 중 오류 발생: " + e.ToString());
     }
 }
 ```
-
-- 리소스 로딩이 끝나기 전에 씬 로딩 되는 것을 막기 위해 allowSceneActivation을 false로 설정
-- allowSceneActivation을 false로 90% 로드 한 상태로 대기하고, true 변경 시, 남은 부분을 로드하고 씬 이동
 <br/>
+
+- 로컬 푸시 취소 기능 구현
+```C#
+public void CancelPushNotification(LocalPushType pushType)
+{
+    int pushCode = 0;
+    switch (pushType)
+    {
+        case LocalPushType.FreeGold:
+            pushCode = PlayerPrefs.GetInt(ClientDef.LOCALKEY_Push_FreeGold, 0);
+            break;
+
+        default:
+            break;
+    }
+
+    if (pushCode == 0)
+        return;
+
+    AndroidNotificationCenter.CancelScheduledNotification(pushCode);
+
+    Debug.LogWarning("Complete Cancel to Push Notification.");
+}
+```
+<br/>
+
+### 8. 튜토리얼 구현
+<img src="https://github.com/user-attachments/assets/462ee72c-3eae-4e0c-8efa-6e53d270ce69" width="50%"/>  
+
+#### 구현 이유
+- 캐주얼 게임 수준의 직관적인 UI 안내 시스템 구현을 위해
+- 사용자가 처음 접하면 이해하기 어려운 규칙들을 설명하기 위해
+- 유저가 쉽게 게임 플레이를 학습할 수 있도록 하기 위해
+- 초반 이탈률을 줄이기 위해
+- 대사 기반 튜토리얼, 클릭 기반 튜토리얼을 공용으로 사용할 수 있도록 설계
+- 보상을 지급하여 게임의 성장 구조를 자연스럽게 맛보게하고, 초기 플레이 동기부여 강화를 위해
+
+#### 구현 방법
+- 튜토리얼 각 단계를 enum으로 정의
+```C#
+public enum TutorialStep
+{
+    None,
+
+    LobbyChat_0,
+    LobbyChat_1,
+    ClickBattle,
+
+    IngameChat_0,
+    IngameChat_1,
+    ClickAttack,
+    ClickReady_0,
+    IngameChat_2,
+    IngameChat_3,
+    IngameChat_4,
+    IngameChat_5,
+    IngameChat_6,
+    IngameChat_7,
+    ClickDeffence,
+    ClickReady_1,
+    IngameChat_8,
+    IngameChat_9,
+    IngameChat_10,
+    IngameChat_11,
+    IngameChat_12,
+    IngameChat_13,
+    IngameChat_14,
+    ClickLobby,
+
+    LobbyChat_2,
+    LobbyChat_3,
+    LobbyChat_4,
+    LobbyChat_5,
+
+    Max
+}
+```
+<br/>
+
+- 각각 튜토리얼 단계에 대한 정보를 class로 정의
+```C#
+public class TutorialData
+{
+    public float TimeScale = -1;
+    public Vector2 MaskSize = new Vector2 (0, 0);
+    public Vector2 MaskPos = new Vector2(0, 0);
+    public Action Action_Mask = null;
+    public string ChatText = string.Empty;
+    public bool IsUp = false;
+    public bool IsDown = false;
+}
+```
+<br/>
+
+- 공용으로 사용할 수 있는 TutorialMask 프리팹 생성
+<img src="https://github.com/user-attachments/assets/6ef6e171-ad95-44d8-99e9-f2c664b77a34" width="50%"/>
+<br/>
+
+- 클릭 했을 때, 실행할 함수들을 TutorialController에 정리
+```C#
+public void OnClick_Ready()
+{
+    m_IngameWindow.OnClick_Ready();
+}
+
+public void OnClick_Deffence()
+{
+    m_IngameWindow.OnClick_MyDefences(0);
+}
+```
+<br/>
+
+- 각각 튜토리얼 스텝을 구현
+```C#
+public async UniTask StartTutorial(TutorialStep step)
+{
+    m_IsClickButton = false;
+
+    switch (step)
+    {
+
+        case TutorialStep.LobbyChat_0:
+
+            // TutorialController 가져올 때 까지 대기
+            await UniTask.WaitUntil(() => UIManager.Instance.GetOpened<LobbyWindow>().GetComponent<TutorialController>() != null);
+            m_TutorialController = UIManager.Instance.GetOpened<LobbyWindow>().GetComponent<TutorialController>();
+
+            TutorialData data_0 = new TutorialData()
+            {
+
+                ChatText = "어서와라. 여긴 네가 실력을 증명해야 하는 결투장이다!",
+                Action_Mask = async () =>
+                {
+                    if (m_IsClickButton)
+                        return;
+
+                    m_IsClickButton = true;
+
+                    await StartTutorial(TutorialStep.LobbyChat_1);
+                }
+            };
+            await SetTutorial(data_0);
+
+            break;
+
+        case TutorialStep.LobbyChat_1:
+
+            TutorialData data_1 = new TutorialData()
+            {
+                ChatText = "긴 말 필요 없이 바로 실전으로 가보자고! BATTLE을 클릭해봐!",
+                Action_Mask = async () =>
+                {
+                    if (m_IsClickButton)
+                        return;
+
+                    m_IsClickButton = true;
+
+                    await StartTutorial(TutorialStep.ClickBattle);
+                }
+            };
+            await SetTutorial(data_1);
+
+            break;
+    }
+}
+```
+<br/>
+
 
 ## 💥 트러블 슈팅
 
-### 1. Photon PUN2를 이용한 PVP 구현
+### 1. 서버를 직접 구축하지 않은 이유
 #### 문제 상황
-- 다른 클라이언트와 연동 가능한 서버가 필요
+- 1:1 실시간 PVP를 구현을 위해 플레이어 간 프레임 단위 실시간 동기화 요구
+- 랭킹 시스템을 구현해야 함
 
 #### 해결 방안
-##### Photon PUN2 사용
-- 참고할 자료 및 내용이 많이 공유되어 있음
-- 많은 개발자들이 대표적으로 가장 많이 사용
-- 무료 버전으로도 비교적 많은 인원을 수용할 수 있음
-- Shared 네트워크 구조 방식만 제공
-##### Photon Fusion2 사용
-- 많은 인원을 수용할 수 있음
-- 직관적이고 간단하게 변수 동기화 가능
-- 여러가지 네트워크 구조 방식 제공하고 네트워크 지연 보간 기능 제공
-- 기능과 성능이 우수함
-- 비교적 어려운 사용 방법
-##### 서버 직접 개발
-- 직접 게임 특성에 맞게 서버를 개발 가능
-- 서버를 직접 개발하기에는 많은 시간과 노력이 필요
+##### HTTP 통신 구현
+- 실제로 서버를 구축하여, 원하는대로 커스텀하여 사용 가능
+- 많은 유저들을 수용할 수 있음
+- 서버 컴퓨터, AWS, DB 등 사용이 필요
+- 1인 개발 규모에서는 부담이 크고 유지보수 난이도 높음
+##### 뒤끝 서버 사용
+- 이미 구현되어 있는 랭킹 시스템을 그대로 사용할 수 있음
+- 유지보수 부담이 거의 없음
+- 빠른 개발, 빠른 출시 가능
+- 그 외, 간단한 유저 데이터 저장 가능
+- 하지만, 일정 사용량 이상은 유료로 전환
+##### 포톤 사용
+- 실시간 동기화 영역을 안정적으로 해결
+- Room 생성/입장, 이벤트 브로드캐스팅 자동화
+- 하지만, 일정 인원 이상을 유저를 수용할 수 없음
+##### Easy Save 에셋 사용
+- 로컬에 AES 암호화된 데이터 저장 가능
+- 서버 부하 없이 저장/로드 가능
+- 데이터 조작과 같은 상황에는 대부분 방어할 수 있지만, 데이터의 삭제는 막을 수 없음
  
 #### 의견 결정
-##### Photon PUN2 사용
-- 1:1 PVP 게임이므로, 많은 인원을 수용할 필요 없음
-- 멀티 게임 개발 경험이 없기 때문에 많은 참고할 자료 및 내용이 필요
-- 무료 버전으로도 충분히 기획한 게임 구현 가능
-- 클라이언트 개발자로서 서버를 직접 개발할 필요성을 느끼지 못함
+##### 직접 서버 구축 없이, 뒤끝 서버 + 포톤 + Easy Save 조합 사용
+- 서버 구축·운영에 드는 리소스를 절약
+- 게임 개발 속도 향상
+- 1:1 PVP이기 때문에 인프라 요구량 낮음
+- 써드파티의 거부감만 없다면, 비교적 쉽게 구현할 수 있음
+- 세 솔루션을 조합함으로써 서버 없이도 “서버가 있는 게임”처럼 완전한 기능 제공 가능
 <br/>
 
-### 2. OnPhotonSerializeView 동기화를 이용한 끊김 현상 개선
-<img src="https://github.com/user-attachments/assets/f8dedc98-a67c-41a0-892b-8849f21cc587" width="50%"/>
-<br/>
-<br/>
-
-#### PhotonTransformView 컴포넌트로 동기화
-<img src="https://github.com/user-attachments/assets/ec1c8a19-9eda-4746-bbc6-4e96269e4043" width="50%"/>
+### 2. OnPhotonSerializeView 동기화
+<img src="https://github.com/user-attachments/assets/51f6349a-f468-4524-a1f6-8ad7160f9853" width="50%"/>
 <br/>
 <br/>
 
-- 간단하고 직관적으로 Position, Rotation 동기화 가능
-- 끊김 현상, 딜레이가 심하게 발생
-- 점프 시, Position Y 값을 제대로 동기화하지 못함
-- 유니티 3D의 빠른 움직임을 동기화 할때는 적합하지 않음
+#### 문제 상황
+- OnPhotonSerializeView은 Photon에서 실시간 동기화가 필요한 값(위치, 회전, 이동 상태 등)을 지속적으로 송수신하는 기능
+- 플레이어 정보 같은 정적 데이터까지 전송하는 것은 비효율적
+- 프레임 단위로 반복 호출로 성능 저하 및 지연(Latency) 증가 가능성
+- 상대 유저의 기초 데이터는 초기 1회만 전달하면 충분
 
-#### OnPhotonSerializeView 함수를 통해 Transform 데이터 실시간 송수신으로 개선
-- 실시간으로 전달된 데이터를 통해 각각 클라이언트에서 직접 움직임을 실행
+#### 해결 방안
+##### RPC 사용
+- 필요한 시점에 필요한 데이터만 직접 호출해서 상대방에게 전송
+- 초기 매칭 후 상대 데이터 전달에 적합
+##### Room / Player Properties 사용
+- Photon의 Key-Value 값을 이용하는 방법
+ 
+#### 의견 결정
+##### RPC 사용
+- Room / Player Properties 사용 방법은 전투 씬, 이동 전에 적용해야 함
+- 이미 구성해놓은 데이터 로드 구조와 충돌
+- 전투 씬 입장 후, 상대 데이터는 단 1회 전달하면 충분
+- RPC 방식이 가장 간단하고 정확한 시점에 데이터를 보낼 수 있음
 ```C#
-public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+[PunRPC]
+public void RPCSetMyData(string nick, int score, string image, string heroName,
+                      int skill0, int skill1, int skill2, int level, int exp, int grade, int gradeExp)
 {
-    // 데이터 보내기 (isMine == true)
-    if (stream.IsWriting)
-    {
-        stream.SendNext(transform.position);
-        stream.SendNext(transform.rotation);
-    }
-    // 데이터 받기 (isMine == false)
-    else
-    {
-        _playerPosition = (Vector3)stream.ReceiveNext();
-        _playerRotation = (Quaternion)stream.ReceiveNext();
-    }
+    MyNickName = nick;
+    MyScore = score;
+    MyImage = image;
+    MyHeroName = heroName;
+    MyHeroSkillproficiencies[0] = skill0;
+    MyHeroSkillproficiencies[1] = skill1;
+    MyHeroSkillproficiencies[2] = skill2;
+    MyHeroLevel = level;
+    MyHeroExp = exp;
+    MyHeroGrade = grade;
+    MyHeroGradeExp = gradeExp;
 }
 ```
 <br/>
 
-- OnPhotonSerializeView 호출 빈도를 직접 설정
-```C#
-private void Awake()
-{
-    PhotonNetwork.SendRate = 60;
-}
-```
+### 3. BattleModule의 상속 구조
+<img src="https://github.com/user-attachments/assets/235adc0a-b97e-48d6-919a-af0580af8a6b" width="50%"/>
 <br/>
+<br/>
+
+#### 문제 상황
+- 성격이 비슷한 스크립트의 공통 코드가 모든 스크립트에 중복
+- 한 로직을 수정할 때 모든 전투 컨텐츠마다 수정을 반복해야 했음
+- 신규 전투 컨텐츠를 추가할 때 진입 장벽이 높고, 수정 시 오류가 잦음
+
+#### 해결 방안
+##### 전투 컨텐츠 간 공통 로직을 BattleModule에 통합
+- Initialize, StartGame, EndGame 등 전투 컨텐츠는 흐름이 동일하기 때문에 반복되는 코드를 BattleModule
+- 모든 전투 컨텐츠가 공유하도록 설계
+##### 컨텐츠마다 다르게 동작해야 하는 구간은 virtual 메서드로 분리
+- 컨텐츠별로 동작을 변경해야 하면 override로 오버라이딩할 수 있도록 설계
+##### 모든 컨텐츠에서 동일하게 사용하는 기능은 public 메서드로 제공
+- 일시정지, 모듈 타입 체크, SetRootObject 등 완전히 동일한 기능은 BattleModule에 정의
+
+#### 설계 구조
+##### 부모 클래스: BattleModule
+- 공통 전투 로직 제공
+- virtual 메서드로 확장 포인트 열어둠
+- 싱글톤 + 모듈 생성/삭제 기능 포함
+##### 자식 클래스: PVPModule / ChapterModule 등 
+- 필요한 부분만 override
+- 나머지는 BattleModule의 공통 구현 재사용
+<br/>
+
+### 4. RenderTexture 최적화 적용
+<img src="https://github.com/user-attachments/assets/f07042c2-256d-4ef7-9f07-8a46ed06dce0" width="50%"/>
+<br/>
+<br/>
+
+#### 문제 상황
+- 프리팹 갯수만큼 RenderTexture과 전용 카메라를 생성하게 되면 높은 DrawCall, 높은 메모리 사용
+- 특히 모바일 환경에서는 성능 저하가 심각
+- 예전 프로젝트에서 사용했던 방법이지만, 위 문제를 개선하고 싶었음
+
+#### 해결 방안
+##### 월드 공간에 Hero 프리팹을 실제로 배치하고 UI에 그대로 보여주기
+- 구현이 가장 간단
+- 카메라 1개만 사용 가능
+- 프로젝트의 UI 구조와 충돌로 인해 추가 설정 필요
+##### 하나의 카메라만 사용하고 UV Rect로 화면을 분리하는 방식
+- 카메라는 정적 위치에서 다수의 Hero 프리팹을 한 번에 촬영
+- 각 Hero는 미리 일정한 간격으로 배치
+- UV Rect를 조절하여 RenderTexture의 특정 영역만 잘라서 표시
+- 화면상에서는 마치, 각 Hero를 따로 찍은 것처럼 보임
+ 
+#### 의견 결정
+<img src="https://github.com/user-attachments/assets/e9b31750-7089-4fb3-af81-f48a41644507" width="50%"/>
+<br/>
+
+##### UV Rect로 화면을 분리하는 방식 사용
+- Hero 프리팹을 일정 간격으로 배치
+- 카메라 1개를 이동시켜 모든 Hero가 한 화면에 들어오도록 구성
+- UV Rect를 이용해 화면 분할 표시
 
 #### 결과
-<img src="https://github.com/user-attachments/assets/c0625e71-1016-48cc-8893-512b0c9db764" width="50%"/>
-<br/>
-<br/>
-
-- 끊김 현상, 딜레이 개선
-- 점프 시, Position Y 값을 제대로 동기화하지 못하는 현상 해결
-<br/>
-
-### 3. 뒤끝 서버를 이용한 랭킹 구현
-<img src="https://github.com/user-attachments/assets/cd2b2bc5-b430-4ebd-8731-a8660d90513c" width="50%"/>
-<br/>
-<br/>
-
-#### 문제 상황
-- 랭킹 시스템에 사용할 서버 필요
-
-#### 해결 방안
-##### 뒤끝 서버 사용
-- 이미 랭킹 시스템이 구현되어 있음
-- 참고 가능한 자료, 정보가 비교적 많음
-- 일정 사용량 초과 시, 발생하는 사용료가 타 서버에 비해서 비쌈
-##### Firebase 서버 사용
-- 매우 저렴한 비용
-- 빠른 속도
-- 직관적인 코드로 쉽게 사용 가능
-##### 서버 직접 개발
-- 직접 게임 특성에 맞게 서버를 개발 가능
-- 서버를 직접 개발하기에는 많은 시간과 노력이 필요
- 
-#### 의견 결정
-##### 뒤끝 서버 사용
-- 이미 데이터를 비교해서 순위를 결정하는 랭킹 시스템이 구현되어 있기 때문에 사용 방법만 익히면 됨
-- 멀티 구현이 미숙하기 때문에 참고 가능한 자료, 정보가 많은 뒤끝 서버로 구현하는 것이 좋다고 판단
-- 랭킹 시스템만 구현하고 사용하는 유저가 적기 때문에 무료 버전의 사용량으로도 충분하다고 판단
+##### 성능 개선
+- 카메라 갯수: N개 → 1개 감소
+- RenderTexture: N개 → 1개 감소
+- DrawCall 감소 및 CPU/GPU 부하 저감
+##### 시각 품질 개선
+- 로비 전용 애니메이션 적용
+- 캐릭터마다 다른 포즈 연출 가능
+- 기존 UI 구조를 그대로 유지할 수 있었음
+#### 유지보수성 증가
+- UV Rect 방식은 캐릭터가 추가되어도 UI만 조정하면 되므로 구조가 단순
+- 여러 개의 카메라 세팅 및 관리 과정이 필요 없어졌음
 <br/>
 
-### 4. List 데이터 수정 시, 원본 데이터도 수정
-#### 문제 상황
-```C#
-public class CharacterData
-{
-    public string Tag;
-    public bool IsEquip;
-    public int Level;
-    public float Speed;
-    public float Atk;
-    public float Def;
-}
-
-public List<CharacterData> CharacterInventory;
-public CharacterData[] CharacterDatas;
-
-if (!CharacterIsGet(_data)) 
-{
-	GameManager.I.DataManager.DataWrapper.CharacterInventory.Add(_data);
-}
-```
-<br/>
-
-- CharacterData의 초기 데이터를 CharacterDatas 배열에서 관리
-- 캐릭터를 얻게 되면 해당 CharacterData를 CharacterInventory List에 추가
-- CharacterInventory List의 데이터가 수정되면, CharacterDatas 배열의 데이터도 함께 변경됨
-- CharacterData가 class이기 때문에 Heap 영역에 할당되고, 참조 형식이기 때문에 원본 데이터도 함께 변경
-
-#### 해결 방안
-##### struct 사용
-- struct는 stack 영역에 할당되고, 값 형식이기 때문에 근본적인 해결 가능
-- 현재 구현한 데이터 저장 방식이 class 형식만 저장 가능하기 때문에 데이터 저장 방식 변경 필요
-##### 별도의 인벤토리 List를 사용하지 않기
-- List를 사용하지 않고 각각 데이터마다 IsGet이라는 bool 값을 설정
-- 매번 CharacterDatas 배열 전체를 순회하여 캐릭터를 가지고 있는지 판단하기 때문에 비효율적이라고 판단
-##### class를 참조하지 않고 값 형식 복사
-- class를 값 형식으로 복사하는 깊은 복사 구현
-- 객체의 내부까지 모두 복사하는 복잡한 깊은 복사를 굳이 구현하는 것은 비효율적이라고 판단
-##### class에 수정하지 않을 원본 값을 추가
-- class에 별도의 원본 데이터를 추가
- 
-#### 의견 결정
-##### class에 수정하지 않을 원본 값을 추가
-- 변경하지 않을 별도의 원본 데이터를 추가
-- 근본적인 해결 방법은 아니지만, 가장 합리적인 해결 방법이라고 판단
-```C#
-public class CharacterData
-{
-    public string Tag;
-    public bool IsEquip;
-    public int Level;
-    public float Speed;
-    public float Atk;
-    public float Def;
-    public float OriginSpeed;
-    public float OriginAtk;
-    public float OriginDef;
-}
-```
-<br/>
-
-### 5. 상태 패턴을 사용한 Enemy 구현
-<img src="https://github.com/user-attachments/assets/6a1b9b91-f1d2-46c2-b2b7-12ef1f311f80" width="50%"/>
+### 5. 현재 시간 구하기
+<img src="https://github.com/user-attachments/assets/ec3a9e46-4bd1-47ae-a043-cbf585fa717b" width="50%"/>
 <br/>
 <br/>
 
 #### 문제 상황
-- 적의 독립적인 움직임을 구현하기 위한 방법이 필요
+- 하루 1회 보상 구현을 위해서는 정확한 현재 시간을 구해야 함
+- 클라이언트에서 신뢰할 수 있는 시간을 구해야 함
 
 #### 해결 방안
-##### 조건문과 스위치문 사용
-- 간단하고 직관적으로 구현 가능
-- 행동이 많다면 코드가 복잡해짐
-##### 상태 패턴
-- 새로운 상태 추가가 쉬움
-- 확장성이 용이
+##### DateTime.Now
+- 가장 간단하고 직관적으로 구현 가능
+- 유저가 시간을 조작할 수 있음
+##### DateTime.UtcNow.AddHours(9)
+- UtcNow는 세계 표준시(UTC)를 기준으로 동작
+- OS 기기 시간이 바뀌어도 UTC는 조작하기 어려움
+- 한국(KST) 시간으로 맞추기 위해 +9시간 보정
   
 #### 의견 결정
-##### 상태 패턴으로 구현
-- 특정 조건에 따라 각각 다른 행동을 할 수 있음
-- 특정 행동을 추가해도 유지 관리가 용이
+##### DateTime.UtcNow.AddHours(9) 사용
+- 세계 표준시 기반이므로 조작 난이도 증가
+- 전 세계가 동일하게 사용하는 시간 기준
+- 클라이언트 단독 환경에서 구현할 수 있는 가장 안전한 방식
+- 서버를 따로 사용하지 않는 구조이기 때문에 최선의 방법
+- 더욱 신뢰 가능한 시간을 구하기 위해서는 서버가 필요
 <br/>
 
-### 6. Physics.Raycast 이용한 Enemy의 Player 인식
-<img src="https://github.com/user-attachments/assets/ed55961a-99b7-4192-a008-ba255791fff5" width="50%"/>
+### 6. aab 파일의 용량 줄이는 방법
+<img src="https://github.com/user-attachments/assets/3e582859-ff77-45a0-8893-3fb8e8e317f4" width="50%"/>
 <br/>
 <br/>
 
 #### 문제 상황
-- 적의 Walk State에서 Attack State로 전환하기 위한 Player 인식 방법이 필요
+- 구글 플레이 업로드 aab 파일은 최대 200MB까지만 업로드 가능
 
-#### 해결 방안
-##### Physics.Raycast 사용
-- 적의 정면으로 Ray를 쏴서 Player 인식 가능
-- 직관적이고 간단한 방법
-- 원거리 적의 경우 Ray의 길이만 길게 하면 됨
+#### 원인 분석 및 해결
+<img src="https://github.com/user-attachments/assets/b7b98e9a-7d09-47fc-a630-48973cf34ca0" width="50%"/>
+<br/>
+
+##### Resources 폴더에 포함된 불필요한 파일
+- Resources 폴더 안의 파일들은 전부 빌드 용량에 포함
+- 사용하지 않는 파일들은 Resources에 절대 넣어선 안됨
+- 사용하지 않는 Prefab, Texture 등 완전 제거
+- 548MB → 414MB (약 134MB 감소)
+##### 3D 캐릭터 모델 텍스처
+- 빌드 리포트 분석 결과, 3D 캐릭터 텍스처가 전체 용량 대부분을 차지
+- 빌드 시, ASTC 12x12 block으로 강한 압축 적용
+- 이미지 품질 일부 저하를 감수하고 용량 최적화 우선 적용
+- 414MB → 193MB (약 221MB 감소)
+##### WAV 오디오 파일 압축
+- 고용량 WAV BGM 3개를 사용
+- Quality를 100 → 50으로 조정
+- Load Type을 Streaming으로 변경하여 메모리 적재 방식 변경
+- 193MB → 177MB (약 16MB 감소)
+#### 프로젝트의 규모가 커진다면?
+- 위 방법들로는 200MB의 aab 파일을 빌드할 수 없음
+- 추후, 에셋 번들 시스템에 대한 정리와 구현이 필수
+<br/>
+
+### 7. 구글 플레이의 손상된 기능 정책
+<img src="https://github.com/user-attachments/assets/b80e6f2a-d94d-4a58-9d03-0a1b827f805d" width="50%"/>
+<br/>
+<br/>
+
+#### 문제 상황
+- 구글 플레이에 앱을 업로드하는 과정에서 위 메시지와 함께 총 4회 거부를 받음
+- 에디터, 모바일 기기, 블루스택 등 모든 테스트 환경에서 정상 작동함에도 거부를 받음
+
+#### 원인 분석
+##### 튜토리얼 진행 불가
+- 심사는 AI 자동화 또는 해외 심사자로 이루어질 가능성이 높음
+- 직관적이지 않은 튜토리얼은 심사자가 진행하지 못할 수 있음
+##### 연속 클릭 시, 오류 가능성
+- 같은 이유로 내가 원하는대로 단 한번만 클릭을 한다는 보장이 없음
+- 연속 클릭 시, 오류 가능성이 있음
+##### 동작하지 않는 버튼
+- 추후, 업데이트 예정인 버튼에 버튼을 연결하지 않음
+- 심사 시, 버튼이 동작하지 않는 것으로 판단 가능성 있음
+
+#### 문제 해결을 위한 개선 작업
+##### 닉네임 입력 강제 → 비강제 방식으로 변경
+<img src="https://github.com/user-attachments/assets/9f534a66-9ee1-4c96-9fcb-536161194d87" width="50%"/>
+<br/>
+
+- 기존 닉네임을 입력하지 않으면 다음 튜토리얼로 넘어갈 수 없었음
+- 자동 닉네임이 설정되도록 변경
+
+##### 튜토리얼 진행 방식 변경 (특정 UI 클릭 → 화면 전체 클릭 가능)
+<img src="https://github.com/user-attachments/assets/5e893e4b-1634-45bc-bb3a-4c13d2cf6169" width="50%"/>
+<br/>
+
+- 내가 원하는 UI를 클릭하지 않을 수도 있음
+- 특정 UI를 클릭해야만 다음 튜토리얼로 넘어가는 방식에서 화면 전체 아무곳을 클릭해도 넘어가도록 변경
+
+##### 중복 클릭 방지를 위한 Trigger 추가
+- 여러 번 클릭하면 튜토리얼 로직이 중복 실행
+- 다음 단계가 2~3번씩 실행되는 문제가 있는 것을 발견
+- 연속 클릭에도 튜토리얼이 오작동하지 않도록 안정성 향상
 ```C#
-public bool CheckPlayer()
-{
-    Debug.DrawRay(transform.position + new Vector3(0, 0.7f, 0), transform.forward, Color.green, 1.5f);
+if (m_IsClickButton)
+    return;
 
-    if (Physics.Raycast(transform.position + new Vector3(0, 0.7f, 0), transform.forward, out hit, 1.5f))
-    { 
-        if (hit.transform.CompareTag("Player"))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
+m_IsClickButton = true;
+await StartTutorial(TutorialStep.LobbyChat_1);
 ```
 <br/>
 
-##### Player와의 거리로 판별
-- 정확한 거리로 판별 가능
-- magnitude 함수로 매 프레임 Player와 거리를 판별해야 함
-```C#
-Distance = (Target.transform.position - transform.position).magnitude;
-```
+##### 비활성 기능 버튼에 안내 팝업 추가
+<img src="https://github.com/user-attachments/assets/56f6d741-8642-4249-885c-8cecc1449c55" width="50%"/>
 <br/>
 
-##### Collider로 판별
-- 범위를 나타내는 추가 Collider 생성
+- 동작하지 않는 버튼이 존재하면 앱 품질 저하로 거부될 수 있음
+- 실제 앱에는 업데이트 예정 기능이 다수 포함
+- “업데이트 예정입니다.” 팝업이 노출 되도록 추가
+- 모든 버튼이 사용자에게 반응을 주도록 조치
 <br/>
-  
-#### 의견 결정
-##### Physics.Raycast 사용
-- 가장 일반적인 방법으로 쉽게 사용 가능
-- magnitude 함수를 매 프레임 실행하면 성능 저하의 원인이 됨
-- Collider를 생성하면 Player의 공격에 Enemy가 인식되기 때문에 추가 설정이 필요
 <br/>
 
 ## 📋 프로젝트 회고
-### 잘한 점
- - 초기 기획과 크게 벗어나지 않게 게임 개발 성공
- - 초기 기획대로 멀티 PVP 구현 완료
- - 최대한 유료 에셋을 사용하여 게임 퀄리티 상승
- - 서버를 이용해서 랭킹을 구현하여 유저들의 흥미를 높임
- - 실제 런칭중인 모바일 게임과 유사한 퀄리티로 제작
- - Admob 배너 광고 적용 완료
-<br/>
-
-### 한계
-- iOS 빌드에 대한 공부가 더 필요
-- 목표 기간에 맞추지 못함
-- PVP의 특성 상, 상대 유저와 동시에 접속하지 않으면 PVP를 즐길 수 없음
-- 출시 후, 홍보 및 광고의 한계
-- 목표 기간에 맞추지 못함
-- 최적화를 제대로하지 못함
-- PVP 플레이 시, 약간의 끊김과 딜레이 발생
-<br/>
-
-### 소감
-이번 프로젝트에서는 두가지의 목표가 있었습니다. 첫번째는 멀티 게임 구현이고, 두번째는 유료 에셋을 사용하여 게임 퀄리티를 상승시키는 것입니다. 결과적으로 두가지 모두 성공적으로 시도하였습니다. 서버를 직접 개발할 수 없기 때문에 포톤 PUN2 서버와 뒤끝 서버를 사용해서 PVP와 랭킹 시스템을 구현했습니다. 그리고 캐릭터, UI, 데이터 저장 등 많은 개발자들이 사용하는 유료 에셋을 사용해서 게임 퀄리티를 최대한 높일 수 있었습니다. 완성 프로젝트를 직접 플레이 해 보니, 실제 런칭중인 모바일 게임을 플레이하는 느낌과 유사했습니다. 실제로 주변 지인들의 플레이 평도 이전 프로젝트에 비해 많이 좋아졌습니다. 처음 시도하는 멀티 서버에 대해서 공부를 하면서 프로젝트를 진행하다 보니, 예상 시간보다 많이 소요했습니다. 하지만 구현한 내용은 블로그에 잘 정리했기 때문에, 비슷한 기능을 구현할 때, 시간을 많이 절약할 수 있을 것 같습니다. 진행했던 프로젝트 중, 가장 실제 모바일 게임과 유사하게 개발한 정말 의미있는 프로젝트라고 생각합니다. 그리고 이전 프로젝트보다 앱 다운로드 수와 수익은 확실히 늘었지만, 역시나 개인의 홍보의 한계를 느낀 프로젝트였습니다.
+이번 프로젝트의 가장 큰 목표는 실무 경험을 바탕으로 실무 코드 스타일을 적용한 구조적이고 일관된 코드 작성이었습니다. 그래서 서버를 사용하지 않는 멀티 플레이 게임이라는 점은 이전 프로젝트와 비슷하지만, 지난번에는 구현에 초점을 맞췄다면, 이번에는 유지보수성이 좋은 코드 작성에 초점을 맞췄습니다. 이 부분에서는 원하는대로 잘 수행한 것 같았습니다. 그래서 지난 1년간의 실무 경험으로 많이 성장했다고 느꼈습니다. 목표한 부분은 프로젝트에 잘 나타냈다고 생각하지만, 새로운 기술을 사용한 부분이 많이 없어서 아쉬웠습니다. 그래서 다음 프로젝트에서는 이때까지는 사용하지 않았던 기술에 대해서 많이 도전을 할 예정입니다. 특히, 그 중에서 HTTP 서버 통신과 에셋번들은 꼭 프로젝트에 적용시켜 잘 정리해 볼 예정입니다.
   
