@@ -1143,7 +1143,7 @@ public async UniTask StartTutorial(TutorialStep step)
 - 게임 개발 속도 향상
 - 1:1 PVP이기 때문에 인프라 요구량 낮음
 - 써드파티의 거부감만 없다면, 비교적 쉽게 구현할 수 있음
-- 세 솔루션을 조합함으로써 서버 없이도 “서버가 있는 게임”처럼 완전한 기능 제공 가능
+- 세 솔루션을 조합함으로써 서버 없이도 서버가 있는 게임처럼 완전한 기능 제공 가능
 <br/>
 
 ### 2. OnPhotonSerializeView 동기화
