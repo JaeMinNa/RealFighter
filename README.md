@@ -1258,7 +1258,7 @@ public void RPCSetMyData(string nick, int score, string image, string heroName,
 - 로비 전용 애니메이션 적용
 - 캐릭터마다 다른 포즈 연출 가능
 - 기존 UI 구조를 그대로 유지할 수 있었음
-#### 유지보수성 증가
+##### 유지보수성 증가
 - UV Rect 방식은 캐릭터가 추가되어도 UI만 조정하면 되므로 구조가 단순
 - 여러 개의 카메라 세팅 및 관리 과정이 필요 없어졌음
 <br/>
