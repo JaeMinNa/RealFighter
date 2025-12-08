@@ -1143,7 +1143,7 @@ public async UniTask StartTutorial(TutorialStep step)
 - 게임 개발 속도 향상
 - 1:1 PVP이기 때문에 인프라 요구량 낮음
 - 써드파티의 거부감만 없다면, 비교적 쉽게 구현할 수 있음
-- 세 솔루션을 조합함으로써 서버 없이도 “서버가 있는 게임”처럼 완전한 기능 제공 가능
+- 세 솔루션을 조합함으로써 서버 없이도 서버가 있는 게임처럼 완전한 기능 제공 가능
 <br/>
 
 ### 2. OnPhotonSerializeView 동기화
@@ -1258,7 +1258,7 @@ public void RPCSetMyData(string nick, int score, string image, string heroName,
 - 로비 전용 애니메이션 적용
 - 캐릭터마다 다른 포즈 연출 가능
 - 기존 UI 구조를 그대로 유지할 수 있었음
-#### 유지보수성 증가
+##### 유지보수성 증가
 - UV Rect 방식은 캐릭터가 추가되어도 UI만 조정하면 되므로 구조가 단순
 - 여러 개의 카메라 세팅 및 관리 과정이 필요 없어졌음
 <br/>
