@@ -12,6 +12,8 @@ public class AdManager : Singleton<AdManager>
     private string m_AdBannerUnitId = string.Empty;
     private Action m_Action = null;
     private bool m_IsLoadingReward = false;
+    private int m_RetryCount = 0;
+    private int m_MaxRetryCount = 3;
 
     public static AdManager Instance
     {
@@ -177,6 +179,7 @@ public class AdManager : Singleton<AdManager>
         {
             m_RewardedAd.Destroy();
             m_RewardedAd = null;
+            m_RetryCount = 0;
         }
 
         // 광고 요청 생성
@@ -211,6 +214,7 @@ public class AdManager : Singleton<AdManager>
                     Debug.LogWarning("Rewarded ad loaded with response : "
                           + ad.GetResponseInfo());
 
+                    m_RetryCount = 0;
                     m_RewardedAd = ad;
                     RegisterEventHandlers(m_RewardedAd);
                     ShowRewardedAd();
@@ -226,6 +230,8 @@ public class AdManager : Singleton<AdManager>
             m_RewardedAd.Show((Reward reward) =>
             {
                 Debug.Log($"User earned reward: {reward.Amount} {reward.Type}");
+
+                m_RetryCount = 0;
 
                 UniTask.Post(() =>
                 {
@@ -253,7 +259,7 @@ public class AdManager : Singleton<AdManager>
         else
         {
             Debug.LogWarning("Rewarded ad is not ready yet.");
-            LoadRewardedAd(m_Action);
+            SafeRetryReward();
         }
     }
 
@@ -286,7 +292,7 @@ public class AdManager : Singleton<AdManager>
         {
             Debug.LogError("Rewarded ad failed to open full screen content " +
                            "with error : " + error);
-            LoadRewardedAd(m_Action);
+            SafeRetryReward();
         };
     }
     #endregion
@@ -325,6 +331,23 @@ public class AdManager : Singleton<AdManager>
 
         // Google Mobile Ads SDK 초기화
         MobileAds.Initialize((InitializationStatus initStatus) => { });
+    }
+
+    private async void SafeRetryReward()
+    {
+        if (m_RetryCount >= m_MaxRetryCount)
+        {
+            Debug.LogWarning("Reward retry limit reached.");
+            return;
+        }
+
+        m_RetryCount++;
+        Action retryAction = m_Action;
+
+        await UniTask.Delay(3000);
+
+        if (retryAction != null)
+            LoadRewardedAd(retryAction);
     }
     #endregion
 }
